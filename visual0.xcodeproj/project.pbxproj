@@ -8,20 +8,36 @@
 
 /* Begin PBXBuildFile section */
 		FBD4548128AA38E2009B191B /* visual0App.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548028AA38E2009B191B /* visual0App.swift */; };
-		FBD4548328AA38E2009B191B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548228AA38E2009B191B /* ContentView.swift */; };
 		FBD4548528AA38E6009B191B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548428AA38E6009B191B /* Assets.xcassets */; };
 		FBD4548828AA38E6009B191B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548728AA38E6009B191B /* Preview Assets.xcassets */; };
 		FBD4549028AB74E2009B191B /* ContentView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548F28AB74E2009B191B /* ContentView1.swift */; };
+		FBD454A528AB7D8A009B191B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454A428AB7D8A009B191B /* ContentView.swift */; };
+		FBD454A728AB7DE4009B191B /* FilePanel+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454A628AB7DE4009B191B /* FilePanel+Extension.swift */; };
+		FBD454A928AB7E34009B191B /* ImageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454A828AB7E34009B191B /* ImageFilter.swift */; };
+		FBD454AC28AB7F23009B191B /* GPUImage in Frameworks */ = {isa = PBXBuildFile; productRef = FBD454AB28AB7F23009B191B /* GPUImage */; };
+		FBD454AE28AB7FEA009B191B /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454AD28AB7FEA009B191B /* ProgressView.swift */; };
+		FBD454B028AB8027009B191B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454AF28AB8027009B191B /* AppDelegate.swift */; };
+		FBD454B228AB81B9009B191B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454B128AB81B9009B191B /* AppState.swift */; };
+		FBD454B828AB86B2009B191B /* ImageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454B728AB86B2009B191B /* ImageFilterView.swift */; };
+		FBD454BA28AB874A009B191B /* CPImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454B928AB874A009B191B /* CPImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FBD4547D28AA38E2009B191B /* visual0.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = visual0.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBD4548028AA38E2009B191B /* visual0App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = visual0App.swift; sourceTree = "<group>"; };
-		FBD4548228AA38E2009B191B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FBD4548428AA38E6009B191B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FBD4548728AA38E6009B191B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FBD4548928AA38E6009B191B /* visual0.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = visual0.entitlements; sourceTree = "<group>"; };
 		FBD4548F28AB74E2009B191B /* ContentView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView1.swift; sourceTree = "<group>"; };
+		FBD454A428AB7D8A009B191B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FBD454A628AB7DE4009B191B /* FilePanel+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FilePanel+Extension.swift"; sourceTree = "<group>"; };
+		FBD454A828AB7E34009B191B /* ImageFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilter.swift; sourceTree = "<group>"; };
+		FBD454AA28AB7ED8009B191B /* GPUImage2 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = GPUImage2; path = ../GPUImage2; sourceTree = "<group>"; };
+		FBD454AD28AB7FEA009B191B /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		FBD454AF28AB8027009B191B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FBD454B128AB81B9009B191B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		FBD454B728AB86B2009B191B /* ImageFilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageFilterView.swift; sourceTree = "<group>"; };
+		FBD454B928AB874A009B191B /* CPImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CPImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBD454AC28AB7F23009B191B /* GPUImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,8 +55,10 @@
 		FBD4547428AA38E2009B191B = {
 			isa = PBXGroup;
 			children = (
+				FBD454A028AB7BC3009B191B /* Packages */,
 				FBD4547F28AA38E2009B191B /* visual0 */,
 				FBD4547E28AA38E2009B191B /* Products */,
+				FBD4549728AB7AE2009B191B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -54,9 +73,16 @@
 		FBD4547F28AA38E2009B191B /* visual0 */ = {
 			isa = PBXGroup;
 			children = (
+				FBD454A628AB7DE4009B191B /* FilePanel+Extension.swift */,
+				FBD454B728AB86B2009B191B /* ImageFilterView.swift */,
+				FBD454B928AB874A009B191B /* CPImage.swift */,
 				FBD4548028AA38E2009B191B /* visual0App.swift */,
-				FBD4548228AA38E2009B191B /* ContentView.swift */,
+				FBD454A828AB7E34009B191B /* ImageFilter.swift */,
 				FBD4548F28AB74E2009B191B /* ContentView1.swift */,
+				FBD454A428AB7D8A009B191B /* ContentView.swift */,
+				FBD454B128AB81B9009B191B /* AppState.swift */,
+				FBD454AD28AB7FEA009B191B /* ProgressView.swift */,
+				FBD454AF28AB8027009B191B /* AppDelegate.swift */,
 				FBD4548428AA38E6009B191B /* Assets.xcassets */,
 				FBD4548928AA38E6009B191B /* visual0.entitlements */,
 				FBD4548628AA38E6009B191B /* Preview Content */,
@@ -70,6 +96,21 @@
 				FBD4548728AA38E6009B191B /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		FBD4549728AB7AE2009B191B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FBD454A028AB7BC3009B191B /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				FBD454AA28AB7ED8009B191B /* GPUImage2 */,
+			);
+			name = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -88,6 +129,9 @@
 			dependencies = (
 			);
 			name = visual0;
+			packageProductDependencies = (
+				FBD454AB28AB7F23009B191B /* GPUImage */,
+			);
 			productName = visual0;
 			productReference = FBD4547D28AA38E2009B191B /* visual0.app */;
 			productType = "com.apple.product-type.application";
@@ -142,9 +186,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBD454A728AB7DE4009B191B /* FilePanel+Extension.swift in Sources */,
+				FBD454A928AB7E34009B191B /* ImageFilter.swift in Sources */,
+				FBD454BA28AB874A009B191B /* CPImage.swift in Sources */,
 				FBD4549028AB74E2009B191B /* ContentView1.swift in Sources */,
-				FBD4548328AA38E2009B191B /* ContentView.swift in Sources */,
+				FBD454B228AB81B9009B191B /* AppState.swift in Sources */,
+				FBD454A528AB7D8A009B191B /* ContentView.swift in Sources */,
+				FBD454B828AB86B2009B191B /* ImageFilterView.swift in Sources */,
+				FBD454B028AB8027009B191B /* AppDelegate.swift in Sources */,
 				FBD4548128AA38E2009B191B /* visual0App.swift in Sources */,
+				FBD454AE28AB7FEA009B191B /* ProgressView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +391,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FBD454AB28AB7F23009B191B /* GPUImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GPUImage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FBD4547528AA38E2009B191B /* Project object */;
 }
