@@ -11,23 +11,35 @@ import SwiftUI
 struct ContentView: View {
     
     @EnvironmentObject var appState: AppState
+    @State var imageLoaded = false
     
     var body: some View {
-        VStack(spacing: 16) {
-            InputView(image: self.$appState.image, filteredImage: appState.filteredImage)
-            
-            Spacer()
+        HStack(spacing: 16) {
+            VStack{
+                Button("Start") {
+                    print("Start button was tapped")
+                }
+                Button("Remove") {
+                    if !imageLoaded {
+                        print("Remove button should not be tapped")
+                    } else {
+                        print("Remove button was tapped")
+                    }
+                }
+            }
+            InputView(image: self.$appState.image, imgLoaded: $imageLoaded)
         }
+        
         .padding(.top, 32)
         .padding(.bottom, 16)
-        .frame(minWidth: 768, idealWidth: 768, maxWidth: 1024, minHeight: 648, maxHeight: 648)
+        .frame(minWidth: 700, idealWidth: 700, maxWidth: 700, minHeight: 1000, maxHeight: 1100)
     }
 }
 
 struct InputView: View {
     
     @Binding var image: NSImage?
-    let filteredImage: NSImage?
+    @Binding var imgLoaded : Bool
     
     var body: some View {
         VStack(spacing: 16) {
@@ -38,12 +50,8 @@ struct InputView: View {
                     Text("Select image")
                 }
             }
-            InputImageView(image: self.$image, filteredImage: filteredImage)
-            if image != nil {
-                Button(action: saveToFile) {
-                    Text("Save image")
-                }
-            }
+            InputImageView(image: self.$image, imgLoaded: self.$imgLoaded)
+            
         }
     }
     
@@ -51,36 +59,31 @@ struct InputView: View {
         NSOpenPanel.openImage { (result) in
             if case let .success(image) = result {
                 self.image = image
+                self.imgLoaded = true
             }
         }
     }
     
-    private func saveToFile() {
-        guard let image = filteredImage ?? image else {
-            return
-        }
-        NSSavePanel.saveImage(image, completion: { _ in  })
-    }
 }
 
 
 struct InputImageView: View {
     
     @Binding var image: NSImage?
-    let filteredImage: NSImage?
-    
+    @Binding var imgLoaded : Bool
+
     var body: some View {
         ZStack {
             if image != nil {
-                Image(nsImage: filteredImage != nil ? filteredImage! : image!)
+                Image(nsImage: image!)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
             } else {
                 Text("Drag and drop image file")
-                    .frame(width: 320)
+                    .frame(width: 600)
             }
         }
-        .frame(height: 320)
+        .frame(height: 900)
         .background(Color.black.opacity(0.5))
         .cornerRadius(8)
         
@@ -97,6 +100,7 @@ struct InputImageView: View {
                             return
                         }
                         self.image = image
+                        self.imgLoaded = true
                     }
                 }
             }
