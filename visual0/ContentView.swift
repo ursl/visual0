@@ -19,10 +19,10 @@ struct ContentView: View {
         
         NavigationView {
             
-            Form {
+            VStack(alignment: .leading) {
                 Section {
                     Text("Hello, world!")
-                        .padding()
+                    // .padding()
                 }
                 Button("Tap Count: \(tapCount)") {
                     tapCount += 1
@@ -36,9 +36,29 @@ struct ContentView: View {
                     }
                 }
                 Text("You chose student \(selectedStudent)")
+                ZStack {
+                    
+                }
+                .padding(50)
+                .background(.ultraThinMaterial)
+    
             }
             
+            HStack {
+                Button {
+                    print("Edit button was tapped")
+                } label: {
+                    Image(systemName: "pencil")
+                }
+                Button("Button 2", role: .destructive) { }
+                    .buttonStyle(.bordered)
+                Button("Button 3") { }
+                    .buttonStyle(.borderedProminent)
+                Button("Button 4", role: .destructive) { }
+                    .buttonStyle(.borderedProminent)
+            }
         }
+        
         .navigationSubtitle("SwiftUI")
     }
 }
