@@ -14,20 +14,24 @@ struct ContentView: View {
     @State var imageLoaded = false
     
     var body: some View {
+        let iv = InputView(image: self.$appState.image, imgLoaded: $imageLoaded)
+
         HStack(spacing: 16) {
             VStack{
                 Button("Start") {
                     print("Start button was tapped")
                 }
                 Button("Remove") {
+                    //                    Text("Remove")
                     if !imageLoaded {
                         print("Remove button should not be tapped")
                     } else {
                         print("Remove button was tapped")
+                        iv.image = nil
                     }
                 }
             }
-            InputView(image: self.$appState.image, imgLoaded: $imageLoaded)
+            iv
         }
         
         .padding(.top, 32)
@@ -71,7 +75,7 @@ struct InputImageView: View {
     
     @Binding var image: NSImage?
     @Binding var imgLoaded : Bool
-
+    
     var body: some View {
         ZStack {
             if image != nil {
