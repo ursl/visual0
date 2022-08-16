@@ -11,6 +11,7 @@
 		FBD4548328AA38E2009B191B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548228AA38E2009B191B /* ContentView.swift */; };
 		FBD4548528AA38E6009B191B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548428AA38E6009B191B /* Assets.xcassets */; };
 		FBD4548828AA38E6009B191B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548728AA38E6009B191B /* Preview Assets.xcassets */; };
+		FBD4549028AB74E2009B191B /* ContentView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548F28AB74E2009B191B /* ContentView1.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +21,7 @@
 		FBD4548428AA38E6009B191B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FBD4548728AA38E6009B191B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FBD4548928AA38E6009B191B /* visual0.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = visual0.entitlements; sourceTree = "<group>"; };
+		FBD4548F28AB74E2009B191B /* ContentView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView1.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 			children = (
 				FBD4548028AA38E2009B191B /* visual0App.swift */,
 				FBD4548228AA38E2009B191B /* ContentView.swift */,
+				FBD4548F28AB74E2009B191B /* ContentView1.swift */,
 				FBD4548428AA38E6009B191B /* Assets.xcassets */,
 				FBD4548928AA38E6009B191B /* visual0.entitlements */,
 				FBD4548628AA38E6009B191B /* Preview Content */,
@@ -139,6 +142,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBD4549028AB74E2009B191B /* ContentView1.swift in Sources */,
 				FBD4548328AA38E2009B191B /* ContentView.swift in Sources */,
 				FBD4548128AA38E2009B191B /* visual0App.swift in Sources */,
 			);

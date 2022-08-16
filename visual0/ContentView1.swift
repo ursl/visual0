@@ -1,13 +1,13 @@
 //
-//  ContentView.swift
+//  ContentView1.swift
 //  visual0
 //
-//  Created by Urs Langenegger on 15.08.22.
+//  Created by Urs Langenegger on 16.08.22.
 //
 
 import SwiftUI
 
-struct ContentView: View {
+struct ContentView1: View {
     
     @State private var tapCount = 0
     @State private var name = ""
@@ -59,14 +59,14 @@ struct ContentView: View {
             }
         }
         
-        .navigationSubtitle("ContentView")
+        .navigationSubtitle("ContentView1")
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct ContentView1_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ContentView()
+            ContentView1()
         }
     }
 }
