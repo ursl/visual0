@@ -11,11 +11,11 @@ import SwiftUI
 struct ContentView: View {
     
     @EnvironmentObject var appState: AppState
-
+    
     var body: some View {
         VStack(spacing: 16) {
             InputView(image: self.$appState.image, filteredImage: appState.filteredImage)
-                      
+            
             Spacer()
         }
         .padding(.top, 32)
@@ -68,7 +68,7 @@ struct InputImageView: View {
     
     @Binding var image: NSImage?
     let filteredImage: NSImage?
-        
+    
     var body: some View {
         ZStack {
             if image != nil {
@@ -83,10 +83,10 @@ struct InputImageView: View {
         .frame(height: 320)
         .background(Color.black.opacity(0.5))
         .cornerRadius(8)
-            
+        
         .onDrop(of: ["public.file-url"], isTargeted: nil, perform: handleOnDrop(providers:))
     }
-        
+    
     private func handleOnDrop(providers: [NSItemProvider]) -> Bool {
         if let item = providers.first {
             item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
@@ -105,7 +105,7 @@ struct InputImageView: View {
         return false
     }
 }
- 
+
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
