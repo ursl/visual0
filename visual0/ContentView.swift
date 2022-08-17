@@ -14,7 +14,6 @@ struct ContentView: View {
     
     @EnvironmentObject var appState: AppState
     @State var imageLoaded = false
-    @StateObject var viewModel = DetectorViewModel()
 
     @StateObject var ana = Analysis()
     
@@ -23,7 +22,7 @@ struct ContentView: View {
         
         HStack(spacing: 16) {
             VStack{
-                Text("Status \(ana.fStatus)")
+                Text("Status \(ana.getStatus())")
                 Button(action: ana.incStatus) {
                     Text("next step")
                 }
