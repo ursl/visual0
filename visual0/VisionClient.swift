@@ -4,7 +4,6 @@
 //
 //  Created by satoutakeshi on 2021/06/20.
 //
-
 import Foundation
 import Vision
 
@@ -394,7 +393,6 @@ final class VisionClient: ObservableObject {
     }
 
     // MARK: - Text Recoginaze
-
     private func makeNormalizedPoints(region: VNFaceLandmarkRegion2D, faceBounds: CGRect) -> [CGPoint]? {
         guard region.pointCount > 1 else {
             return nil

@@ -1,20 +1,17 @@
-//
+// -----------------------------------------------------------------------
 //  ContentView.swift
-//  ImageFilterMac
-//
-//  Created by Alfian Losari on 23/02/20.
-//  Copyright © 2020 Alfian Losari. All rights reserved.
-//
+// -----------------------------------------------------------------------
 
 import SwiftUI
 import CoreImage
 import Vision
 
+// -----------------------------------------------------------------------
 struct ContentView: View {
     
     @EnvironmentObject var appState: AppState
     @State var imageLoaded = false
-
+    
     @StateObject var ana = Analysis()
     
     var body: some View {
@@ -37,6 +34,7 @@ struct ContentView: View {
     }
 }
 
+// -----------------------------------------------------------------------
 struct InputView: View {
     
     @Binding var image: NSImage?
@@ -59,7 +57,7 @@ struct InputView: View {
                         image = nil
                     }
                 }
-
+                
             }
             InputImageView(image: self.$image, imgLoaded: self.$imgLoaded)
             
@@ -77,9 +75,8 @@ struct InputView: View {
     
 }
 
-
+// -----------------------------------------------------------------------
 struct InputImageView: View {
-    
     @Binding var image: NSImage?
     @Binding var imgLoaded : Bool
     

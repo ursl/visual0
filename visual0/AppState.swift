@@ -1,6 +1,7 @@
 import Combine
 import Cocoa
 
+// -----------------------------------------------------------------------
 class AppState: ObservableObject {
     
     // 1

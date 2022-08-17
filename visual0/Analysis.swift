@@ -12,9 +12,10 @@ import Vision
 import Combine
 import CoreImage
 
+// -----------------------------------------------------------------------
 final class Analysis: ObservableObject {
     
-    @Published var fImage: Image = Image("bla")
+    @Published var image: Image = Image("bla")
     @Published var detectedFrame: [CGRect] = []
     @Published var detectedPoints: [(closed: Bool, points: [CGPoint])] = []
     @Published var detectedInfo: [[String: String]] = []
