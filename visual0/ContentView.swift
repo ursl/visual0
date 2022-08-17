@@ -7,20 +7,23 @@
 //
 
 import SwiftUI
+import CoreImage
+import Vision
 
 struct ContentView: View {
     
     @EnvironmentObject var appState: AppState
     @State var imageLoaded = false
-    
+    @StateObject var viewModel = DetectorViewModel()
+
     var body: some View {
         let iv = InputView(image: self.$appState.image, imgLoaded: $imageLoaded)
-
+        
         HStack(spacing: 16) {
             VStack{
-                Button("Start") {
-                    print("Start button was tapped")
-                }
+//                Button(action: DetectorView(image: iv.image, requestType: [.rect])) {
+//                    Text("Vision")
+//                }
                 Button("Remove") {
                     //                    Text("Remove")
                     if !imageLoaded {
@@ -38,6 +41,58 @@ struct ContentView: View {
         .padding(.bottom, 16)
         .frame(minWidth: 700, idealWidth: 700, maxWidth: 700, minHeight: 1000, maxHeight: 1100)
     }
+    
+    /// - Tag: ConfigureCompletionHandler
+    lazy var rectangleDetectionRequest: VNDetectRectanglesRequest = {
+        let rectDetectRequest = VNDetectRectanglesRequest(completionHandler: self.handleDetectedRectangles)
+        // Customize & configure the request to detect only certain rectangles.
+        rectDetectRequest.maximumObservations = 8 // Vision currently supports up to 16.
+        rectDetectRequest.minimumConfidence = 0.6 // Be confident.
+        rectDetectRequest.minimumAspectRatio = 0.3 // height / width
+        return rectDetectRequest
+    }()
+    
+    fileprivate func handleDetectedRectangles(request: VNRequest?, error: Error?) {
+        print("handleDetectedRectangles -- now what?")
+        if let nsError = error as NSError? {
+            //self.presentAlert("Rectangle Detection Error", error: nsError)
+            return
+        }
+        // Since handlers are executing on a background thread, explicitly send draw calls to the main thread.
+        DispatchQueue.main.async {
+            //            guard let drawLayer = self.pathLayer,
+            //                let results = request?.results as? [VNRectangleObservation] else {
+            //                    return
+            //            }
+            //self.draw(rectangles: results, onImageWithBounds: drawLayer.bounds)
+            //drawLayer.setNeedsDisplay()
+        }
+    }
+//
+//    private func performVisionRequest() {
+//        print("Vision button was tapped")
+//        // Create a request handler.
+////        let requests = createVisionRequests()
+//        // Create an array to collect all desired requests.
+//        //var requests: [VNRequest] = []
+//
+//        // Create & include a request if and only if switch is ON.
+//        requests.append(rectangleDetectionRequest)
+//
+//        let image = NSImage(named:"image")
+//        if let image = image {
+//            let cgimg = image.cgImage(forProposedRect: nil, context: nil, hints: nil)
+//
+//
+//            let imageRequestHandler = VNImageRequestHandler(cgImage: cgimg!,
+//                                                            orientation:  .up,
+//                                                            options: [:])
+//
+//
+//
+//      }
+//    }
+    
 }
 
 struct InputView: View {
