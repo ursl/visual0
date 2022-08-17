@@ -15,7 +15,7 @@ extension NSOpenPanel {
         panel.allowsMultipleSelection = false
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
-        panel.allowedFileTypes = ["jpg", "jpeg", "png", "heic"]
+        panel.allowedContentTypes = [.jpeg, .png, .heic]
         panel.canChooseFiles = true
         panel.begin { (result) in
             if result == .OK,
