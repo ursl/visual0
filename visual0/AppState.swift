@@ -3,19 +3,19 @@ import Cocoa
 
 // -----------------------------------------------------------------------
 class AppState: ObservableObject {
-    
-    // 1
+    // -- singleton
     static let shared = AppState()
     private init() {}
     
-    // 2
     @Published var image: NSImage? {
         didSet {
-            // 4
-            self.filteredImage = nil
+            print("AppState: assigned to image")
         }
     }
-        
-    // 3
-    @Published var filteredImage: NSImage?
+    
+    @Published var ciimage: CIImage? {
+        didSet {
+            print("AppState: assigned to ciimage")
+        }
+    }
 }

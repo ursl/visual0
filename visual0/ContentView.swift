@@ -10,18 +10,26 @@ import Vision
 struct ContentView: View {
     
     @EnvironmentObject var appState: AppState
+
+    
     @State var imageLoaded = false
     
     @StateObject var ana = Analysis()
     
     var body: some View {
-        let iv = InputView(image: self.$appState.image, imgLoaded: $imageLoaded)
+        let iv = InputView(image: self.$appState.image,
+                           ciimage: self.$appState.ciimage,
+                           imgLoaded: $imageLoaded)
         
         HStack(spacing: 16) {
             VStack{
                 Text("Status \(ana.getStatus())")
                 Button(action: ana.incStatus) {
                     Text("next step")
+                }
+                // -- apply filter
+                Button(action: filterImage) {
+                    Text("filterImage")
                 }
             }
             // -- put InputView into the ContentView
@@ -32,12 +40,34 @@ struct ContentView: View {
         .padding(.bottom, 16)
         .frame(minWidth: 700, idealWidth: 700, maxWidth: 700, minHeight: 1000, maxHeight: 1100)
     }
+    
+    func filterImage()  {
+        let context = CIContext()
+        let currentFilter = CIFilter.sepiaTone()
+        currentFilter.inputImage = appState.ciimage!
+        currentFilter.intensity = 1
+
+        // https://www.hackingwithswift.com/books/ios-swiftui/integrating-core-image-with-swiftui
+        // get a CIImage from our filter or exit if that fails
+        guard let outputImage = currentFilter.outputImage else { return }
+
+        // attempt to get a CGImage from our CIImage
+        if let cgimg = context.createCGImage(outputImage, from: outputImage.extent) {
+            // convert that to a UIImage
+            self.appState.ciimage = CIImage(cgImage: cgimg)
+        }
+
+        return
+    }
+
 }
 
 // -----------------------------------------------------------------------
 struct InputView: View {
     
     @Binding var image: NSImage?
+    @Binding var ciimage: CIImage?
+    
     @Binding var imgLoaded : Bool
     
     var body: some View {
@@ -49,7 +79,7 @@ struct InputView: View {
                     Text("Select image")
                 }
                 Button("Remove") {
-                    //                    Text("Remove")
+                    // Text("Remove")
                     if !imgLoaded {
                         print("Remove button should not be tapped")
                     } else {
@@ -59,7 +89,7 @@ struct InputView: View {
                 }
                 
             }
-            InputImageView(image: self.$image, imgLoaded: self.$imgLoaded)
+            InputImageView(image: $image, ciimage: $ciimage, imgLoaded: $imgLoaded)
             
         }
     }
@@ -78,6 +108,7 @@ struct InputView: View {
 // -----------------------------------------------------------------------
 struct InputImageView: View {
     @Binding var image: NSImage?
+    @Binding var ciimage: CIImage?
     @Binding var imgLoaded : Bool
     
     var body: some View {
@@ -94,10 +125,9 @@ struct InputImageView: View {
         .frame(height: 900)
         .background(Color.black.opacity(0.5))
         .cornerRadius(8)
-        
         .onDrop(of: ["public.file-url"], isTargeted: nil, perform: handleOnDrop(providers:))
     }
-    
+        
     private func handleOnDrop(providers: [NSItemProvider]) -> Bool {
         if let item = providers.first {
             item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
@@ -108,6 +138,7 @@ struct InputImageView: View {
                             return
                         }
                         self.image = image
+                        self.ciimage = NSImage.ciImage(image)
                         self.imgLoaded = true
                     }
                 }
@@ -123,3 +154,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
