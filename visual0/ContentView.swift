@@ -16,13 +16,14 @@ struct ContentView: View {
         HStack(spacing: 16) {
             VStack{
                 HStack{
-                    Text("getStatus \(ana.getStatus())")
-                    Button(action: ana.incStatus) {
-                        Text("inc status")
-                    }
+                    Text("idx \(ana.getIdx())")
                     Button(action: ana.changeImage) {
                         Text("change image")
                     }
+                    Button(action: ana.runAna1) {
+                        Text("runAna1")
+                    }
+                   
                 }
                 Image(nsImage: ana.fImage)
                     .resizable()

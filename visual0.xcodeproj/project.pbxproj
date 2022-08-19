@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FB0340EE28ACE07800F15BDB /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0340ED28ACE07800F15BDB /* Analysis.swift */; };
+		FB507B5428AFCF39009BAAC5 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB507B5328AFCF39009BAAC5 /* util.swift */; };
 		FBD4548128AA38E2009B191B /* visual0App.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548028AA38E2009B191B /* visual0App.swift */; };
 		FBD4548528AA38E6009B191B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548428AA38E6009B191B /* Assets.xcassets */; };
 		FBD4548828AA38E6009B191B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548728AA38E6009B191B /* Preview Assets.xcassets */; };
@@ -16,6 +17,7 @@
 
 /* Begin PBXFileReference section */
 		FB0340ED28ACE07800F15BDB /* Analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analysis.swift; sourceTree = "<group>"; };
+		FB507B5328AFCF39009BAAC5 /* util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = util.swift; sourceTree = "<group>"; };
 		FBD4547D28AA38E2009B191B /* visual0.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = visual0.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBD4548028AA38E2009B191B /* visual0App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = visual0App.swift; sourceTree = "<group>"; };
 		FBD4548428AA38E6009B191B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -57,6 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				FB0340ED28ACE07800F15BDB /* Analysis.swift */,
+				FB507B5328AFCF39009BAAC5 /* util.swift */,
 				FBD454A428AB7D8A009B191B /* ContentView.swift */,
 				FBD4548028AA38E2009B191B /* visual0App.swift */,
 				FBD4548428AA38E6009B191B /* Assets.xcassets */,
@@ -163,6 +166,7 @@
 				FBD454A528AB7D8A009B191B /* ContentView.swift in Sources */,
 				FBD4548128AA38E2009B191B /* visual0App.swift in Sources */,
 				FB0340EE28ACE07800F15BDB /* Analysis.swift in Sources */,
+				FB507B5428AFCF39009BAAC5 /* util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
