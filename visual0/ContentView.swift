@@ -21,13 +21,14 @@ struct ContentView: View {
         
         HStack(spacing: 16) {
             VStack{
-                Text("getStatus \(ana.getStatus())")
-                Button(action: ana.incStatus) {
-                    Text("inc status")
-                }
-                Text("fStatus \(ana.fStatus)")
-                Button(action: ana.changeImage) {
-                    Text("change image")
+                HStack{
+                    Text("getStatus \(ana.getStatus())")
+                    Button(action: ana.incStatus) {
+                        Text("inc status")
+                    }
+                    Button(action: ana.changeImage) {
+                        Text("change image")
+                    }
                 }
                 Image(nsImage: ana.fImage)
                     .resizable()
