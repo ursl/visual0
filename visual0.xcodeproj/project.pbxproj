@@ -8,27 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		FB0340EE28ACE07800F15BDB /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0340ED28ACE07800F15BDB /* Analysis.swift */; };
-		FB0340F028AD1A3700F15BDB /* VisionClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0340EF28AD1A3700F15BDB /* VisionClient.swift */; };
 		FBD4548128AA38E2009B191B /* visual0App.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548028AA38E2009B191B /* visual0App.swift */; };
 		FBD4548528AA38E6009B191B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548428AA38E6009B191B /* Assets.xcassets */; };
 		FBD4548828AA38E6009B191B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBD4548728AA38E6009B191B /* Preview Assets.xcassets */; };
-		FBD4549028AB74E2009B191B /* ContentViewOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4548F28AB74E2009B191B /* ContentViewOld.swift */; };
 		FBD454A528AB7D8A009B191B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454A428AB7D8A009B191B /* ContentView.swift */; };
-		FBD454A728AB7DE4009B191B /* FilePanel+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454A628AB7DE4009B191B /* FilePanel+Extension.swift */; };
 		FBD454B228AB81B9009B191B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD454B128AB81B9009B191B /* AppState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FB0340ED28ACE07800F15BDB /* Analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analysis.swift; sourceTree = "<group>"; };
-		FB0340EF28AD1A3700F15BDB /* VisionClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionClient.swift; sourceTree = "<group>"; };
 		FBD4547D28AA38E2009B191B /* visual0.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = visual0.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBD4548028AA38E2009B191B /* visual0App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = visual0App.swift; sourceTree = "<group>"; };
 		FBD4548428AA38E6009B191B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FBD4548728AA38E6009B191B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FBD4548928AA38E6009B191B /* visual0.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = visual0.entitlements; sourceTree = "<group>"; };
-		FBD4548F28AB74E2009B191B /* ContentViewOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewOld.swift; sourceTree = "<group>"; };
 		FBD454A428AB7D8A009B191B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		FBD454A628AB7DE4009B191B /* FilePanel+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FilePanel+Extension.swift"; sourceTree = "<group>"; };
 		FBD454B128AB81B9009B191B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -67,9 +61,6 @@
 				FB0340ED28ACE07800F15BDB /* Analysis.swift */,
 				FBD454B128AB81B9009B191B /* AppState.swift */,
 				FBD454A428AB7D8A009B191B /* ContentView.swift */,
-				FBD454A628AB7DE4009B191B /* FilePanel+Extension.swift */,
-				FBD4548F28AB74E2009B191B /* ContentViewOld.swift */,
-				FB0340EF28AD1A3700F15BDB /* VisionClient.swift */,
 				FBD4548028AA38E2009B191B /* visual0App.swift */,
 				FBD4548428AA38E6009B191B /* Assets.xcassets */,
 				FBD4548928AA38E6009B191B /* visual0.entitlements */,
@@ -172,11 +163,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBD454A728AB7DE4009B191B /* FilePanel+Extension.swift in Sources */,
-				FBD4549028AB74E2009B191B /* ContentViewOld.swift in Sources */,
 				FBD454B228AB81B9009B191B /* AppState.swift in Sources */,
 				FBD454A528AB7D8A009B191B /* ContentView.swift in Sources */,
-				FB0340F028AD1A3700F15BDB /* VisionClient.swift in Sources */,
 				FBD4548128AA38E2009B191B /* visual0App.swift in Sources */,
 				FB0340EE28ACE07800F15BDB /* Analysis.swift in Sources */,
 			);

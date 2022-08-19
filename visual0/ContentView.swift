@@ -10,30 +10,22 @@ import Vision
 struct ContentView: View {
     
     @EnvironmentObject var appState: AppState
-
+    
     
     @State var imageLoaded = false
     
     @StateObject var ana = Analysis()
     
     var body: some View {
-        let iv = InputView(image: self.$appState.image,
-                           ciimage: self.$appState.ciimage,
-                           imgLoaded: $imageLoaded)
         
         HStack(spacing: 16) {
             VStack{
                 Text("Status \(ana.getStatus())")
-                Button(action: ana.incStatus) {
-                    Text("next step")
+                Button("Button 1") {
                 }
-                // -- apply filter
-                Button(action: filterImage) {
-                    Text("filterImage")
+                Button("Button 2") {
                 }
             }
-            // -- put InputView into the ContentView
-            iv
         }
         
         .padding(.top, 32)
@@ -41,113 +33,8 @@ struct ContentView: View {
         .frame(minWidth: 700, idealWidth: 700, maxWidth: 700, minHeight: 1000, maxHeight: 1100)
     }
     
-    func filterImage()  {
-        let context = CIContext()
-        let currentFilter = CIFilter.sepiaTone()
-        currentFilter.inputImage = appState.ciimage!
-        currentFilter.intensity = 1
-
-        // https://www.hackingwithswift.com/books/ios-swiftui/integrating-core-image-with-swiftui
-        // get a CIImage from our filter or exit if that fails
-        guard let outputImage = currentFilter.outputImage else { return }
-
-        // attempt to get a CGImage from our CIImage
-        if let cgimg = context.createCGImage(outputImage, from: outputImage.extent) {
-            // convert that to a UIImage
-            self.appState.ciimage = CIImage(cgImage: cgimg)
-        }
-
-        return
-    }
-
 }
 
-// -----------------------------------------------------------------------
-struct InputView: View {
-    
-    @Binding var image: NSImage?
-    @Binding var ciimage: CIImage?
-    
-    @Binding var imgLoaded : Bool
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("Input image")
-                    .font(.headline)
-                Button(action: selectFile) {
-                    Text("Select image")
-                }
-                Button("Remove") {
-                    // Text("Remove")
-                    if !imgLoaded {
-                        print("Remove button should not be tapped")
-                    } else {
-                        print("Removed image")
-                        image = nil
-                    }
-                }
-                
-            }
-            InputImageView(image: $image, ciimage: $ciimage, imgLoaded: $imgLoaded)
-            
-        }
-    }
-    
-    private func selectFile() {
-        NSOpenPanel.openImage { (result) in
-            if case let .success(image) = result {
-                self.image = image
-                self.imgLoaded = true
-            }
-        }
-    }
-    
-}
-
-// -----------------------------------------------------------------------
-struct InputImageView: View {
-    @Binding var image: NSImage?
-    @Binding var ciimage: CIImage?
-    @Binding var imgLoaded : Bool
-    
-    var body: some View {
-        ZStack {
-            if image != nil {
-                Image(nsImage: image!)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-            } else {
-                Text("Drag and drop image file")
-                    .frame(width: 600)
-            }
-        }
-        .frame(height: 900)
-        .background(Color.black.opacity(0.5))
-        .cornerRadius(8)
-        .onDrop(of: ["public.file-url"], isTargeted: nil, perform: handleOnDrop(providers:))
-    }
-        
-    private func handleOnDrop(providers: [NSItemProvider]) -> Bool {
-        if let item = providers.first {
-            item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
-                DispatchQueue.main.async {
-                    if let urlData = urlData as? Data {
-                        let url = NSURL(absoluteURLWithDataRepresentation: urlData, relativeTo: nil) as URL
-                        guard let image = NSImage(contentsOf: url) else {
-                            return
-                        }
-                        self.image = image
-                        self.ciimage = NSImage.ciImage(image)
-                        self.imgLoaded = true
-                    }
-                }
-            }
-            return true
-        }
-        return false
-    }
-}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

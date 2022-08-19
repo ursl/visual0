@@ -13,9 +13,4 @@ class AppState: ObservableObject {
         }
     }
     
-    @Published var ciimage: CIImage? {
-        didSet {
-            print("AppState: assigned to ciimage")
-        }
-    }
 }
