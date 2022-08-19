@@ -10,10 +10,8 @@ import SwiftUI
 @main
 struct visual0App: App {
     var body: some Scene {
-        let appState = AppState.shared
         WindowGroup {
             ContentView()
-                .environmentObject(appState)
         }
     }
 }

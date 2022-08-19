@@ -9,12 +9,6 @@ import Vision
 
 // -----------------------------------------------------------------------
 struct ContentView: View {
-    
-    @EnvironmentObject var appState: AppState
-    
-    
-    @State var imageLoaded = false
-    
     @ObservedObject var ana = Analysis()
     
     var body: some View {
@@ -34,7 +28,6 @@ struct ContentView: View {
                     .resizable()
             }
         }
-        
         .padding(.top, 32)
         .padding(.bottom, 16)
         .frame(minWidth: 600, idealWidth: 600, maxWidth: 600, minHeight: 900, maxHeight: 900)
@@ -42,7 +35,7 @@ struct ContentView: View {
     
 }
 
-
+// -----------------------------------------------------------------------
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
