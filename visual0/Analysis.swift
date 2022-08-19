@@ -23,12 +23,13 @@ final class Analysis: ObservableObject {
     let fContext = CIContext()
     var fLocalImageView: NSImageView!
     var fLocalCIImage : CIImage
-    var rectangles: [VNRectangleObservation]?
+    var frectangles: [VNRectangleObservation]?
     
     // -----------------------------------------------------------------------
     init() {
         fImage = imgArray[0]!
         fLocalImageView = NSImageView(frame: NSRect())
+        fLocalImageView.wantsLayer = true
         fLocalCIImage = NSImage.ciImage(imgArray[0]!)!
     }
     
@@ -106,7 +107,7 @@ final class Analysis: ObservableObject {
     func completedVisionRequest(_ request: VNRequest?, _ error: Error?) {
         print("completedVisionRequest")
         // -- Only proceed if a rectangular image was detected.
-        guard let rectangles = request?.results as? [VNRectangleObservation] else {
+        guard let lrectangles = request?.results as? [VNRectangleObservation] else {
             guard let error = error else {
                 print("hm?")
                 return
@@ -115,38 +116,110 @@ final class Analysis: ObservableObject {
             return
         }
         
-        self.rectangles = rectangles
+        frectangles = lrectangles
         
+        // -- this is required to run in main thread
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.addRectangleOutlinesToInputImage()
         }
         
-        // do stuff with your rectangles
-        print("found \(rectangles.count) rectangles")
-        for rectangle in rectangles {
-            print(rectangle.boundingBox)
-            
-            // -- add them
+        // -----------------------------------------------------------------------
+        // -- testBox
+        print("call testBox")
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.testBox()
         }
+        
+        
+        
+        // -- do stuff with your rectangles
+        print("found \(frectangles!.count) rectangles")
     }
     
+    // -----------------------------------------------------------------------
     func addRectangleOutlinesToInputImage() {
+        print("running addRectangleOutlinesToInputImage")
         let nsi = NSImage.fromCIImage(fLocalCIImage)
         fLocalImageView = NSImageView(frame: NSRect(origin: .zero, size: nsi.size))
+        fLocalImageView.wantsLayer = true
         fLocalImageView.image = nsi
-        if let layer = fLocalImageView.layer,
-           let rectangles = self.rectangles {
-            self.rectangles = rectangles
-            for rectangle in rectangles {
-                let shapeLayer = self.shapeLayerForObservation(rectangle)
-                layer.addSublayer(shapeLayer)
+        if let layer = fLocalImageView.layer {
+            print("layer OK")
+            if let rectangles = frectangles {
+                print("looping over rectangles")
+                for rectangle in rectangles {
+                    print(rectangle.boundingBox)
+                    let shapeLayer = shapeLayerForObservation(rectangle)
+                    layer.addSublayer(shapeLayer)
+                }
             }
+        } else {
+            print("no layer in fLocalImageView")
         }
+        
+        fImage = fLocalImageView.image!
         
     }
     
+    // -----------------------------------------------------------------------
+    func testBox() {
+        print("nada")
+        fLocalCIImage = NSImage.ciImage(fImage)!
+
+//        imgArray.append(NSImage.fromCIImage(ciimage))
+//        fImgIdx = imgArray.count-1
+//        fImage = imgArray[fImgIdx]!
+        
+        print("running testBox, ciimage = \(fLocalCIImage.extent)")
+        
+//        let nsi = NSImage.fromCIImage(fLocalCIImage)
+        let nsi = fImage
+        fLocalImageView = NSImageView(frame: NSRect(origin: .zero, size: nsi.size))
+        fLocalImageView.wantsLayer = true
+        fLocalImageView.canDrawSubviewsIntoLayer = true
+        fLocalImageView.image = nsi
+        
+        if let layer = fLocalImageView.layer {
+            print("testBox layer OK")
+            
+            let shapeLayer = CAShapeLayer()
+            let recta = NSRect(x: 200 , y: 200, width: 500, height: 500)
+            shapeLayer.frame = recta
+            shapeLayer.contents = recta
+            
+            shapeLayer.cornerRadius = 100.0
+            shapeLayer.borderWidth = 50.0
+            
+            let rect = CGRect(x: 0, y: 0, width: 300, height: 300)
+
+            // fLocalImageView.draw(rect)
+
+            
+            var transform = CGAffineTransform.identity
+            shapeLayer.backgroundColor = CGColor.white
+
+            shapeLayer.path = CGPath(rect:rect, transform: &transform)
+            shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
+            shapeLayer.lineWidth = 100.0
+            shapeLayer.fillColor = CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+            shapeLayer.name = "rectangle"
+            layer.addSublayer(shapeLayer)
+        }
+        // -- this may be wrong! FIXME!
+        fLocalImageView.updateLayer()
+
+        fImage = fLocalImageView.image!
+
+//        imgArray.append(NSImage.fromCIImage(ciimage))
+        imgArray.append(fImage)
+        fImgIdx = imgArray.count-1
+ 
+
+    }
     
+    // -----------------------------------------------------------------------
     func shapeLayerForObservation(_ rectangle: VNRectangleObservation) -> CAShapeLayer {
         guard let image = fLocalImageView.layer?.contents as? NSImage else { return CAShapeLayer() }
         let transformProperties = CGSize.aspectFit(aspectRatio: image.size, boundingSize: fLocalImageView.bounds.size)
@@ -155,12 +228,13 @@ final class Analysis: ObservableObject {
         shapeLayer.frame = frame
         shapeLayer.path = pathForRectangle(rectangle, withTransformProperties: transformProperties, andBoundingBox: shapeLayer.bounds)
         shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
-        shapeLayer.lineWidth = 2.0
+        shapeLayer.lineWidth = 4.0
         shapeLayer.fillColor = CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.0)
         shapeLayer.name = "rectangle"
         return shapeLayer
     }
     
+    // -----------------------------------------------------------------------
     func frameForRectangle(_ rectangle: VNRectangleObservation, withTransformProperties properties: (size: CGSize, xOffset: CGFloat, yOffset: CGFloat)) -> NSRect {
         // Use aspect fit to determine scaling and X & Y offsets
         let transform = CGAffineTransform.identity
@@ -182,6 +256,7 @@ final class Analysis: ObservableObject {
         return frame
     }
     
+    // -----------------------------------------------------------------------
     func pathForRectangle(_ rectangle: VNRectangleObservation,withTransformProperties properties: (size: CGSize, xOffset: CGFloat, yOffset: CGFloat),andBoundingBox size: CGRect) -> CGPath {
         //Convert to appropriate scale
         let scaleTransform = CGAffineTransform.identity
