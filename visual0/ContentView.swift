@@ -26,7 +26,8 @@ struct ContentView: View {
                     Text("inc status")
                 }
                 Text("fStatus \(ana.fStatus)")
-                Button("change image") {
+                Button(action: ana.changeImage) {
+                    Text("change image")
                 }
                 Image(nsImage: ana.fImage)
                     .resizable()

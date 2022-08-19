@@ -20,11 +20,11 @@ final class Analysis: ObservableObject {
         , NSImage(named: NSImage.Name("glass-20220401-6"))
     ]
     
-    
+    var fImgIdx : Int = 0
     
     init() {
         fStatus = 0
-        fImage = imgArray[0]!
+        fImage = imgArray[fImgIdx]!
     }
     
     func getImage() -> NSImage {
@@ -37,5 +37,14 @@ final class Analysis: ObservableObject {
     
     func incStatus() {
         fStatus += 1
+    }
+
+    func changeImage() {
+        if fImgIdx == 0 {
+            fImgIdx = 1
+        } else {
+            fImgIdx = 0
+        }
+        fImage = imgArray[fImgIdx]!
     }
 }
