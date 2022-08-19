@@ -6,6 +6,7 @@ import SwiftUI
 import CoreImage
 import Vision
 
+
 // -----------------------------------------------------------------------
 struct ContentView: View {
     
@@ -14,23 +15,27 @@ struct ContentView: View {
     
     @State var imageLoaded = false
     
-    @StateObject var ana = Analysis()
+    @ObservedObject var ana = Analysis()
     
     var body: some View {
         
         HStack(spacing: 16) {
             VStack{
-                Text("Status \(ana.getStatus())")
-                Button("Button 1") {
+                Text("getStatus \(ana.getStatus())")
+                Button(action: ana.incStatus) {
+                    Text("inc status")
                 }
-                Button("Button 2") {
+                Text("fStatus \(ana.fStatus)")
+                Button("change image") {
                 }
+                Image(nsImage: ana.fImage)
+                    .resizable()
             }
         }
         
         .padding(.top, 32)
         .padding(.bottom, 16)
-        .frame(minWidth: 700, idealWidth: 700, maxWidth: 700, minHeight: 1000, maxHeight: 1100)
+        .frame(minWidth: 600, idealWidth: 600, maxWidth: 600, minHeight: 900, maxHeight: 900)
     }
     
 }
