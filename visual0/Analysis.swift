@@ -18,7 +18,9 @@ final class Analysis: ObservableObject {
         NSImage(named: NSImage.Name("glass-20220401-5"))
         , NSImage(named: NSImage.Name("glass-20220401-6"))
     ]
-        
+    
+    let fContext = CIContext()
+
     // -----------------------------------------------------------------------
     init() {
         fImage = imgArray[0]!
@@ -33,7 +35,7 @@ final class Analysis: ObservableObject {
     func getIdx() -> Int {
         return fImgIdx
     }
-     
+    
     // -----------------------------------------------------------------------
     func changeImage() {
         if fImgIdx == imgArray.count-1 {
@@ -44,17 +46,17 @@ final class Analysis: ObservableObject {
         fImage = imgArray[fImgIdx]!
     }
     
-
+    
     // -----------------------------------------------------------------------
-    // https://developer.apple.com/documentation/coreimage/processing_an_image_using_built-in_filters
     func runAna1() {
-        let context = CIContext()
         let originalCIImage = NSImage.ciImage(fImage)!
         
         let sepiaCIImage = sepiaFilter(originalCIImage, intensity:0.9)!
-
+              
+        
         imgArray.append(NSImage.fromCIImage(sepiaCIImage))
-        fImage = imgArray[imgArray.count-1]!
+        fImgIdx = imgArray.count-1
+        fImage = imgArray[fImgIdx]!
     }
     
     func sepiaFilter(_ input: CIImage, intensity: Double) -> CIImage?  {
