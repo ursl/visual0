@@ -292,8 +292,8 @@ final class Analysis: ObservableObject {
     func runAna3() {
         print("runAna3")
 
-        let width: CGFloat = 640
-        let height: CGFloat = 640
+        let width: CGFloat = 600
+        let height: CGFloat = 900
 
         let fLocalView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
         
@@ -312,7 +312,7 @@ final class Analysis: ObservableObject {
             var transform  = CGAffineTransform(rotationAngle: angle)
                 .concatenating(CGAffineTransform(translationX: width / 2, y: height / 2))
             
-            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 100, height: 100),
+            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 100, height: 300),
                                transform: &transform)
             
             path.addPath(petal)
