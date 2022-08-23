@@ -27,12 +27,31 @@ extension NSImage {
     }
 }
 
+extension CALayer {
+    // -----------------------------------------------------------------------
+    // https://stackoverflow.com/questions/41386423/get-image-from-calayer-or-nsview-swift-3
+    // Get NSImage from CALayer
+
+    func image() -> NSImage {
+        let width = Int(bounds.width * contentsScale)
+        let height = Int(bounds.height * contentsScale)
+        let imageRepresentation = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+        imageRepresentation.size = bounds.size
+
+        let context = NSGraphicsContext(bitmapImageRep: imageRepresentation)!
+
+        render(in: context.cgContext)
+
+        return NSImage(cgImage: imageRepresentation.cgImage!, size: bounds.size)
+    }
+}
+
+
 extension NSView {
-
-    /// Get `NSImage` representation of the view.
-    ///
-    /// - Returns: `NSImage` of view
-
+    // -----------------------------------------------------------------------
+    // https://stackoverflow.com/questions/41386423/get-image-from-calayer-or-nsview-swift-3
+    // Get NSImage from NSView
+    
     func image() -> NSImage {
         let imageRepresentation = bitmapImageRepForCachingDisplay(in: bounds)!
         cacheDisplay(in: bounds, to: imageRepresentation)
@@ -48,7 +67,7 @@ extension CGSize {
         var fittedHeight = boundingSize.height
         var xOffset = CGFloat(0.0)
         var yOffset = CGFloat(0.0)
-
+        
         if( mH < mW ) {
             fittedWidth = boundingSize.height / aspectRatio.height * aspectRatio.width;
             xOffset = abs(boundingSize.width - fittedWidth)/2
