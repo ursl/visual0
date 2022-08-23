@@ -288,4 +288,45 @@ final class Analysis: ObservableObject {
     }
     
     
+    // -----------------------------------------------------------------------
+    func runAna3() {
+        print("runAna3")
+
+        let width: CGFloat = 640
+        let height: CGFloat = 640
+
+        let fLocalView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
+        
+        fLocalView.wantsLayer = true
+        fLocalView.canDrawSubviewsIntoLayer = true
+        
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect(x: 0, y: 0,
+                                  width: width, height: height)
+
+
+        let path = CGMutablePath()
+             
+        stride(from: 0, to: CGFloat.pi * 2, by: CGFloat.pi / 6).forEach {
+            angle in
+            var transform  = CGAffineTransform(rotationAngle: angle)
+                .concatenating(CGAffineTransform(translationX: width / 2, y: height / 2))
+            
+            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 100, height: 100),
+                               transform: &transform)
+            
+            path.addPath(petal)
+        }
+            
+        shapeLayer.path = path
+        shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
+        shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
+
+        fLocalView.layer!.addSublayer(shapeLayer)
+
+        fImage = fLocalView.image()
+        imgArray.append(fImage)
+        fImgIdx = imgArray.count-1
+    }
+    
 }

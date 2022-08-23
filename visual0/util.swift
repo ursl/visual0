@@ -27,6 +27,19 @@ extension NSImage {
     }
 }
 
+extension NSView {
+
+    /// Get `NSImage` representation of the view.
+    ///
+    /// - Returns: `NSImage` of view
+
+    func image() -> NSImage {
+        let imageRepresentation = bitmapImageRepForCachingDisplay(in: bounds)!
+        cacheDisplay(in: bounds, to: imageRepresentation)
+        return NSImage(cgImage: imageRepresentation.cgImage!, size: bounds.size)
+    }
+}
+
 extension CGSize {
     static func aspectFit(aspectRatio : CGSize, boundingSize: CGSize) -> (size: CGSize, xOffset: CGFloat, yOffset: CGFloat)  {
         let mW = boundingSize.width / aspectRatio.width;
