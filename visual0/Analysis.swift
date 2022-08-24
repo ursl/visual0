@@ -181,38 +181,38 @@ final class Analysis: ObservableObject {
         fLocalImageView.canDrawSubviewsIntoLayer = true
         fLocalImageView.image = nsi
         
+        let shapeLayer = CAShapeLayer()
+
         if let layer = fLocalImageView.layer {
             print("testBox layer OK")
             
-            let shapeLayer = CAShapeLayer()
-            let recta = NSRect(x: 200 , y: 200, width: 500, height: 500)
-            shapeLayer.frame = recta
-            shapeLayer.contents = recta
+            shapeLayer.frame = CGRect(x: 0, y: 0,
+                                      width: 600, height: 900)
             
-            shapeLayer.cornerRadius = 100.0
-            shapeLayer.borderWidth = 50.0
             
-            let rect = CGRect(x: 0, y: 0, width: 300, height: 300)
-
-            // fLocalImageView.draw(rect)
-
-            
-            var transform = CGAffineTransform.identity
-            shapeLayer.backgroundColor = CGColor.white
-
-            shapeLayer.path = CGPath(rect:rect, transform: &transform)
-            shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
-            shapeLayer.lineWidth = 100.0
-            shapeLayer.fillColor = CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            shapeLayer.name = "rectangle"
-            layer.addSublayer(shapeLayer)
+            let path = CGMutablePath()
+                 
+            stride(from: 0, to: CGFloat.pi * 2, by: CGFloat.pi / 6).forEach {
+                angle in
+                var transform  = CGAffineTransform(rotationAngle: angle)
+                    .concatenating(CGAffineTransform(translationX: 600.0/2, y: 900.0/2))
+                
+                let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 100, height: 300),
+                                   transform: &transform)
+                
+                path.addPath(petal)
+            }
+                
+            shapeLayer.path = path
         }
-        // -- this may be wrong! FIXME!
-        fLocalImageView.updateLayer()
 
-        fImage = fLocalImageView.image!
+        shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
+        shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
 
-//        imgArray.append(NSImage.fromCIImage(ciimage))
+        fLocalImageView.layer!.addSublayer(shapeLayer)
+
+        fImage = fLocalImageView.image()
+
         imgArray.append(fImage)
         fImgIdx = imgArray.count-1
  
@@ -295,10 +295,10 @@ final class Analysis: ObservableObject {
         let width: CGFloat = 600
         let height: CGFloat = 900
 
-        let fLocalView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
+        let localView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
         
-        fLocalView.wantsLayer = true
-        fLocalView.canDrawSubviewsIntoLayer = true
+        localView.wantsLayer = true
+        localView.canDrawSubviewsIntoLayer = true
         
         let shapeLayer = CAShapeLayer()
         shapeLayer.frame = CGRect(x: 0, y: 0,
@@ -322,9 +322,10 @@ final class Analysis: ObservableObject {
         shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
         shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
 
-        fLocalView.layer!.addSublayer(shapeLayer)
+        localView.layer!.addSublayer(shapeLayer)
 
-        fImage = fLocalView.image()
+        // -- the crucial difference to the original ana2()
+        fImage = localView.image()
         imgArray.append(fImage)
         fImgIdx = imgArray.count-1
     }
