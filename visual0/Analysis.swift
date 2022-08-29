@@ -14,7 +14,7 @@ final class Analysis: ObservableObject {
     
     @Published var fImgIdx : Int = 0
     @Published var fImage : NSImage
-    
+
     var imgArray = [
         NSImage(named: NSImage.Name("glass-20220401-5"))
         , NSImage(named: NSImage.Name("glass-20220401-6"))
@@ -31,6 +31,7 @@ final class Analysis: ObservableObject {
         fLocalImageView = NSImageView(frame: NSRect())
         fLocalImageView.wantsLayer = true
         fLocalCIImage = NSImage.ciImage(imgArray[0]!)!
+
     }
     
     // -----------------------------------------------------------------------
@@ -175,11 +176,28 @@ final class Analysis: ObservableObject {
         print("running testBox, ciimage = \(fLocalCIImage.extent)")
         
 //        let nsi = NSImage.fromCIImage(fLocalCIImage)
+
+// https://stackoverflow.com/questions/13272512/add-uiimage-in-calayer
+//        let myLayer = CALayer()
+//        let myImage = UIImage(named: "star")?.cgImage
+//        myLayer.frame = myView.bounds
+//        myLayer.contents = myImage
+//        myView.layer.addSublayer(myLayer)
+
+
+
         let nsi = fImage
         fLocalImageView = NSImageView(frame: NSRect(origin: .zero, size: nsi.size))
         fLocalImageView.wantsLayer = true
         fLocalImageView.canDrawSubviewsIntoLayer = true
-        fLocalImageView.image = nsi
+
+        let myLayer = CALayer()
+        myLayer.frame = fLocalImageView.bounds
+        myLayer.contents = fImage
+        fLocalImageView.layer?.addSublayer(myLayer)
+        
+        //        fLocalImageView.image = nsi
+//        fLocalImageView.layer!.contents = nsi
         
         let shapeLayer = CAShapeLayer()
 
@@ -208,7 +226,10 @@ final class Analysis: ObservableObject {
 
         shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
         shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
-
+        shapeLayer.zPosition = CGFloat(-1)
+        shapeLayer.isHidden = false
+        
+        fLocalImageView.layer!.contents = nsi
         fLocalImageView.layer!.addSublayer(shapeLayer)
 
         fImage = fLocalImageView.image()
@@ -297,6 +318,8 @@ final class Analysis: ObservableObject {
 
         let localView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
         
+        
+        
         localView.wantsLayer = true
         localView.canDrawSubviewsIntoLayer = true
         
@@ -311,8 +334,11 @@ final class Analysis: ObservableObject {
             angle in
             var transform  = CGAffineTransform(rotationAngle: angle)
                 .concatenating(CGAffineTransform(translationX: width / 2, y: height / 2))
-            
-            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 100, height: 300),
+            var idx = fImgIdx
+            if idx == 0 {
+                idx = 1
+            }
+            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 200/idx, height: 400/idx),
                                transform: &transform)
             
             path.addPath(petal)
@@ -323,7 +349,7 @@ final class Analysis: ObservableObject {
         shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
 
         localView.layer!.addSublayer(shapeLayer)
-
+        
         // -- the crucial difference to the original ana2()
         fImage = localView.image()
         imgArray.append(fImage)

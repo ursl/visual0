@@ -32,7 +32,8 @@ struct ContentView: View {
                     
                 }
                 Image(nsImage: ana.fImage)
-                    .resizable()
+                .resizable()
+
             }
         }
         .padding(.top, 32)
