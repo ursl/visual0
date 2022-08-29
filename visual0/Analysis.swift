@@ -14,7 +14,7 @@ final class Analysis: ObservableObject {
     
     @Published var fImgIdx : Int = 0
     @Published var fImage : NSImage
-
+    
     var imgArray = [
         NSImage(named: NSImage.Name("glass-20220401-5"))
         , NSImage(named: NSImage.Name("glass-20220401-6"))
@@ -31,7 +31,8 @@ final class Analysis: ObservableObject {
         fLocalImageView = NSImageView(frame: NSRect())
         fLocalImageView.wantsLayer = true
         fLocalCIImage = NSImage.ciImage(imgArray[0]!)!
-
+        
+        
     }
     
     // -----------------------------------------------------------------------
@@ -168,76 +169,56 @@ final class Analysis: ObservableObject {
     func testBox() {
         print("nada")
         fLocalCIImage = NSImage.ciImage(fImage)!
-
-//        imgArray.append(NSImage.fromCIImage(ciimage))
-//        fImgIdx = imgArray.count-1
-//        fImage = imgArray[fImgIdx]!
         
         print("running testBox, ciimage = \(fLocalCIImage.extent)")
         
-//        let nsi = NSImage.fromCIImage(fLocalCIImage)
-
-// https://stackoverflow.com/questions/13272512/add-uiimage-in-calayer
-//        let myLayer = CALayer()
-//        let myImage = UIImage(named: "star")?.cgImage
-//        myLayer.frame = myView.bounds
-//        myLayer.contents = myImage
-//        myView.layer.addSublayer(myLayer)
-
-
-
+        // https://stackoverflow.com/questions/13272512/add-uiimage-in-calayer
+        
+        
+        
         let nsi = fImage
         fLocalImageView = NSImageView(frame: NSRect(origin: .zero, size: nsi.size))
         fLocalImageView.wantsLayer = true
         fLocalImageView.canDrawSubviewsIntoLayer = true
-
+        
         let myLayer = CALayer()
         myLayer.frame = fLocalImageView.bounds
         myLayer.contents = fImage
         fLocalImageView.layer?.addSublayer(myLayer)
         
-        //        fLocalImageView.image = nsi
-//        fLocalImageView.layer!.contents = nsi
-        
         let shapeLayer = CAShapeLayer()
-
+        
         if let layer = fLocalImageView.layer {
             print("testBox layer OK")
             
-            shapeLayer.frame = CGRect(x: 0, y: 0,
-                                      width: 600, height: 900)
+            shapeLayer.frame = CGRect(x: 0, y: 0, width: 600, height: 900)
+            var transform  = CGAffineTransform(rotationAngle: 0)
+                .concatenating(CGAffineTransform(translationX: 0.0, y: 0.0))
             
+            let width = 0.9*fLocalCIImage.extent.width
+            let height = 0.9*fLocalCIImage.extent.height
+            let rechteck = CGPath(rect: CGRect(x: 100, y: 200, width: width, height: height),
+                                  transform: &transform)
             
             let path = CGMutablePath()
-                 
-            stride(from: 0, to: CGFloat.pi * 2, by: CGFloat.pi / 6).forEach {
-                angle in
-                var transform  = CGAffineTransform(rotationAngle: angle)
-                    .concatenating(CGAffineTransform(translationX: 600.0/2, y: 900.0/2))
-                
-                let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 100, height: 300),
-                                   transform: &transform)
-                
-                path.addPath(petal)
-            }
-                
+            path.addPath(rechteck)
             shapeLayer.path = path
         }
-
-        shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
-        shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
+        
+        shapeLayer.strokeColor = CGColor(red: 0, green: 1, blue: 1, alpha: 1.0)
+        shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 0.2)
         shapeLayer.zPosition = CGFloat(-1)
         shapeLayer.isHidden = false
         
         fLocalImageView.layer!.contents = nsi
         fLocalImageView.layer!.addSublayer(shapeLayer)
-
+        
         fImage = fLocalImageView.image()
-
+        
         imgArray.append(fImage)
         fImgIdx = imgArray.count-1
- 
-
+        
+        
     }
     
     // -----------------------------------------------------------------------
@@ -312,10 +293,10 @@ final class Analysis: ObservableObject {
     // -----------------------------------------------------------------------
     func runAna3() {
         print("runAna3")
-
+        
         let width: CGFloat = 600
         let height: CGFloat = 900
-
+        
         let localView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
         
         
@@ -326,28 +307,29 @@ final class Analysis: ObservableObject {
         let shapeLayer = CAShapeLayer()
         shapeLayer.frame = CGRect(x: 0, y: 0,
                                   width: width, height: height)
-
-
+        
+        
         let path = CGMutablePath()
-             
+        
         stride(from: 0, to: CGFloat.pi * 2, by: CGFloat.pi / 6).forEach {
             angle in
             var transform  = CGAffineTransform(rotationAngle: angle)
-                .concatenating(CGAffineTransform(translationX: width / 2, y: height / 2))
+                .concatenating(CGAffineTransform(translationX: 0, y: 0))
             var idx = fImgIdx
             if idx == 0 {
                 idx = 1
             }
-            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 200/idx, height: 400/idx),
+            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0,
+                                                 width: 200/idx, height: 400/idx),
                                transform: &transform)
             
             path.addPath(petal)
         }
-            
+        
         shapeLayer.path = path
         shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
         shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
-
+        
         localView.layer!.addSublayer(shapeLayer)
         
         // -- the crucial difference to the original ana2()
