@@ -167,15 +167,9 @@ final class Analysis: ObservableObject {
     
     // -----------------------------------------------------------------------
     func testBox() {
-        print("nada")
         fLocalCIImage = NSImage.ciImage(fImage)!
-        
         print("running testBox, ciimage = \(fLocalCIImage.extent)")
-        
         // https://stackoverflow.com/questions/13272512/add-uiimage-in-calayer
-        
-        
-        
         let nsi = fImage
         fLocalImageView = NSImageView(frame: NSRect(origin: .zero, size: nsi.size))
         fLocalImageView.wantsLayer = true
@@ -199,7 +193,6 @@ final class Analysis: ObservableObject {
             let height = 0.9*fLocalCIImage.extent.height
             let rechteck = CGPath(rect: CGRect(x: 100, y: 200, width: width, height: height),
                                   transform: &transform)
-            
             let path = CGMutablePath()
             path.addPath(rechteck)
             shapeLayer.path = path
@@ -217,8 +210,6 @@ final class Analysis: ObservableObject {
         
         imgArray.append(fImage)
         fImgIdx = imgArray.count-1
-        
-        
     }
     
     // -----------------------------------------------------------------------
@@ -299,8 +290,6 @@ final class Analysis: ObservableObject {
         
         let localView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
         
-        
-        
         localView.wantsLayer = true
         localView.canDrawSubviewsIntoLayer = true
         
@@ -332,6 +321,45 @@ final class Analysis: ObservableObject {
         
         localView.layer!.addSublayer(shapeLayer)
         
+        // -- the crucial difference to the original ana2()
+        fImage = localView.image()
+        imgArray.append(fImage)
+        fImgIdx = imgArray.count-1
+    }
+    
+    
+    // -----------------------------------------------------------------------
+    // -- keep the petal drawing code around for a while
+    func runAna3Old() {
+        print("runAna3")
+        
+        let width: CGFloat = 600
+        let height: CGFloat = 900
+        let localView = NSView(frame: NSRect(x: 0, y: 0, width: width, height: height))
+        localView.wantsLayer = true
+        localView.canDrawSubviewsIntoLayer = true
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect(x: 0, y: 0, width: width, height: height)
+                
+        let path = CGMutablePath()
+        stride(from: 0, to: CGFloat.pi * 2, by: CGFloat.pi / 6).forEach {
+            angle in
+            var transform  = CGAffineTransform(rotationAngle: angle)
+                .concatenating(CGAffineTransform(translationX: 0, y: 0))
+            var idx = fImgIdx
+            if idx == 0 {
+                idx = 1
+            }
+            let petal = CGPath(ellipseIn: CGRect(x: -20, y: 0, width: 200/idx, height: 400/idx),
+                               transform: &transform)
+            path.addPath(petal)
+        }
+        
+        shapeLayer.path = path
+        shapeLayer.strokeColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
+        shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 1.0)
+
+        localView.layer!.addSublayer(shapeLayer)
         // -- the crucial difference to the original ana2()
         fImage = localView.image()
         imgArray.append(fImage)
