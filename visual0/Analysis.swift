@@ -143,25 +143,72 @@ final class Analysis: ObservableObject {
     // -----------------------------------------------------------------------
     func addRectangleOutlinesToInputImage() {
         print("running addRectangleOutlinesToInputImage")
-        let nsi = NSImage.fromCIImage(fLocalCIImage)
+        
+        fLocalCIImage = NSImage.ciImage(fImage)!
+        print("running testBox, ciimage = \(fLocalCIImage.extent)")
+        // https://stackoverflow.com/questions/13272512/add-uiimage-in-calayer
+        let nsi = fImage
         fLocalImageView = NSImageView(frame: NSRect(origin: .zero, size: nsi.size))
         fLocalImageView.wantsLayer = true
-        fLocalImageView.image = nsi
+        fLocalImageView.canDrawSubviewsIntoLayer = true
+        
+        let myLayer = CALayer()
+        myLayer.frame = fLocalImageView.bounds
+        myLayer.contents = fImage
+        fLocalImageView.layer?.addSublayer(myLayer)
+        
+        let shapeLayer = CAShapeLayer()
+        
         if let layer = fLocalImageView.layer {
-            print("layer OK")
-            if let rectangles = frectangles {
-                print("looping over rectangles")
-                for rectangle in rectangles {
-                    print(rectangle.boundingBox)
-                    let shapeLayer = shapeLayerForObservation(rectangle)
-                    layer.addSublayer(shapeLayer)
-                }
-            }
-        } else {
-            print("no layer in fLocalImageView")
+            print("testBox layer OK")
+            
+            shapeLayer.frame = CGRect(x: 0, y: 0, width: 600, height: 900)
+            var transform  = CGAffineTransform(rotationAngle: 0)
+                .concatenating(CGAffineTransform(translationX: 0.0, y: 0.0))
+            
+            let width = 0.9*fLocalCIImage.extent.width
+            let height = 0.9*fLocalCIImage.extent.height
+            let rechteck = CGPath(rect: CGRect(x: 100, y: 200, width: width, height: height),
+                                  transform: &transform)
+            let path = CGMutablePath()
+            path.addPath(rechteck)
+            shapeLayer.path = path
         }
         
-        fImage = fLocalImageView.image!
+        shapeLayer.strokeColor = CGColor(red: 0, green: 1, blue: 1, alpha: 1.0)
+        shapeLayer.fillColor = CGColor(red: 0.0, green: 1, blue: 1, alpha: 0.2)
+        shapeLayer.zPosition = CGFloat(-1)
+        shapeLayer.isHidden = false
+        
+        fLocalImageView.layer!.contents = nsi
+        fLocalImageView.layer!.addSublayer(shapeLayer)
+        
+        fImage = fLocalImageView.image()
+        
+        imgArray.append(fImage)
+        fImgIdx = imgArray.count-1
+        
+        
+        
+//        let nsi = NSImage.fromCIImage(fLocalCIImage)
+//        fLocalImageView = NSImageView(frame: NSRect(origin: .zero, size: nsi.size))
+//        fLocalImageView.wantsLayer = true
+//        fLocalImageView.image = nsi
+//        if let layer = fLocalImageView.layer {
+//            print("layer OK")
+//            if let rectangles = frectangles {
+//                print("looping over rectangles")
+//                for rectangle in rectangles {
+//                    print(rectangle.boundingBox)
+//                    let shapeLayer = shapeLayerForObservation(rectangle)
+//                    layer.addSublayer(shapeLayer)
+//                }
+//            }
+//        } else {
+//            print("no layer in fLocalImageView")
+//        }
+//        
+//        fImage = fLocalImageView.image!
         
     }
     
