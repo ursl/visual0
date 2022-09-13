@@ -125,7 +125,7 @@ final class Analysis: ObservableObject {
             guard let self = self else { return }
             self.addRectangleOutlinesToInputImage()
         }
-        
+
         // -----------------------------------------------------------------------
         // -- testBox
         print("call testBox")
@@ -133,7 +133,7 @@ final class Analysis: ObservableObject {
             guard let self = self else { return }
             self.testBox()
         }
-        
+
         
         
         // -- do stuff with your rectangles
@@ -207,7 +207,7 @@ final class Analysis: ObservableObject {
 //        } else {
 //            print("no layer in fLocalImageView")
 //        }
-//        
+//
 //        fImage = fLocalImageView.image!
         
     }
