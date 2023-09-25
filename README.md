@@ -13,4 +13,8 @@ cmake --build . --parallel 10
 ```
 
 ## analysis code
+Get the source code 
+```
 git clone https://github.com/ursl/visual0
+```
+Adapt the Makefile to find your installation of opencv
