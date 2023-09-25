@@ -19,7 +19,6 @@ git clone https://github.com/ursl/visual0
 ```
 Adapt the Makefile to find your installation of opencv
 
-## analysis code
 Example first run
 ```
 bin/opencvRun -m test0 -f DSC_3084.JPG 
