@@ -1,5 +1,7 @@
 # visual0
 
+Repository for a variety of visual/graphics code in "new" setups.
+
 ## install dependencies on Linux
 Cf. https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html
 ```
