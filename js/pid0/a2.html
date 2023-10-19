@@ -31,7 +31,7 @@
     </table>
     
     <br>
-    <canvas id="canvas" width="1200" height="300"></canvas>
+    <canvas id="canvas" width="1200" height="400"></canvas>
   </body>
 
   <script type="text/javascript">
@@ -51,13 +51,15 @@
     }
 
     // ----------------------------------------------------------------------
-    function fun2(x) {return Math.cos(freqKp*x);}
+    function fun2(x) {
+        return Math.cos(freqKp*x);
+    }
 
     document.getElementById("valKp").innerHTML = freqKp;
     document.getElementById("valKi").innerHTML = freqKi;
     document.getElementById("valKd").innerHTML = freqKd;
     document.getElementById("valSetpoint").innerHTML = setPoint;
-
+    
     // ----------------------------------------------------------------------
     var slidKp = document.getElementById("slidKp");
     slidKp.addEventListener("input", (event) => {
@@ -99,8 +101,8 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         axes.x0 = 0.;
-        axes.y0 = .5 + .5*canvas.height; // y0 pixels from top to y=0
-        axes.scale = 100;                 // 40 pixels from x=0 to x=1
+        axes.y0 = .5 + .5*canvas.height;  // y0 pixels from top to y=0
+        axes.scale = 100;                 // 100 pixels from x=0 to x=1
 
         showAxes(ctx, axes);
         funGraph(ctx, axes, funSetPoint, "rgb(11,153,11)", 3); 
@@ -130,10 +132,16 @@
         var x0=axes.x0, w=ctx.canvas.width;
         var y0=axes.y0, h=ctx.canvas.height;
         var xmin = axes.doNegativeX ? 0 : x0;
+        let eps = 10;
         ctx.beginPath();
         ctx.strokeStyle = "rgb(128,128,128)"; 
         ctx.moveTo(xmin,y0); ctx.lineTo(w,y0);  // X axis
         ctx.moveTo(x0,0);    ctx.lineTo(x0,h);  // Y axis
+        ctx.strokeText("0", x0, y0 + eps);
+        ctx.strokeText("10", 100., y0 + eps);
+
+        ctx.strokeText("0.5", 0., 150.);
+
         ctx.stroke();
     }
   </script>
