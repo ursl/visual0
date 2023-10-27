@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head><title>Canvas code example</title>
+  </head>
+  <body onload="draw()">
+    <table>
+      <th>
+        <td style="background-color:gray;">Parameter</td>
+        <td style="background-color:gray;">Selection</td>
+      </th>
+      <tr>
+        <td>
+        <td>Setpoint</td>
+        <td><input type="range" min="0" max="2" step="0.1" value="1"  class="slider" id="slidSetpoint">  <span id="valSetpoint">valSetpoint</span></td>
+      </tr>
+      <tr>
+        <td>
+        <td>Kp</td>
+        <td><input type="range" min="0" max="20" step="0.2" value="5"  class="slider" id="slidKp">  <span id="valKp">valKp</span></td>
+      </tr>
+      <tr>
+        <td>
+        <td>Ki</td>
+        <td><input type="range" min="0" max="20" step="0.2" value="5"  class="slider" id="slidKi">  <span id="valKi">valKi</span></td>
+      </tr>
+      <tr>
+        <td>
+        <td>Kd</td>
+        <td><input type="range" min="0" max="20" step="0.2" value="5"  class="slider" id="slidKd">  <span id="valKd">valKd</span></td>
+      </tr>
+    </table>
+    
+    <br>
+    <canvas id="canvas" width="1200" height="400"></canvas>
+  </body>
+
+  <script type="text/javascript">
+    var setPoint = 0.5;
+
+    var freqKi = 5;
+    var freqKd = 5;
+    var freqKp = 5;
+
+    // ----------------------------------------------------------------------
+    function funSetPoint(x) {
+        if (x > 1) {
+            return setPoint;
+        } else {
+            return 0.;
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    function fun2(x) {
+        return Math.cos(freqKp*x);
+    }
+
+    document.getElementById("valKp").innerHTML = freqKp;
+    document.getElementById("valKi").innerHTML = freqKi;
+    document.getElementById("valKd").innerHTML = freqKd;
+    document.getElementById("valSetpoint").innerHTML = setPoint;
+    
+    // ----------------------------------------------------------------------
+    var slidKp = document.getElementById("slidKp");
+    slidKp.addEventListener("input", (event) => {
+        freqKp = slidKp.value;
+        document.getElementById("valKp").innerHTML = freqKp;
+        draw();
+    })
+
+    // ----------------------------------------------------------------------
+    var slidKi = document.getElementById("slidKi");
+    slidKi.addEventListener("input", (event) => {
+        freqKi = slidKi.value;
+        document.getElementById("valKi").innerHTML = freqKi;
+        draw();
+    })
+
+    // ----------------------------------------------------------------------
+    var slidKd = document.getElementById("slidKd");
+    slidKd.addEventListener("input", (event) => {
+        freqKd = slidKd.value;
+        document.getElementById("valKd").innerHTML = freqKd;
+        draw();
+    })
+
+    // ----------------------------------------------------------------------
+    var slidSetpoint = document.getElementById("slidSetpoint");
+    slidSetpoint.addEventListener("input", (event) => {
+        setPoint = slidSetpoint.value;
+        document.getElementById("valSetpoint").innerHTML = setPoint;
+        draw();
+    })
+
+    // ----------------------------------------------------------------------
+    function draw() {
+        var canvas = document.getElementById("canvas");
+        if (null==canvas || !canvas.getContext) return;
+        
+        var axes={}, ctx=canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        axes.x0 = 0.;
+        axes.y0 = .5 + .5*canvas.height;  // y0 pixels from top to y=0
+        axes.scale = 100;                 // 100 pixels from x=0 to x=1
+
+        showAxes(ctx, axes);
+        funGraph(ctx, axes, funSetPoint, "rgb(11,153,11)", 3); 
+        funGraph(ctx, axes, fun2, "rgb(66,44,255)", 2);
+    }
+
+    // ----------------------------------------------------------------------
+    function funGraph (ctx,axes,func,color,thick) {
+        var xx, yy, dx=1, x0=axes.x0, y0=axes.y0, scale=axes.scale;
+        var iMax = Math.round((ctx.canvas.width-x0)/dx);
+        var iMin = 0.;
+
+        ctx.beginPath();
+        ctx.lineWidth = thick;
+        ctx.strokeStyle = color;
+
+        for (var i=iMin;i<=iMax;i++) {
+            xx = dx*i; yy = scale*func(xx/scale);
+            if (i==iMin) ctx.moveTo(x0+xx,y0-yy);
+            else         ctx.lineTo(x0+xx,y0-yy);
+        }
+        ctx.stroke();
+    }
+
+    // ----------------------------------------------------------------------
+    function showAxes(ctx,axes) {
+        var x0=axes.x0, w=ctx.canvas.width;
+        var y0=axes.y0, h=ctx.canvas.height;
+        var xmin = axes.doNegativeX ? 0 : x0;
+        let eps = 10;
+        ctx.beginPath();
+        ctx.strokeStyle = "rgb(128,128,128)"; 
+        ctx.moveTo(xmin,y0); ctx.lineTo(w,y0);  // X axis
+        ctx.moveTo(x0,0);    ctx.lineTo(x0,h);  // Y axis
+        ctx.strokeText("0", x0, y0 + eps);
+        ctx.strokeText("10", 100., y0 + eps);
+
+        ctx.strokeText("0.5", 0., 150.);
+
+        ctx.stroke();
+    }
+  </script>
+
+</html>
+
