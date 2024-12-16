@@ -5,11 +5,6 @@
 # ======================================================================
 .PHONY: prep clean vars
 
-ROOTCINT      = rootcling
-ROOTCFLAGS    = $(shell root-config --cflags)
-ROOTGLIBS     = $(shell root-config --glibs)
-ROOTLDFLAGS   = $(shell root-config --ldflags)
-
 ifdef SCRAM_ARCH
   # CXX         := $(shell scramv1 tool info gcc-cxxcompiler | grep CXX= | sed s/CXX=//)
   # this likely is decrepit
@@ -26,23 +21,19 @@ else
   endif
 endif
 
-INCOPENCV     := -I/opt/homebrew/Cellar/opencv/4.8.0/include/opencv4
+INCOPENCV     := -I /opt/homebrew/Cellar/opencv/4.10.0_15/include/opencv4
 
-CXXFLAGS      = -g -O0 -Wall -fPIC -pipe
-CXXFLAGS     += $(ROOTCFLAGS)
+CXXFLAGS      = -std=c++1z -g -O0 -Wall -fPIC -pipe
 CXXFLAGS     += $(INCOPENCV)
 
 LD            = $(CXX)
-LDFLAGS       = $(CXXFLAGS) $(ROOTLDFLAGS) -dynamiclib -shared
-SOFLAGS       = $(CXXFLAGS) $(ROOTLDFLAGS) -dynamiclib -shared
+LDFLAGS       = $(CXXFLAGS)  -dynamiclib -shared
+SOFLAGS       = $(CXXFLAGS)  -dynamiclib -shared
 
-GLIBS         = $(filter-out -lz, $(ROOTGLIBS))
-GLIBS         += -lMinuit #-lRooFitCore -lRooFit
-
-LIBOPENCV     := -L/opt/homebrew/Cellar/opencv/4.8.0/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc
+LIBOPENCV     := -L /opt/homebrew/Cellar/opencv/4.10.0_15/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc
 
 # -- Source code
-OPENCV = opencvTests.o
+OPENCV = opencvTests.o opencvModule.o
 
 # -- Default rules
 $(addprefix obj/,%.o) : %.cc %.hh
@@ -56,7 +47,7 @@ $(addprefix obj/,%.o) : %.cc
 all: prep lib bin
 
 lib: $(addprefix obj/,$(OPENCV))
-	$(CXX) $(SOFLAGS) $(addprefix obj/,$(OPENCV)) -o lib/libOpenCV.so $(GLIBS) -lMinuit $(LIBOPENCV)
+	$(CXX) $(SOFLAGS) $(addprefix obj/,$(OPENCV)) -o lib/libOpenCV.so  $(LIBOPENCV)
 
 bin: opencvRun.cc lib
 	$(CXX) $(CXXFLAGS) -c -o obj/opencvRun.o opencvRun.cc 

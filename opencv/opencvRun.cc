@@ -2,6 +2,7 @@
 #include <string>
 
 #include "opencvTests.hh"
+#include "opencvModule.hh"
 
 using namespace cv;
 using namespace std;
@@ -21,8 +22,12 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  if (!string::npos == mode.find("test0")) {
+  if (string::npos != mode.find("test0")) {
     opencvTest0(img);
+  }
+
+  if (string::npos != mode.find("mana1")) {
+    moduleAna1(img);
   }
 
   return 0;
