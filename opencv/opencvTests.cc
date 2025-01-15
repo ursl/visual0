@@ -6,6 +6,13 @@
 using namespace cv;
 using namespace std;
 
+// ----------------------------------------------------------------------
+void airex1(Mat &img, Mat &tem) {
+
+}
+
+
+// ----------------------------------------------------------------------
 void opencvTest0(Mat &img) {
   imshow("Original", img);
 

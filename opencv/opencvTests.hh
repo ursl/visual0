@@ -9,4 +9,7 @@
 void opencvTest0(cv::Mat &);
 void opencvTest1(cv::Mat &);
 
+void airex1(cv::Mat &, cv::Mat &);
+
+
 #endif
