@@ -9,7 +9,7 @@
 void opencvTest0(cv::Mat &);
 void opencvTest1(cv::Mat &);
 
-void airex1(cv::Mat &, cv::Mat &);
+void airex1(cv::Mat &, cv::Mat &, int match = cv::TM_CCOEFF_NORMED);
 
 
 #endif

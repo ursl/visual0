@@ -1,5 +1,6 @@
 #include "opencvTests.hh"
 
+
 #include <string>
 #include <iostream>
 
@@ -7,7 +8,85 @@ using namespace cv;
 using namespace std;
 
 // ----------------------------------------------------------------------
-void airex1(Mat &img, Mat &tem) {
+// https://pyimagesearch.com/2015/01/26/multi-scale-template-matching-using-python-opencv/
+void airex1(Mat &colImg, Mat &colTempl, int match) {
+
+  Mat result;
+
+  /** Template matching methods 
+      enum
+      {
+      TM_SQDIFF        =0,
+      TM_SQDIFF_NORMED =1, masked
+      TM_CCORR         =2,
+      TM_CCORR_NORMED  =3, masked
+      TM_CCOEFF        =4,
+      TM_CCOEFF_NORMED =5
+      };
+  */
+
+	Mat img;
+  img.create(colImg.size(), colImg.type());
+  cvtColor(colImg, img, COLOR_BGR2GRAY);
+
+	Mat templ;
+  templ.create(colTempl.size(), colTempl.type());
+  cvtColor(colTempl, templ, COLOR_BGR2GRAY);
+
+  //  const char* img_window = "Grayscale Image";
+  //  namedWindow(img_window, WINDOW_AUTOSIZE);
+  //  imshow(img_window, img);
+
+  //  const char* tmpl_window = "Grayscale templ";
+  //  namedWindow(tmpl_window, WINDOW_AUTOSIZE);
+  //  imshow(tmpl_window, templ);
+
+  int match_method(match);
+  
+  Mat img_display;
+  img.copyTo(img_display);
+  int result_cols =  img.cols - templ.cols + 1;
+  int result_rows = img.rows - templ.rows + 1;
+  cout << "Hallo 1 img.cols   = " << img.cols   << " img.rows   = " << img.rows << endl;
+  cout << "Hallo 1 templ.cols = " << templ.cols << " templ.rows = " << templ.rows << endl;
+  result.create(result_rows, result_cols, CV_32FC1);
+
+  matchTemplate(img, templ, result, match_method); 
+
+  normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat() );
+
+  double minVal; double maxVal; Point minLoc; Point maxLoc;
+  Point matchLoc;
+  minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
+  
+  cout << "minVal = " << minVal << " maxVal = " << maxVal << endl;
+  cout << "minLoc = " << minLoc << " maxLoc = " << maxLoc << endl;
+
+  //bool method_accepts_mask = (CV_TM_SQDIFF == match_method || match_method == CV_TM_CCORR_NORMED);
+
+  if (match_method  == TM_SQDIFF || match_method == TM_SQDIFF_NORMED ) { 
+    matchLoc = minLoc; 
+  } else { 
+    matchLoc = maxLoc; 
+  }
+
+  rectangle(img_display, matchLoc, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows), Scalar::all(255), 20, 8, 0);
+  rectangle(result,      matchLoc, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows), Scalar::all(255), 20, 8, 0);
+
+  const char* image_window = "Source Image";
+  namedWindow(image_window, WINDOW_AUTOSIZE);
+  imshow( image_window, img_display );
+
+  //  const char* result_window = "Result window";
+  //  namedWindow(result_window, WINDOW_AUTOSIZE);
+  //  imshow(result_window, result);
+
+  int k = waitKey(0); // Wait for a keystroke in the window
+  if(k == 's') {
+    imwrite("result.png", result);
+  } else if (k == 'q') {
+    return; 
+  }
 
 }
 

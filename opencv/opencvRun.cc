@@ -10,7 +10,9 @@ using namespace std;
 // ----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
   string file("fixme"), mode("tests"), tmpl("template");
+  int algo(0);
   for (int i = 0; i < argc; i++){
+    if (!strcmp(argv[i], "-a"))   {algo = atoi(argv[++i]);}
     if (!strcmp(argv[i], "-f"))   {file = argv[++i];}
     if (!strcmp(argv[i], "-t"))   {tmpl = argv[++i];}
     if (!strcmp(argv[i], "-m"))   {mode = argv[++i];}
@@ -40,7 +42,7 @@ int main(int argc, char* argv[]) {
   }
 
   if (string::npos != mode.find("airex1")) {
-    airex1(img, templ);
+    airex1(img, templ, algo);
   }
 
   return 0;
