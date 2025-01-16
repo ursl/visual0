@@ -25,13 +25,15 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::string tmpl_path = samples::findFile(tmpl);
-  Mat templ = imread(tmpl_path, IMREAD_COLOR);
-  if (templ.empty()) {
-    std::cout << "Could not read the image: " << tmpl_path << std::endl;
-    return 1;
+  Mat templ;
+  if (tmpl != "template") {
+    std::string tmpl_path = samples::findFile(tmpl);
+    templ = imread(tmpl_path, IMREAD_COLOR);
+    if (templ.empty()) {
+      std::cout << "Could not read the image: " << tmpl_path << std::endl;
+      return 1;
+    }
   }
-
 
   if (string::npos != mode.find("test0")) {
     opencvTest0(img);
@@ -43,6 +45,10 @@ int main(int argc, char* argv[]) {
 
   if (string::npos != mode.find("airex1")) {
     airex1(img, templ, algo);
+  }
+
+  if (string::npos != mode.find("hdicutout")) {
+    HDICutout(img, algo);
   }
 
   return 0;

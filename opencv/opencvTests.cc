@@ -8,9 +8,40 @@ using namespace cv;
 using namespace std;
 
 // ----------------------------------------------------------------------
-// https://pyimagesearch.com/2015/01/26/multi-scale-template-matching-using-python-opencv/
-void airex1(Mat &colImg, Mat &colTempl, int match) {
+void resizeCanvas(const Mat& src, Mat& dst, const Size& canvasSize, const Scalar& emptyColor) {
+  if((canvasSize.height < src.rows) || canvasSize.width < src.cols) {
+    // Canvas is smaller than source image
+    return;
+  }
+  
+  int bottom = canvasSize.height - src.rows;
+  int right = canvasSize.width - src.cols;
+  
+  copyMakeBorder(src, dst, 0 /*top*/, bottom, 0 /*left*/, right, cv::BORDER_CONSTANT, emptyColor);
+}
 
+
+// ----------------------------------------------------------------------
+Mat resizeCanvas(const Mat& source, Size newSize, Scalar emptyColor) {
+  cv::Mat result(newSize, source.type(), emptyColor);
+  
+  int height = std::min(source.rows, newSize.height);
+  int width = std::min(source.cols, newSize.width);
+  cv::Rect roi(0, 0, width, height);
+  
+  auto sourceWindow = source(roi);
+  auto targetWindow = result(roi);
+  sourceWindow.copyTo(targetWindow);
+  
+  return result;
+}
+
+
+// ----------------------------------------------------------------------
+// -- started from https://pyimagesearch.com/2015/01/26/multi-scale-template-matching-using-python-opencv/
+// -- this matches the AIREX frames onto either glass pictures or HDI pictures
+// -- pictures taken with CANON EOS, standard alignment
+void airex1(Mat &colImg, Mat &colTempl, int match) {
   Mat result;
 
   /** Template matching methods 
@@ -33,14 +64,6 @@ void airex1(Mat &colImg, Mat &colTempl, int match) {
   templ.create(colTempl.size(), colTempl.type());
   cvtColor(colTempl, templ, COLOR_BGR2GRAY);
 
-  //  const char* img_window = "Grayscale Image";
-  //  namedWindow(img_window, WINDOW_AUTOSIZE);
-  //  imshow(img_window, img);
-
-  //  const char* tmpl_window = "Grayscale templ";
-  //  namedWindow(tmpl_window, WINDOW_AUTOSIZE);
-  //  imshow(tmpl_window, templ);
-
   int match_method(match);
   
   Mat img_display;
@@ -49,6 +72,104 @@ void airex1(Mat &colImg, Mat &colTempl, int match) {
   int result_rows = img.rows - templ.rows + 1;
   cout << "Hallo 1 img.cols   = " << img.cols   << " img.rows   = " << img.rows << endl;
   cout << "Hallo 1 templ.cols = " << templ.cols << " templ.rows = " << templ.rows << endl;
+  result.create(result_rows, result_cols, CV_32FC1);
+
+  matchTemplate(img, templ, result, match_method); 
+
+  normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat() );
+
+  double minVal; double maxVal; Point minLoc; Point maxLoc;
+  Point matchLoc;
+  minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
+  
+  cout << "minVal = " << minVal << " maxVal = " << maxVal << endl;
+  cout << "minLoc = " << minLoc << " maxLoc = " << maxLoc << endl;
+
+  if (match_method  == TM_SQDIFF || match_method == TM_SQDIFF_NORMED ) { 
+    matchLoc = minLoc; 
+  } else { 
+    matchLoc = maxLoc; 
+  }
+
+  rectangle(img_display, matchLoc, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows), Scalar::all(255), 20, 8, 0);
+  rectangle(result,      matchLoc, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows), Scalar::all(255), 20, 8, 0);
+
+  const char* image_window = "Source Image";
+  namedWindow(image_window, WINDOW_AUTOSIZE);
+  imshow( image_window, img_display );
+
+  int k = waitKey(0); // Wait for a keystroke in the window
+  if(k == 's') {
+    imwrite("result.png", result);
+  } else if (k == 'q') {
+    return; 
+  }
+
+}
+
+
+// ----------------------------------------------------------------------
+// -- this matches the HDI rounded cutouts onto HDI pictures
+// -- pictures taken with CANON EOS, standard alignment
+void HDICutout(Mat &colImg, int match) {
+  Mat result;
+
+  cout << "HDICutout" << endl;
+
+  /** Template matching methods 
+      enum
+      {
+      TM_SQDIFF        =0,
+      TM_SQDIFF_NORMED =1, masked
+      TM_CCORR         =2,
+      TM_CCORR_NORMED  =3, masked
+      TM_CCOEFF        =4,
+      TM_CCOEFF_NORMED =5
+      };
+  */
+
+	Mat img;
+  img.create(colImg.size(), colImg.type());
+  cvtColor(colImg, img, COLOR_BGR2GRAY);
+
+  std::string tmpl_path = samples::findFile("patterns/hdi-incut1.png");
+  Mat colTempl = imread(tmpl_path, IMREAD_COLOR);
+  if (colTempl.empty()) {
+    std::cout << "Could not read the image: " << tmpl_path << std::endl;
+    return;
+  }
+
+
+	Mat templ;
+  templ.create(colTempl.size(), colTempl.type());
+  cvtColor(colTempl, templ, COLOR_BGR2GRAY);
+
+  Mat newFrame;
+
+  Mat resized;
+  cv::cvtColor(resized, resized, COLOR_BGR2BGRA);
+
+  resizeCanvas(templ, resized, img.size(), Scalar(10,10,10,10));
+
+  Mat resized2 = resizeCanvas(templ, img.size(), Scalar(10,10,10,10));
+
+  double alpha(0.4), gamma(0);
+  addWeighted(resized, alpha, img, 1 - alpha, gamma, newFrame);
+
+  //  bitwise_and(resized, newFrame, resized);
+  imshow("frame", resized);
+
+  int k0 = waitKey(0); // Wait for a keystroke in the window
+  if(k0 == 'q') {
+    return; 
+  }
+
+  int match_method(match);
+  
+  Mat img_display;
+  img.copyTo(img_display);
+  int result_cols =  img.cols - templ.cols + 1;
+  int result_rows = img.rows - templ.rows + 1;
   result.create(result_rows, result_cols, CV_32FC1);
 
   matchTemplate(img, templ, result, match_method); 
@@ -71,19 +192,15 @@ void airex1(Mat &colImg, Mat &colTempl, int match) {
   }
 
   rectangle(img_display, matchLoc, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows), Scalar::all(255), 20, 8, 0);
-  rectangle(result,      matchLoc, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows), Scalar::all(255), 20, 8, 0);
 
   const char* image_window = "Source Image";
   namedWindow(image_window, WINDOW_AUTOSIZE);
-  imshow( image_window, img_display );
-
-  //  const char* result_window = "Result window";
-  //  namedWindow(result_window, WINDOW_AUTOSIZE);
-  //  imshow(result_window, result);
+  imshow(image_window, img_display);
+  imshow(image_window, templ);
 
   int k = waitKey(0); // Wait for a keystroke in the window
   if(k == 's') {
-    imwrite("result.png", result);
+    imwrite("hdicutout.png", result);
   } else if (k == 'q') {
     return; 
   }
