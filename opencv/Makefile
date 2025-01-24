@@ -21,7 +21,7 @@ else
   endif
 endif
 
-INCOPENCV     := -I /opt/homebrew/Cellar/opencv/4.10.0_15/include/opencv4
+INCOPENCV     := -I /opt/homebrew/Cellar/opencv/4.11.0/include/opencv4
 
 CXXFLAGS      = -std=c++1z -g -O0 -Wall -fPIC -pipe
 CXXFLAGS     += $(INCOPENCV)
@@ -30,7 +30,7 @@ LD            = $(CXX)
 LDFLAGS       = $(CXXFLAGS)  -dynamiclib -shared
 SOFLAGS       = $(CXXFLAGS)  -dynamiclib -shared
 
-LIBOPENCV     := -L /opt/homebrew/Cellar/opencv/4.10.0_15/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc
+LIBOPENCV     := -L /opt/homebrew/Cellar/opencv/4.11.0/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc
 
 # -- Source code
 OPENCV = opencvTests.o opencvModule.o
