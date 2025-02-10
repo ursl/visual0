@@ -7,6 +7,16 @@
 using namespace cv;
 using namespace std;
 
+
+// ----------------------------------------------------------------------
+bool waitQ() {
+  int k0 = waitKey(0); // Wait for a keystroke in the window
+  if(k0 == 'q') {
+    return true; 
+  }
+}
+
+
 // ----------------------------------------------------------------------
 void resizeCanvas(const Mat& src, Mat& dst, const Size& canvasSize, const Scalar& emptyColor) {
   if((canvasSize.height < src.rows) || canvasSize.width < src.cols) {
@@ -139,11 +149,25 @@ void HDICutout(Mat &colImg, int match) {
     return;
   }
 
-
+  // -- first overlay the two to get the approximate size corect
 	Mat templ;
   templ.create(colTempl.size(), colTempl.type());
   cvtColor(colTempl, templ, COLOR_BGR2GRAY);
 
+
+
+  cout << " templ.size() = " << templ.size << endl;
+  cout << " img.size()   = " << img.size << endl;
+
+  Mat resi;
+  resize(templ, resi, Size(0.11*templ.cols, 0.11*templ.rows), INTER_LINEAR);
+
+  imshow("frame_templ", templ);
+  imshow("frame_img", img);
+  imshow("frame_resi", resi);
+  
+  if (waitQ()) return;
+  
   Mat newFrame;
 
   Mat resized;
@@ -159,10 +183,6 @@ void HDICutout(Mat &colImg, int match) {
   //  bitwise_and(resized, newFrame, resized);
   imshow("frame", resized);
 
-  int k0 = waitKey(0); // Wait for a keystroke in the window
-  if(k0 == 'q') {
-    return; 
-  }
 
   int match_method(match);
   
