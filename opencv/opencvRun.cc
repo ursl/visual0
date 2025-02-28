@@ -8,6 +8,10 @@ using namespace cv;
 using namespace std;
 
 // ----------------------------------------------------------------------
+// -- Usage examples
+// 
+// bin/opencvRun -f test.jpeg -t patterns/HDI-markers.png 
+// ----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
   string file("fixme"), mode("tests"), tmpl("template");
   int algo(0);
@@ -37,6 +41,14 @@ int main(int argc, char* argv[]) {
 
   if (string::npos != mode.find("test0")) {
     opencvTest0(img);
+  }
+
+  if (string::npos != mode.find("test1")) {
+    opencvTest1(img);
+  }
+
+  if (string::npos != mode.find("test2")) {
+    opencvTest2(img, templ, algo);
   }
 
   if (string::npos != mode.find("mana1")) {

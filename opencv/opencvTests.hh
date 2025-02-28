@@ -12,5 +12,6 @@ void opencvTest1(cv::Mat &);
 void airex1(cv::Mat &, cv::Mat &, int match = cv::TM_CCOEFF_NORMED);
 void HDICutout(cv::Mat &colImg, int match = cv::TM_CCOEFF_NORMED);
 
+void opencvTest2(cv::Mat &, cv::Mat &, int match = cv::TM_CCOEFF_NORMED);
 
 #endif

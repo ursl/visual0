@@ -14,6 +14,7 @@ bool waitQ() {
   if(k0 == 'q') {
     return true; 
   }
+  return false;
 }
 
 
@@ -110,7 +111,7 @@ void airex1(Mat &colImg, Mat &colTempl, int match) {
 
   int k = waitKey(0); // Wait for a keystroke in the window
   if(k == 's') {
-    imwrite("result.png", result);
+    imwrite("result.png", img_display);
   } else if (k == 'q') {
     return; 
   }
@@ -375,4 +376,39 @@ void opencvTest1(Mat &img) {
       imwrite("starry_night.png", img);
     }
   }
+}
+
+
+// ----------------------------------------------------------------------
+void opencvTest2(Mat &colImg, Mat &colTempl, int match) {
+
+  Mat result;
+
+  /** Template matching methods 
+      enum
+      {
+      TM_SQDIFF        =0,
+      TM_SQDIFF_NORMED =1, masked
+      TM_CCORR         =2,
+      TM_CCORR_NORMED  =3, masked
+      TM_CCOEFF        =4,
+      TM_CCOEFF_NORMED =5
+      };
+  */
+
+	Mat img;
+  img.create(colImg.size(), colImg.type());
+  cvtColor(colImg, img, COLOR_BGR2GRAY);
+
+	Mat templ;
+  templ.create(colTempl.size(), colTempl.type());
+//  cvtColor(colTempl, templ, COLOR_BGR2GRAY);
+
+  cv::Mat insetImage(img, cv::Rect(70, 70, 20, 20));
+  templ.copyTo(insetImage);
+  
+  cv::imshow("Overlay Image", templ);
+
+  int k = waitKey(0); // Wait for a keystroke in the window
+
 }
