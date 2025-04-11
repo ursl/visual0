@@ -37,7 +37,7 @@ all: prep lib bin
 # -- targets
 all: prep lib bin
  
-lib: $(addprefix obj/,$(FILES))
+lib: prep $(addprefix obj/,$(FILES))
 	echo "hallo lib"
 	$(CXX) $(SOFLAGS) $(addprefix obj/,$(FILES)) -o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS)
  
