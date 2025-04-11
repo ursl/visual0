@@ -1,0 +1,12 @@
+[
+    {
+      "env": {
+        "myIncludePath": ["${workspaceFolder}", "${ROOTSYS}/include/**"]
+    },
+    {
+        "directory": "${workspaceFolder}",
+        "arguments": [
+            "c++", "-std=c++1z", "-g",  "-O0", "-Wall", "-fPIC", "-pipe", "-stdlib=libc++", "-pthread", "-std=c++17", "-m64", "-I/opt/software/root/063204/include", "-o", "obj/compound.o"],
+        "file": "compound.cc"
+    }
+] 
