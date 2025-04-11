@@ -1,0 +1,36 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}",
+                "/opt/software/root/063204/include/**",
+                "/Users/ursl/macros/ana/util/"
+            ],
+            "defines": [
+                "__ROOT__",
+                "ROOT_VERSION_CODE=63204"
+            ],
+            "macFrameworkPath": [
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/c++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-arm64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "/opt/software/root/063204/include",
+                    "/opt/software/root/063204/include/root",
+                    "/opt/software/root/063204/include/ROOT",
+                    "/opt/software/root/063204/include/core",
+                    "/opt/software/root/063204/include/math"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db"
+            }
+        }
+    ],
+    "version": 4
+}

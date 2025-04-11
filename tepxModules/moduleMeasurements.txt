@@ -1,0 +1,267 @@
+#include "TVector2.h"
+
+// ----------------------------------------------------------------------
+// cd /Users/ursl/inkscape/tepx-modules   
+// rr> .L ~/macros/pixel/moduleMeasurements.C 
+// rr> parseSvgFile("P1007.svg")
+// ----------------------------------------------------------------------
+
+// ----------------------------------------------------------------------
+struct compound {
+  void dump() {
+    cout << "HDI:    "; 
+    for (int i = 0; i < 8; ++i) {
+      cout << Form("%8.3f/%8.3f ", pHDI[i].X(), pHDI[i].Y()); 
+    }
+    cout << endl;
+    cout << "ROCs: "; 
+    for (int i = 0; i < 4; ++i) {
+      cout << Form("%8.3f/%8.3f ", pROCs[i].X(), pROCs[i].Y()); 
+    }
+    cout << endl;
+    cout << "scale factor = " << sf << endl;
+  }
+  // -- 8 points for HDI. SVG coordinates
+  vector<TVector2> pHDI, pHDIPrime;
+  // 8 points for ROCs. SVG coordinates
+  vector<TVector2> pROCs, pROCsPrime;
+  // 8 alignment crosses for ROCs. SVG coordinates
+  vector<TVector2> pACs, pACsPrime;
+  // 3 points for HDI markers. SVG coordinates
+  vector<TVector2> pMarkers, pMarkersPrime;
+  // convert pixel (distance) to mm (distance)
+  double sf;
+};
+ 
+
+// ----------------------------------------------------------------------
+TVector2 rotate(TVector2 r, double theta) {
+  double x = TMath::Cos(theta)*r.X() - TMath::Sin(theta)*r.Y();
+  double y = TMath::Sin(theta)*r.X() + TMath::Cos(theta)*r.Y();
+  return TVector2(x, y);
+}
+
+
+// ----------------------------------------------------------------------
+TVector2 transform(TVector2 r, double theta, TVector2 t) {
+  return (rotate(r, theta) + t);
+}
+
+
+// ----------------------------------------------------------------------
+// -- absolute length scale factor extracted from measurement markers on HDI
+double px2mm(compound &a) {
+  double result(0.);
+  double dm1m2 = 23.0; //mm
+  double dm2m3 = 40.0; //mm
+
+  double pxDiff1 = (a.pMarkers[0] - a.pMarkers[1]).Mod(); 
+  cout << "pxDiff1 = " << pxDiff1 << " is 23mm, sf = " << dm1m2/pxDiff1 << endl;
+
+  double pxDiff2 = (a.pMarkers[1] - a.pMarkers[2]).Mod(); 
+  cout << "pxDiff2 = " << pxDiff2 << " is 40mm, sf = " <<  dm2m3/pxDiff2  << endl;
+  
+  a.sf = 0.5*(dm1m2/pxDiff1 + dm2m3/pxDiff2); 
+  cout << "sf = " << a.sf << endl;
+
+  return result;
+}
+
+
+// ----------------------------------------------------------------------
+void calculateAll(compound a) {
+  
+  // -- normalized unit vectors of primed coordinate system on HDI
+  TVector2 yPrime = a.pMarkers[0] - a.pMarkers[1];
+  yPrime /= yPrime.Mod();
+  TVector2 xPrime = a.pMarkers[2] - a.pMarkers[1];
+  xPrime /= xPrime.Mod();
+  
+  double theta = TMath::ACos(xPrime*TVector2(1., 0.));
+  double alpha = TMath::ACos(yPrime*TVector2(0., 1.));
+  double thetaPrime = TMath::ACos(xPrime*yPrime);
+
+  // theta = 0.5*(theta + alpha);
+  // theta = 0.0;
+  // theta = alpha; 
+
+  a.pMarkersPrime.push_back(transform(a.pMarkers[0], theta, a.pMarkers[1]));
+  a.pMarkersPrime.push_back(transform(a.pMarkers[1], theta, a.pMarkers[1]));
+  a.pMarkersPrime.push_back(transform(a.pMarkers[2], theta, a.pMarkers[1]));
+  
+  cout << "--------------------------" << endl;
+  cout << Form("xPrime = %+10.8f/%+10.8f", xPrime.X(), xPrime.Y()) << endl;
+  cout << Form("yPrime = %+10.8f/%+10.8f", yPrime.X(), yPrime.Y()) << endl;
+  cout << "theta = " << theta << " 180-theta[deg] = " << (TMath::Pi() - theta)*TMath::RadToDeg() << endl;
+  cout << "alpha = " << alpha << " 180-alpha[deg] = " << (TMath::Pi() - alpha)*TMath::RadToDeg() << endl;
+
+  cout << "prime orthogonality = " << thetaPrime
+       << " pi/2-thetaPrime = " << (0.5*TMath::Pi() - thetaPrime) << "rad"
+       << " 90-thetaPrime[deg] = " << (0.5*TMath::Pi() - thetaPrime)*TMath::RadToDeg() << "deg"
+       << endl;
+
+  cout << "marker0Prime = " << a.pMarkersPrime[0].X() << "/" << a.pMarkersPrime[0].Y() << endl;
+  cout << "marker1Prime = " << a.pMarkersPrime[1].X() << "/" << a.pMarkersPrime[1].Y() << endl;
+  cout << "marker2Prime = " << a.pMarkersPrime[2].X() << "/" << a.pMarkersPrime[2].Y() << endl;
+
+  for (unsigned int i = 0; i < 8; ++i) {
+    a.pROCsPrime.push_back(transform(a.pROCs[0], theta, a.pMarkers[i]));
+  }
+
+  // -- Chip 0
+  a.pACs.push_back(TVector2(a.pROCsPrime[0].X() + 6.75 -  30, a.pROCsPrime[0].Y() + 8.3));
+  a.pACs.push_back(TVector2(a.pROCsPrime[1].X() + 6.75 + 165, a.pROCsPrime[1].Y() + 8.3));
+
+  // -- Chip 1
+  a.pACs.push_back(TVector2(a.pROCsPrime[2].X() + 6.75 -  30, a.pROCsPrime[2].Y() + 8.3));
+  a.pACs.push_back(TVector2(a.pROCsPrime[3].X() + 6.75 + 165, a.pROCsPrime[3].Y() + 8.3));
+
+  // -- Chip 2
+  a.pACs.push_back(TVector2(a.pROCsPrime[4].X() + 6.75 + 165, a.pROCsPrime[4].Y() + 8.3));
+  a.pACs.push_back(TVector2(a.pROCsPrime[5].X() + 6.75 -  30, a.pROCsPrime[5].Y() + 8.3));
+
+  // -- Chip 3
+  a.pACs.push_back(TVector2(a.pROCsPrime[6].X() + 6.75 + 165, a.pROCsPrime[6].Y() + 8.3));
+  a.pACs.push_back(TVector2(a.pROCsPrime[7].X() + 6.75 -  30, a.pROCsPrime[7].Y() + 8.3));
+
+  cout << "*** pROCs X/Y" << endl;
+  for (auto it: a.pROCs) {
+    cout << it.X() << "/" << it.Y() << endl;
+  }
+
+  cout << "*** pROCsPrime X/Y" << endl;
+  for (auto it: a.pROCsPrime) {
+    cout << it.X() << "/" << it.Y() << endl;
+  }
+
+  cout << "*** alignment crosses X/Y" << endl;
+  for (auto it: a.pACs) {
+    cout << it.X() << "/" << it.Y() << endl;
+  }
+  cout << "test1: " << a.pACs[1].X() - a.pACs[0].X() << endl;
+
+}
+
+// ----------------------------------------------------------------------
+compound parseSvgFile(const string filename) {
+  int VERBOSE(0); 
+  string bareName(filename);
+  string csv1 = Form("%s.chips", bareName.c_str());
+  string csv2 = Form("%s.hdi", bareName.c_str());
+  string csv3 = Form("%s.marks", bareName.c_str());
+
+  system(Form("/Applications/Inkscape.app/Contents/MacOS/inkscape %s --query-id chip00,chip01,chip10,chip11,chip20,chip21,chip30,chip31 -X -Y > %s", 
+              filename.c_str(), csv1.c_str()));
+
+  system(Form("/Applications/Inkscape.app/Contents/MacOS/inkscape %s --query-id HDI00,HDI01,HDI10,HDI11,HDI20,HDI21,HDI30,HDI31 -X -Y > %s", 
+              filename.c_str(), csv2.c_str()));
+
+  system(Form("/Applications/Inkscape.app/Contents/MacOS/inkscape %s --query-id mark1,mark2,mark3 -X -Y > %s", filename.c_str(), csv3.c_str()));
+
+  bool doParse(false);
+  ifstream INS;
+  string sline;
+
+  compound a;
+
+  // -- read 2 lines of chip coordinates
+  cout << "read 1" << endl;
+  INS.open(csv1);
+  vector<string> vlines; 
+  while (getline(INS, sline)) {
+    vlines.push_back(sline);
+  }
+  INS.close();
+  
+  vector<string> schipsX = split(vlines[0], ',');  
+  vector<string> schipsY = split(vlines[1], ',');  
+
+  for (unsigned int i = 0; i < schipsX.size(); ++i) {
+    a.pROCs.push_back(TVector2(::stof(schipsX[i]), ::stof(schipsY[i])));
+  }
+
+  // -- read 2 lines of HDI coordinates
+  cout << "read 2" << endl;
+  INS.open(csv2);
+  vlines.clear();
+  while (getline(INS, sline)) {
+    vlines.push_back(sline);
+  }
+  INS.close();
+  
+  vector<string> shdiX = split(vlines[0], ',');  
+  vector<string> shdiY = split(vlines[1], ',');  
+
+  for (unsigned int i = 0; i < shdiX.size(); ++i) {
+    a.pHDI.push_back(TVector2(::stof(shdiX[i]), ::stof(shdiY[i])));
+  }
+
+  // -- read 2 lines of markers
+  cout << "read 3" << endl;
+  INS.open(csv3);
+  vlines.clear();
+  while (getline(INS, sline)) {
+    vlines.push_back(sline);
+  }
+  INS.close();
+  
+  vector<string> smarkersX = split(vlines[0], ',');  
+  vector<string> smarkersY = split(vlines[1], ',');  
+
+  for (unsigned int i = 0; i < smarkersX.size(); ++i) {
+    a.pMarkers.push_back(TVector2(::stof(smarkersX[i]), ::stof(smarkersY[i])));
+  }
+
+  cout << "Chips:" << endl;
+  for (unsigned int i = 0; i < 4; ++i) {
+    cout << Form("%+09.3f/%+09.3f ", a.pROCs[i].X(), a.pROCs[i].Y());
+  }
+  cout << endl;
+  for (unsigned int i = 7; i > 3; --i) {
+    cout << Form("%+09.3f/%+09.3f ", a.pROCs[i].X(), a.pROCs[i].Y());
+  }
+  cout << endl;
+  
+  cout << "HDI:" << endl;
+  for (unsigned int i = 0; i < 4; ++i) {
+    cout << Form("%+09.3f/%+09.3f ", a.pHDI[i].X(), a.pHDI[i].Y());
+  }
+  cout << endl;
+  for (unsigned int i = 7; i > 3; --i) {
+    cout << Form("%+09.3f/%+09.3f ", a.pHDI[i].X(), a.pHDI[i].Y());
+  }
+  cout << endl;
+
+  cout << "Markers:" << endl;
+  for (unsigned int i = 0; i < 3; ++i) {
+    cout << Form("%+09.3f/%+09.3f ", a.pMarkers[i].X(), a.pMarkers[i].Y());
+  }
+  cout << endl;
+
+  px2mm(a);
+  calculateAll(a);
+  return a;
+}
+
+
+// ----------------------------------------------------------------------
+void testCoordinates() {
+  // -- normalized unit vectors of primed coordinate system on HDI
+  compound a;
+  a.pMarkers[0] = {8120, 1308};
+  a.pMarkers[1] = {8139, 4671};
+  a.pMarkers[2] = {2245, 4670};
+  
+  TVector2 yPrime = a.pMarkers[0] - a.pMarkers[1];
+  yPrime /= yPrime.Mod();
+  TVector2 xPrime = a.pMarkers[2] - a.pMarkers[1];
+  xPrime /= xPrime.Mod();
+  
+  cout << "xPrime = " << xPrime.X() << "/" << xPrime.Y() << endl;
+  cout << "yPrime = " << yPrime.X() << "/" << yPrime.Y() << endl;
+
+  double theta = TMath::ACos(xPrime*TVector2(1., 0.));
+  double alpha = TMath::ACos(yPrime*TVector2(0., 1.));
+  double thetaPrime = TMath::ACos(xPrime*yPrime);
+
+}
