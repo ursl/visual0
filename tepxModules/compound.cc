@@ -312,19 +312,19 @@ void compound::dump() {
   }
   cout << endl;
 
-  cout << "Alignment crosses X/Y(Prime)" << endl;
-  for (auto it : pACsPrime) {
-    cout << it.X() << "/" << it.Y() << endl;
-  }
-
-  cout << "Test chip dimensions?" << endl;
+  cout << "Test chip dimensions? (Correct answer: 21.673mm)" << endl;
+  TH1D *h0 = new TH1D("hdr", "hdr", 40, 21.4, 21.8);
   for (int i = 0; i < 4; ++i) {
+    double diff = fSF * TMath::Abs((pROCsPrime[2 * i + 1].X() - pROCsPrime[2 * i].X()));
     cout << "chip " << i << ": "
-         << TMath::Abs(pACsPrime[2 * i + 1].X() - pACsPrime[2 * i].X())
+         << TMath::Abs(pROCsPrime[2 * i + 1].X() - pROCsPrime[2 * i].X())
          << " px, "
-         << fSF * TMath::Abs((pACsPrime[2 * i + 1].X() - pACsPrime[2 * i].X()))
+         << diff
          << " mm" << endl;
+    h0->Fill(diff);
   }
+  cout << "RMS = " << h0->GetRMS() << endl;
+
 
   cout << "Test HDI marker precision" << endl;
   TH1D *h1 = new TH1D("hdi", "hdi", 40, 20.4, 20.6);
