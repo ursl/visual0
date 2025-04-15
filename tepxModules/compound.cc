@@ -127,31 +127,6 @@ void compound::parseSvgFile() {
     pMarkers[i] = TVector2(::stof(smarkersX[i]), ::stof(smarkersY[i]));
   }
 
-  // cout << "Chips:" << endl;
-  // for (unsigned int i = 0; i < 4; ++i) {
-  //   cout << Form("%+09.3f/%+09.3f ", pROCs[i].X(), pROCs[i].Y());
-  // }
-  // cout << endl;
-  // for (unsigned int i = 7; i > 3; --i) {
-  //   cout << Form("%+09.3f/%+09.3f ", pROCs[i].X(), pROCs[i].Y());
-  // }
-  // cout << endl;
-
-  // cout << "HDI:" << endl;
-  // for (unsigned int i = 0; i < 4; ++i) {
-  //   cout << Form("%+09.3f/%+09.3f ", pHDI[i].X(), pHDI[i].Y());
-  // }
-  // cout << endl;
-  // for (unsigned int i = 7; i > 3; --i) {
-  //   cout << Form("%+09.3f/%+09.3f ", pHDI[i].X(), pHDI[i].Y());
-  // }
-  // cout << endl;
-
-  // cout << "Markers:" << endl;
-  // for (unsigned int i = 0; i < 3; ++i) {
-  //   cout << Form("%+09.3f/%+09.3f ", pMarkers[i].X(), pMarkers[i].Y());
-  // }
-  // cout << endl;
 }
 
 // ----------------------------------------------------------------------
@@ -312,7 +287,7 @@ void compound::dump() {
   }
   cout << endl;
 
-  cout << "Test chip dimensions? (Correct answer: 21.673mm)" << endl;
+  cout << "Test chip dimensions? (Correct answer: 21.500mm)" << endl;
   TH1D *h0 = new TH1D("hdr", "hdr", 40, 21.4, 21.8);
   for (int i = 0; i < 4; ++i) {
     double diff = fSF * TMath::Abs((pROCsPrime[2 * i + 1].X() - pROCsPrime[2 * i].X()));
@@ -323,7 +298,7 @@ void compound::dump() {
          << " mm" << endl;
     h0->Fill(diff);
   }
-  cout << "RMS = " << h0->GetRMS() << endl;
+  cout << "RMS = " << h0->GetRMS() << "mm" << endl;
 
 
   cout << "Test HDI marker precision" << endl;
@@ -337,5 +312,5 @@ void compound::dump() {
          << " mm" << endl;
          h1->Fill(diff);
   }
-  cout << "RMS = " << h1->GetRMS() << endl;
+  cout << "RMS = " << h1->GetRMS() << "mm" << endl;
 }
