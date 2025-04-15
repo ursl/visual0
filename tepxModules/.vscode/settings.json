@@ -3,4 +3,13 @@
     "files.associations": {
         "vector": "cpp"
     }
-}
+    "makefile.configureOnOpen": true,
+    "files.associations": {
+        "vector": "cpp"
+    },
+    "[cpp]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false
+    }
+}}
