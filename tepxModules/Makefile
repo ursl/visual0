@@ -18,7 +18,7 @@ GLIBS         = $(filter-out -lz, $(ROOTGLIBS))
 OSUFFIX := .o
 
 # -- Source code
-FILES = compound.o moduleMeasurement.o 
+FILES = compound.o moduleMeasurement.o modulesAnalysis.o 
 BINARIES = runModuleMeasurement
 
 LIBRARIES = lib/libAnaUtil.so 

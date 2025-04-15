@@ -1,5 +1,5 @@
 #include "moduleMeasurement.hh"
-
+#include "modulesAnalysis.hh"
 #include <iostream>
 #include <string>
 
@@ -14,8 +14,14 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < argc; i++){
     if (!strcmp(argv[i], "-v"))   {verbose = atoi(argv[++i]);}
     if (!strcmp(argv[i], "-f"))   {fileName = argv[++i];}
+    if (!strcmp(argv[i], "-m"))   {mode = atoi(argv[++i]);}
   }
  
+  if (1 == mode) {
+    modulesAnalysis ma(1);
+    ma.calcAll();
+  }
+
   moduleMeasurement m(fileName);
   if (fileName != "bla") {
     m.setFileName(fileName);
