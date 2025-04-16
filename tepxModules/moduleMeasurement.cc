@@ -8,18 +8,44 @@
 using namespace std;
 
 // ----------------------------------------------------------------------
-moduleMeasurement::moduleMeasurement(string filename) : fCompound(), fFilename(filename) {}
+moduleMeasurement::moduleMeasurement(string filename, int position) : fCompound(filename), fFilename(filename), fPosition(position) {
+  // -- extract index from filename
+  fIndex = filename.find_last_of("/") + 2; // assume single-letter offset for index
+  fIndex = stoi(filename.substr(fIndex, 4)); // assume 4-digit index
+  cout << "fIndex = " << fIndex << endl;
+}
 
 
 // ----------------------------------------------------------------------
 void moduleMeasurement::setFileName(string filename) {
   fFilename = filename;
-  fCompound.fName = filename;
+  fCompound.setName(filename);
+  
+  // -- extract index from filename
+  fIndex = filename.find_last_of("/") + 2; // assume single-letter offset for index
+  fIndex = stoi(filename.substr(fIndex, 4));
+  cout << "fIndex = " << fIndex << endl;
 }
 
 // ----------------------------------------------------------------------
-void moduleMeasurement::calcAll() {
-  fCompound.calcAll();
+void moduleMeasurement::calcAll(int verbose, int doParse) {
+  fCompound.calcAll(verbose, doParse);
+}
+
+// ----------------------------------------------------------------------
+double moduleMeasurement::getChipWidth(int ichip) {
+  return fCompound.getSF() * TMath::Abs(fCompound.getROCsPrime(2*ichip).X() - fCompound.getROCsPrime(2*ichip+1).X());
+}
+
+// ----------------------------------------------------------------------
+double moduleMeasurement::getMarkerDistance(std::string dir) {
+  if (dir == "x") {
+    return fCompound.getSF() * (fCompound.getMarkersPrime(2) - fCompound.getMarkersPrime(1)).Mod();
+  }
+  if (dir == "y") {
+    return fCompound.getSF() * (fCompound.getMarkersPrime(0) - fCompound.getMarkersPrime(1)).Mod();
+  }
+  return 0;
 }
 
 // ----------------------------------------------------------------------
@@ -60,50 +86,50 @@ void moduleMeasurement::testCoordinates(int mode) {
   // -- normalized unit vectors of new coordinate system on HDI, in SVG coordinates
   compound a("test");
   if (0) {
-    a.pMarkers[0] = TVector2(8120, 1308);
-    a.pMarkers[1] = TVector2(8139, 4671);
-    a.pMarkers[2] = TVector2(2245, 4670);
+    a.getMarkers(0) = TVector2(8120, 1308);
+    a.getMarkers(1) = TVector2(8139, 4671);
+    a.getMarkers(2) = TVector2(2245, 4670);
   }
 
   // -- test perfect case (flipped, perfectly aligned)
   if (0) {
-    a.pMarkers[0] = TVector2(8120, 1308);
-    a.pMarkers[1] = TVector2(8120, 4671);
-    a.pMarkers[2] = TVector2(2245, 4671);
+    a.getMarkers(0) = TVector2(8120, 1308);
+    a.getMarkers(1) = TVector2(8120, 4671);
+    a.getMarkers(2) = TVector2(2245, 4671);
   }
 
   // -- test perfect case (rotated by 90 degrees, perfectly aligned)
   if (0) {
-    a.pMarkers[2] = TVector2(8120, 6000);
-    a.pMarkers[1] = TVector2(8120, 4671);
-    a.pMarkers[0] = TVector2(2245, 4671);
+    a.getMarkers(2) = TVector2(8120, 6000);
+    a.getMarkers(1) = TVector2(8120, 4671);
+    a.getMarkers(0) = TVector2(2245, 4671);
   }
 
   TVector2 aTestPoint = TVector2(8125, 4000);
   // -- test slightly overrotated case (flipped)
   if (1 == mode) {
-    a.fName = "mode 1";
+    a.getName() = "mode 1";
     cout << "alpha more negative than -3.1415" << endl;
-    a.pMarkers[0] = TVector2(8160, 1308);
-    a.pMarkers[1] = TVector2(8120, 4671);
-    a.pMarkers[2] = TVector2(2245, 4650);
+    a.getMarkers(0) = TVector2(8160, 1308);
+    a.getMarkers(1) = TVector2(8120, 4671);
+    a.getMarkers(2) = TVector2(2245, 4650);
   }
 
    // -- test slightly underrotated case (flipped)
    if (2 == mode) {
-    a.fName = "mode 2";
+    a.getName() = "mode 2";
     cout << "alpha less negative than -3.1415" << endl;
-    a.pMarkers[0] = TVector2(8080, 1308);
-    a.pMarkers[1] = TVector2(8120, 4671);
-    a.pMarkers[2] = TVector2(2245, 4691);
+    a.getMarkers(0) = TVector2(8080, 1308);
+    a.getMarkers(1) = TVector2(8120, 4671);
+    a.getMarkers(2) = TVector2(2245, 4691);
   }
 
   a.dump();
 
-  TVector2 ySvg = a.pMarkers[0] - a.pMarkers[1];
+  TVector2 ySvg = a.getMarkers(0) - a.getMarkers(1);
   cout << "ySvgRaw  = " << Form("%9.7f", ySvg .X()) << "/" << Form("%9.7f", ySvg .Y()) << endl;
   ySvg  /= ySvg .Mod();
-  TVector2 xSvg  = a.pMarkers[2] - a.pMarkers[1];
+  TVector2 xSvg  = a.getMarkers(2) - a.getMarkers(1);
   //cout << "xSvgRaw  = " << Form("%9.7f", xSvg .X()) << "/" << Form("%9.7f", xSvg .Y()) << endl;
   xSvg  /= xSvg .Mod();
   
@@ -119,7 +145,7 @@ void moduleMeasurement::testCoordinates(int mode) {
   double theta0 = TMath::ACos(xSvg  * TVector2(1., 0.));
   double theta1 = TMath::ACos(ySvg  * TVector2(0., 1.));
   double alpha  = 0.5*(theta0 + theta1);
-  TVector2 offset = a.pMarkers[1];
+  TVector2 offset = a.getMarkers(1);
 
   // -- rotation sign
   TVector2 xOld = TVector2(1, 0);
@@ -130,11 +156,11 @@ void moduleMeasurement::testCoordinates(int mode) {
   cout << "rsgn     = " << rsgn << endl;
   cout << "theta0/1 = " << theta0 << "/" << theta1 << endl;
   cout << "alpha    = " << alpha << endl;
-  cout << "offset   = " << dump(a.pMarkers[1]) << endl;
-  a.fAlpha = alpha; 
-  a.fOffset = offset;
+  cout << "offset   = " << dump(a.getMarkers(1)) << endl;
+  a.setAlpha(alpha); 
+  a.setOffset(offset);
 
-  TVector2 origPrime = transform(a.pMarkers[1], alpha, offset);
+  TVector2 origPrime = transform(a.getMarkers(1), alpha, offset);
   cout << "origPrime = " << dump(origPrime) << endl;
 
   TVector2 aPrime = transform(aTestPoint, alpha, offset);
@@ -143,12 +169,12 @@ void moduleMeasurement::testCoordinates(int mode) {
   a.dump();
   fCompound.set(a);
 
-  TVector2 aPrime2 = transform(aTestPoint, fCompound.fAlpha, fCompound.fOffset);
+  TVector2 aPrime2 = transform(aTestPoint, fCompound.getAlpha(), fCompound.getOffset());
   cout << "aPrime2   = " << dump(aPrime2) << endl;
 
   fCompound.set(a);
   // fCompound.transform(fCompound.pMarkers, fCompound.pMarkersPrime);
   // fCompound.dump();
-  TVector2 aPrime3 = fCompound.transform(aTestPoint, fCompound.fAlpha, fCompound.fOffset);
+  TVector2 aPrime3 = fCompound.transform(aTestPoint, fCompound.getAlpha(), fCompound.getOffset());
   cout << "aPrime3   = " << dump(aPrime3) << endl;
 }

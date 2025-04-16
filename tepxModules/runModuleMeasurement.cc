@@ -19,10 +19,12 @@ int main(int argc, char* argv[]) {
  
   if (1 == mode) {
     modulesAnalysis ma(1);
-    ma.calcAll();
+    ma.doAll();
+    ma.plotGlueTests();
+    return 0;
   }
 
-  moduleMeasurement m(fileName);
+  moduleMeasurement m(fileName, 0);
   if (fileName != "bla") {
     m.setFileName(fileName);
     m.calcAll();
@@ -30,5 +32,5 @@ int main(int argc, char* argv[]) {
     m.testCoordinates(1);
     m.testCoordinates(2);
   }
-
+  return 0;
  }

@@ -13,7 +13,8 @@ using namespace std;
 
 // ----------------------------------------------------------------------
 compound::compound(string name)
-    : fSF(0.), fAlpha(0.0), fOrthogonality(9999.), fName(name) {
+    : fSF(0.1), fAlpha(0.0), fOrthogonality(9999.), fName(name) {
+  cout << "ctor compound ->" << fName << "<- " << "inside constructor for object " << this << endl;
   TVector2 a(0., 0.);
   pHDI = {a, a, a, a, a, a, a, a};
   pHDIPrime = {a, a, a, a, a, a, a, a};
@@ -54,33 +55,39 @@ void compound::set(compound &other) {
 }
 
 // ----------------------------------------------------------------------
-void compound::parseSvgFile() {
+void compound::parseSvgFile(int doParse) {
+
   int    VERBOSE(0);
   string bareName(fName);
   string csv1 = Form("%s.chips", bareName.c_str());
   string csv2 = Form("%s.hdi", bareName.c_str());
   string csv3 = Form("%s.marks", bareName.c_str());
 
-  system(
+  if (doParse) {
+    system(
       Form("/Applications/Inkscape.app/Contents/MacOS/inkscape %s --query-id "
            "chip00,chip01,chip10,chip11,chip20,chip21,chip30,chip31 -X -Y > %s",
            fName.c_str(), csv1.c_str()));
+  }
 
-  system(
+  if (doParse) {
+    system(
       Form("/Applications/Inkscape.app/Contents/MacOS/inkscape %s --query-id "
            "HDI00,HDI01,HDI10,HDI11,HDI20,HDI21,HDI30,HDI31 -X -Y > %s",
            fName.c_str(), csv2.c_str()));
+  }
 
-  system(Form("/Applications/Inkscape.app/Contents/MacOS/inkscape %s "
-              "--query-id mark1,mark2,mark3 -X -Y > %s",
-              fName.c_str(), csv3.c_str()));
+  if (doParse) {
+    system(Form("/Applications/Inkscape.app/Contents/MacOS/inkscape %s "
+                "--query-id mark1,mark2,mark3 -X -Y > %s",
+                fName.c_str(), csv3.c_str()));
+  }
 
-  bool     doParse(false);
   ifstream INS;
   string   sline;
 
   // -- read 2 lines of chip coordinates
-  cout << "read 1: chip coordinates" << endl;
+  cout << "read 1: chip coordinates ->" << csv1 << "<- ";
   INS.open(csv1);
   vector<string> vlines;
   while (getline(INS, sline)) {
@@ -90,13 +97,14 @@ void compound::parseSvgFile() {
 
   vector<string> schipsX = split(vlines[0], ',');
   vector<string> schipsY = split(vlines[1], ',');
+  cout << "schips.size() = " << schipsX.size() << "/" << schipsY.size() << endl;
 
   for (unsigned int i = 0; i < schipsX.size(); ++i) {
     pROCs[i] = TVector2(::stof(schipsX[i]), ::stof(schipsY[i]));
   }
 
   // -- read 2 lines of HDI coordinates
-  cout << "read 2: HDI coordinates" << endl;
+  cout << "read 2: HDI coordinates ->" << csv2 << "<- ";
   INS.open(csv2);
   vlines.clear();
   while (getline(INS, sline)) {
@@ -106,13 +114,14 @@ void compound::parseSvgFile() {
 
   vector<string> shdiX = split(vlines[0], ',');
   vector<string> shdiY = split(vlines[1], ',');
+  cout << "shdi.size() = " << shdiX.size() << "/" << shdiY.size() << endl;
 
   for (unsigned int i = 0; i < shdiX.size(); ++i) {
     pHDI[i] = TVector2(::stof(shdiX[i]), ::stof(shdiY[i]));
   }
 
   // -- read 2 lines of markers
-  cout << "read 3: marker coordinates" << endl;
+  cout << "read 3: marker coordinates ->" << csv3 << "<- ";
   INS.open(csv3);
   vlines.clear();
   while (getline(INS, sline)) {
@@ -122,6 +131,7 @@ void compound::parseSvgFile() {
 
   vector<string> smarkersX = split(vlines[0], ',');
   vector<string> smarkersY = split(vlines[1], ',');
+  cout << "smarkers.size() = " << smarkersX.size() << "/" << smarkersY.size() << endl;
 
   for (unsigned int i = 0; i < smarkersX.size(); ++i) {
     pMarkers[i] = TVector2(::stof(smarkersX[i]), ::stof(smarkersY[i]));
@@ -159,7 +169,7 @@ void compound::determineTransformation() {
   xSvg /= xSvg.Mod();
 
   // -- this is a x-check on how well the markers have been measured
-  fOrthogonality = TMath::ACos(xSvg * ySvg);
+  fOrthogonality = 100. * TMath::ACos(xSvg * ySvg) / TMath::PiOver2();
 
   fOffset = pMarkers[1];
 
@@ -221,8 +231,9 @@ void compound::determineAlignmentCrosses() {
 }
 
 // ----------------------------------------------------------------------
-void compound::calcAll() {
-  parseSvgFile();
+void compound::calcAll(int verbose, int doParse) {
+  cout << "compound ->" << fName << "<- " << "inside calcAll() for object " << this << endl;
+  parseSvgFile(doParse);
   determineSF();
   determineTransformation();
   transform(pMarkers, pMarkersPrime);
@@ -236,8 +247,8 @@ void compound::calcAll() {
 void compound::dump() {
   cout << "compound ->" << fName << "<- alpha = " << fAlpha << " offset = ("
        << fOffset.X() << "/" << fOffset.Y() << ")"
-       << " orthogonality = " << 100. * fOrthogonality / TMath::PiOver2() << "%"
-       << " SF = " << fSF << "mm/px" << endl;
+       << " orthogonality = " << fOrthogonality  << "%"
+       << " SF = " << fSF << "mm/px" << " at address " << this << endl;
 
   cout << "Markers:        ";
   for (int i = 0; i < pMarkers.size(); ++i) {
@@ -299,6 +310,7 @@ void compound::dump() {
     h0->Fill(diff);
   }
   cout << "RMS = " << h0->GetRMS() << "mm" << endl;
+  delete h0;
 
 
   cout << "Test HDI marker precision" << endl;
@@ -313,4 +325,11 @@ void compound::dump() {
          h1->Fill(diff);
   }
   cout << "RMS = " << h1->GetRMS() << "mm" << endl;
+  delete h1;
+}
+
+// ----------------------------------------------------------------------
+bool exists_test0(const std::string& name) {
+  ifstream f(name.c_str());
+  return f.good();
 }
