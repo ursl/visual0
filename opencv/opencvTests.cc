@@ -407,7 +407,7 @@ void opencvTest2(Mat &colImg, Mat &colTempl, int match) {
   cv::Mat insetImage(img, cv::Rect(70, 70, 20, 20));
   templ.copyTo(insetImage);
   
-  cv::imshow("Overlay Image", templ);
+  cv::imshow("Overlay Image", img);
 
   int k = waitKey(0); // Wait for a keystroke in the window
 
