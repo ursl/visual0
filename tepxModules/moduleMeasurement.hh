@@ -23,6 +23,9 @@ class moduleMeasurement {
   double getMarkerDistance(std::string dir = "x");
   
   compound &getCompound() {return fCompound;}
+  int getIndex() {return fIndex;}
+  int getHistIndex() {return fIndex - 1000;}
+  int getPosition() {return fPosition;}
 
   // -- dump
   void dump() {fCompound.dump();}

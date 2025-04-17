@@ -5,6 +5,7 @@
 
 #include "TFile.h"
 #include "TH1.h"
+#include "TProfile.h"
 #include <vector>
 #include <map>
 
@@ -26,7 +27,7 @@ class modulesAnalysis {
   std::string fFilename;
   TFile *fFile;
   std::map<std::string, TH1 *> fHists;
-
+  std::map<std::string, TProfile *> fProfiles;
 };
 
 #endif
