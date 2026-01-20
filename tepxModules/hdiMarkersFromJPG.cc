@@ -70,11 +70,9 @@ int main(int argc, char** argv) {
     cv::Mat vis1 = img.clone();
     for (size_t k = 0; k < circles.size(); ++k) {
         const auto& c = circles[k];
-        cv::Scalar color(0, 0, 255 - int(80 * k));  // different reds
-        cv::circle(vis1, cv::Point2f(c[0], c[1]), int(c[2]), color, 2);
-        cv::putText(vis1, "C" + std::to_string(k),
-        cv::Point2f(c[0], c[1]) + cv::Point2f(10, -10),
-        cv::FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
+        Scalar color(0, 0, 255 - int(80 * k));  // different reds
+        circle(vis1, cv::Point2f(c[0], c[1]), int(c[2]), color, 2);
+        putText(vis1, "C" + std::to_string(k), Point2f(c[0], c[1]) + cv::Point2f(-30, -30), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
         cout << "C" << k << " center (px): "
         << c[0] << ", " << c[1]
         << "  r=" << c[2] << endl;
@@ -98,9 +96,7 @@ int main(int argc, char** argv) {
         const auto& c = circles2[k];
         cv::Scalar color(0, 255, 0);  // different reds
         cv::circle(vis1, cv::Point2f(c[0], c[1]), int(c[2]), color, 2);
-        cv::putText(vis1, "D" + std::to_string(k),
-        cv::Point2f(c[0], c[1]) + cv::Point2f(10, -10),
-        cv::FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
+        putText(vis1, "D" + std::to_string(k), Point2f(c[0], c[1]) + cv::Point2f(60, -60),FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
         cout << "D" << k << " center (px): "
         << c[0] << ", " << c[1]
         << "  r=" << c[2] << endl;
@@ -154,6 +150,8 @@ int main(int argc, char** argv) {
     cout << "Found " << hdiMarkers.size() << " concentric pairs of HDI markers\n";
     for (size_t k = 0; k < hdiMarkers.size(); ++k) {
         const auto& c = hdiMarkers[k];
+        Scalar color(0, 0, 255 - int(80 * k));  // different reds
+        putText(vis1, "M" + std::to_string(k), Point2f(c[0]-15, c[1]+10), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
         cout << "HDI marker " << k << " center (px): "
         << c[0] << ", " << c[1]
         << endl;
