@@ -41,6 +41,7 @@ class compound {
   void calcAll(int verbose = 0, int doParse = 1);
   // -- read information
   void parseSvgFile(int doParse = 1);
+  void parseJsonFile();
   // -- calculate scale factor (pixel to mm)
   void determineSF();
   // -- calculate fOffset and fAlpha
@@ -65,8 +66,8 @@ class compound {
   TVector2 getOffset() {return fOffset;}
   std::string getName() {return fName;}
 
-  TVector2 getHDI(int i) {return pHDI[i];}
-  TVector2 getHDIPrime(int i) {return pHDIPrime[i];}
+  // TVector2 getHDI(int i) {return pHDI[i];}
+  // TVector2 getHDIPrime(int i) {return pHDIPrime[i];}
   TVector2 getROCs(int i) {return pROCs[i];}
   TVector2 getROCsPrime(int i) {return pROCsPrime[i];}
   TVector2 getACsPrime(int i) {return pACsPrime[i];}
@@ -80,7 +81,7 @@ class compound {
 
 private:
   // -- 8 points for HDI. SVG coordinates and primed coordinates
-  std::vector<TVector2> pHDI, pHDIPrime;
+  // std::vector<TVector2> pHDI, pHDIPrime;
   // 8 points for ROCs. SVG coordinates and primed coordinates
   std::vector<TVector2> pROCs, pROCsPrime;
   // 8 alignment crosses for ROCs. SVG coordinates and primed coordinates

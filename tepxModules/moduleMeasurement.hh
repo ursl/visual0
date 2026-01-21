@@ -33,7 +33,7 @@ class moduleMeasurement {
   // -- variables
   std::string getFileName() {return fFilename;}
   void setFileName(std::string name);
-  void testCoordinates(int mode = 1); // COMPLETELY DECREPIT!!!!
+
   std::string dump(TVector2);
   TVector2 PerpAntiClockwise(TVector2);
   TVector2 PerpClockwise(TVector2);
