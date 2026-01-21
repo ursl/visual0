@@ -1,6 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <fstream>
+#include <ostream>
 #include <vector>
 #include <cmath>
 #include "TMath.h"
@@ -21,72 +22,131 @@ using namespace std;
 
 
 // ----------------------------------------------------------------------
-struct MarkerCandidate {
-    cv::Point2f center;
-    float       rInner;
-    float       rOuter;
-};
+map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const vector<Point> &matchesRHS) {
+    map<string, cv::Point> chipMarkers;
+    // RHS x-divider: 5000, LHS x-divider: 3000
+    // -- LHS
+    // Match 0 center (px): 1504, 4313 circle coordinates: 1489, 4318
+    // Match 1 center (px): 3889, 214 circle coordinates: 3874, 219
+    // Match 2 center (px): 3905, 4305 circle coordinates: 3890, 4310
+    // Match 3 center (px): 1491, 223 circle coordinates: 1476, 228
+    // -- RHS
+    // Match 0 center (px): 3732, 4305 circle coordinates: 3863, 4310
+    // Match 1 center (px): 3715, 215 circle coordinates: 3846, 220
+    // Match 2 center (px): 6111, 208 circle coordinates: 6242, 213
+    // Match 3 center (px): 6130, 4295 circle coordinates: 6261, 4300
+    
+    string chipName = "chip";
+    int xDivider = 2500;
+    int yDivider = 2500;
+    // -- LHS
+    for (size_t k = 0; k < matchesLHS.size(); ++k) {
+        if (matchesLHS[k].x < xDivider) {
+            if (matchesLHS[k].y < yDivider) {
+                chipName = "chip00";
+            } else {
+                chipName = "chip31";
+            }
+        } else {
+            if (matchesLHS[k].y < yDivider) {
+                chipName = "chip10";
+            } else {
+                chipName = "chip21";
+            }
+        }
+        chipMarkers[chipName] = matchesLHS[k];
+    }
+    
+    // -- RHS
+    xDivider = 5000;
+    for (size_t k = 0; k < matchesRHS.size(); ++k) {
+        if (matchesRHS[k].x < xDivider) {
+            if (matchesRHS[k].y < yDivider) {
+                chipName = "chip01";
+            } else {
+                chipName = "chip30";
+            }
+        } else {
+            if (matchesRHS[k].y < yDivider) {
+                chipName = "chip11";
+            } else {
+                chipName = "chip20";
+            }
+        }
+        chipMarkers[chipName] = matchesRHS[k];
+    }
+    
+    // -- fill missing entries
+    vector<string> chipNames = {"chip00", "chip01", "chip10", "chip11", "chip20", "chip21", "chip30", "chip31"};
+    for (const auto& chipName : chipNames) {
+        if (chipMarkers.find(chipName) == chipMarkers.end()) {
+            chipMarkers[chipName] = cv::Point(-1, -1);
+        }
+    }
+    
+    
+    return chipMarkers;
+}
+
+
 
 // ----------------------------------------------------------------------
 // find chip-marker matches in the template match result, applying
 // thresholding, geometric vetoes using HDI markers, and non-maximum suppression
-std::vector<cv::Point> findChipMatches(const cv::Mat &result,
-    const std::vector<cv::Vec3f> &hdiMarkers,
-    double threshold,
-    double minDist2) {
-        // Get all candidate matches with their scores
-        struct Match {
-            cv::Point pt;
-            double score;
-        };
-        std::vector<Match> candidates;
-        for (int y = 0; y < result.rows; ++y) {
-            for (int x = 0; x < result.cols; ++x) {
-                float score = result.at<float>(y, x);
-                if (score > threshold) {
-                    candidates.push_back({cv::Point(x, y), score});
-                }
+std::vector<cv::Point> findChipMatches(const cv::Mat &result, const vector<cv::Vec3f> &hdiMarkers, double threshold, double minDist2) {
+    // Get all candidate matches with their scores
+    struct Match {
+        cv::Point pt;
+        double score;
+    };
+    std::vector<Match> candidates;
+    for (int y = 0; y < result.rows; ++y) {
+        for (int x = 0; x < result.cols; ++x) {
+            float score = result.at<float>(y, x);
+            if (score > threshold) {
+                candidates.push_back({cv::Point(x, y), score});
             }
         }
-        
-        // Sort by score (highest first)
-        std::sort(candidates.begin(), candidates.end(), [](const Match& a, const Match& b) { return a.score > b.score; });
-        
-        // Compute y/x bands between M0 and M1 to veto matches in that strip
-        double y0m = hdiMarkers.size() > 0 ? hdiMarkers[0][1] : 0.0;
-        double y1m = hdiMarkers.size() > 1 ? hdiMarkers[1][1] : 0.0;
-        double yMin = std::min(y0m, y1m);
-        double yMax = std::max(y0m, y1m);
-               
-        // Apply geometric vetoes and spatial non-maximum suppression
-        std::vector<cv::Point> matches;
-        for (const auto& cand : candidates) {
-            // Skip matches whose y lies strictly between the two marker y positions
-            if (hdiMarkers.size() > 1 && cand.pt.y > yMin && cand.pt.y < yMax) {
-                continue;
-            }
-                       
-            // Non-maximum suppression in space: enforce a minimum distance between matches
-            bool tooClose = false;
-            for (const auto& kept : matches) {
-                double dist = cv::norm(cand.pt - kept);
-                if (dist < minDist2) {
-                    tooClose = true;
-                    break;
-                }
-            }
-            if (!tooClose) {
-                matches.push_back(cand.pt);
-            }
-        }
-        
-        std::cout << "Found " << matches.size()
-        << " matches (after NMS from " << candidates.size()
-        << " candidates)" << std::endl;
-        
-        return matches;
-}
+    }
     
+    // Sort by score (highest first)
+    std::sort(candidates.begin(), candidates.end(), [](const Match& a, const Match& b) { return a.score > b.score; });
+    
+    // Compute y/x bands between M0 and M1 to veto matches in that strip
+    double y0m = hdiMarkers.size() > 0 ? hdiMarkers[0][1] : 0.0;
+    double y1m = hdiMarkers.size() > 1 ? hdiMarkers[1][1] : 0.0;
+    double yMin = std::min(y0m, y1m);
+    double yMax = std::max(y0m, y1m);
+    
+    // Apply geometric vetoes and spatial non-maximum suppression
+    std::vector<cv::Point> matches;
+    for (const auto& cand : candidates) {
+        // Skip matches whose y lies strictly between the two marker y positions
+        if (hdiMarkers.size() > 1 && cand.pt.y > yMin && cand.pt.y < yMax) {
+            continue;
+        }
+        
+        // Non-maximum suppression in space: enforce a minimum distance between matches
+        bool tooClose = false;
+        for (const auto& kept : matches) {
+            double dist = cv::norm(cand.pt - kept);
+            if (dist < minDist2) {
+                tooClose = true;
+                break;
+            }
+        }
+        if (!tooClose) {
+            matches.push_back(cand.pt);
+        }
+    }
+    
+    std::cout << "Found " << matches.size()
+    << " matches (after NMS from " << candidates.size()
+    << " candidates)" << std::endl;
+    
+    return matches;
+}
+
 // ----------------------------------------------------------------------
 // helper to construct the composite chip-marker template
 // if mirrorRight is true, the template is horizontally flipped (RHS version)
@@ -141,18 +201,24 @@ cv::Mat makeChipTemplate(bool mirrorRight = false) {
     
     return templateRect;
 }
-    
+
 // ---------------------------------------------------------------------- 
 int main(int argc, char** argv) {
-    std::string filename = "250109-M035_0255.JPG";
-    std::string outMarksFile;  // e.g. "moduleTemplate.marks"
-    
+    bool verbose(false);
+    string directory = "json";
+    string filename = "250109-M035_0255.JPG";
+    string outMarksFile;  // e.g. "moduleTemplate.marks"
+    bool visualize(false);    
     for (int i = 1; i < argc; ++i) {
-        if (std::string(argv[i]) == "-f" && i + 1 < argc) {
-            filename = argv[++i];
-        } else if (std::string(argv[i]) == "-o" && i + 1 < argc) {
-            outMarksFile = argv[++i];
-        }
+        if (string(argv[i]) == "-d" && i + 1 < argc) { directory = argv[++i]; }
+        if (string(argv[i]) == "-f" && i + 1 < argc) { filename = argv[++i]; }
+        if (string(argv[i]) == "-o" && i + 1 < argc) { outMarksFile = argv[++i]; }
+        if (string(argv[i]) == "-v" && i + 1 < argc) { visualize = true; }
+    }
+    
+    if (outMarksFile.empty()) {
+        outMarksFile = filename.substr(filename.rfind('/') + 1);
+        outMarksFile = directory + "/" + outMarksFile.substr(0, outMarksFile.rfind('.')) + ".json";
     }
     
     // -- read image
@@ -179,9 +245,7 @@ int main(int argc, char** argv) {
     int    maxRadius = 30;    // px
     
     cv::HoughCircles(gray, circles, cv::HOUGH_GRADIENT, dp, minDist, param1, param2, minRadius, maxRadius);
-    
-    std::cout << "Found " << circles.size() << " raw circles\n";
-    
+        
     // -- draw result for visual debugging
     cv::Mat vis1 = img.clone();
     for (size_t k = 0; k < circles.size(); ++k) {
@@ -189,9 +253,12 @@ int main(int argc, char** argv) {
         Scalar color(0, 0, 255 - int(80 * k));  // different reds
         circle(vis1, cv::Point2f(c[0], c[1]), int(c[2]), color, 2);
         putText(vis1, "C" + std::to_string(k), Point2f(c[0], c[1]) + cv::Point2f(-30, -30), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
-        cout << "C" << k << " center (px): "
-        << c[0] << ", " << c[1]
-        << "  r=" << c[2] << endl;
+        
+        if (verbose) {  
+            cout << "C" << k << " center (px): "
+            << c[0] << ", " << c[1]
+            << "  r=" << c[2] << endl;
+        }
     }
     
     
@@ -202,9 +269,7 @@ int main(int argc, char** argv) {
     param2    = 50;
     vector<cv::Vec3f> circles2;
     
-    cv::HoughCircles(gray, circles2, cv::HOUGH_GRADIENT, dp, minDist, param1, param2, minRadius, maxRadius);
-    std::cout << "Found " << circles2.size() << " raw circles\n";
-    
+    cv::HoughCircles(gray, circles2, cv::HOUGH_GRADIENT, dp, minDist, param1, param2, minRadius, maxRadius);  
     
     std::vector<cv::Vec3f> hdiMarkers;
     double epsilon = 10.0; // px
@@ -213,9 +278,11 @@ int main(int argc, char** argv) {
         cv::Scalar color(0, 255, 0);  // different reds
         cv::circle(vis1, cv::Point2f(c[0], c[1]), int(c[2]), color, 2);
         putText(vis1, "D" + std::to_string(k), Point2f(c[0], c[1]) + cv::Point2f(60, -60),FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
-        cout << "D" << k << " center (px): "
-        << c[0] << ", " << c[1]
-        << "  r=" << c[2] << endl;
+        if (verbose) {
+            cout << "D" << k << " center (px): "
+            << c[0] << ", " << c[1]
+            << "  r=" << c[2] << endl;
+        }
         for (size_t l = 0; l < circles.size(); ++l) {
             const auto& c2 = circles[l];
             if (TMath::Abs(c2[0] - c[0]) < epsilon  && TMath::Abs(c2[1] - c[1]) < epsilon) {
@@ -272,8 +339,6 @@ int main(int argc, char** argv) {
         << endl;
     }
     
-    //cv::waitKey(0);
-    
     
     // ------------------------------------------------------------------
     // -- find chip markers using a composite templates
@@ -290,9 +355,11 @@ int main(int argc, char** argv) {
     double minDist2 = 100.0;  // minimum distance between matches (px)
     
     double offsetX = 15;
-    double offsetY = 1;
     
-    std::vector<cv::Point> matchesLHS = findChipMatches(resultLHS, hdiMarkers, threshold, minDist2);
+    // -- alignment crosses
+    vector<cv::Point> lhsAC, rhsAC;
+    
+    vector<cv::Point> matchesLHS = findChipMatches(resultLHS, hdiMarkers, threshold, minDist2);
     for (size_t k = 0; k < matchesLHS.size(); ++k) {
         const auto& m = matchesLHS[k];
         Scalar color(0, 0, 255 - int(80 * k));  // different reds
@@ -304,49 +371,103 @@ int main(int argc, char** argv) {
             cv::Mat roiMat = vis1(roi);
             cv::addWeighted(roiMat, 0.5, templateLHS, 0.5, 0, roiMat);
             cv::rectangle(vis1, roi, color, 2);
-
-             // Draw a small circle just left of the LHS template
-             cv::Point circleCenter(roi.x - offsetX, roi.y + roi.height / 2);
-             int circleRadius = 6;
-             cv::circle(vis1, circleCenter, circleRadius, color, 2);
-
+            
+            // Draw a small circle just left of the LHS template
+            cv::Point circleCenter(roi.x - offsetX, roi.y + roi.height / 2);
+            int circleRadius = 6;
+            cv::circle(vis1, circleCenter, circleRadius, color, 2);
+            lhsAC.push_back(circleCenter);
+            
             putText(vis1, "P" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
-             cout << "Match " << k << " center (px): "
-             << m.x << ", " << m.y
-             << " circle coordinates: " << circleCenter.x << ", " << circleCenter.y
-            << endl;
+            if (verbose) {
+                cout << "Match " << k << " center (px): "
+                << m.x << ", " << m.y
+                << " circle coordinates: " << circleCenter.x << ", " << circleCenter.y
+                << endl;
+            }
         }
     }    
-
-
-     std::vector<cv::Point> matchesRHS = findChipMatches(resultRHS, hdiMarkers, threshold, minDist2);
-     for (size_t k = 0; k < matchesRHS.size(); ++k) {
-         const auto& m = matchesRHS[k];
-         Scalar color(0, 0, 255 - int(80 * k));  // different reds
-         cv::Rect roi(m.x, m.y, templateRHS.cols, templateRHS.rows);
-         if (roi.x >= 0 && roi.y >= 0 && roi.x + roi.width <= vis1.cols && roi.y + roi.height <= vis1.rows) {
-             cv::Mat roiMat = vis1(roi);
-             cv::addWeighted(roiMat, 0.5, templateRHS, 0.5, 0, roiMat);
-             cv::rectangle(vis1, roi, color, 2);
-
-              // Draw a small circle just right of the RHS template
-              cv::Point circleCenter(roi.x + roi.width + offsetX,
-                                     roi.y + roi.height / 2);
-              int circleRadius = 6;
-              cv::circle(vis1, circleCenter, circleRadius, color, 2);
+    
+    
+    vector<Point> matchesRHS = findChipMatches(resultRHS, hdiMarkers, threshold, minDist2);
+    for (size_t k = 0; k < matchesRHS.size(); ++k) {
+        const auto& m = matchesRHS[k];
+        Scalar color(0, 0, 255 - int(80 * k));  // different reds
+        cv::Rect roi(m.x, m.y, templateRHS.cols, templateRHS.rows);
+        if (roi.x >= 0 && roi.y >= 0 && roi.x + roi.width <= vis1.cols && roi.y + roi.height <= vis1.rows) {
+            cv::Mat roiMat = vis1(roi);
+            cv::addWeighted(roiMat, 0.5, templateRHS, 0.5, 0, roiMat);
+            cv::rectangle(vis1, roi, color, 2);
+            
+            // Draw a small circle just right of the RHS template
+            cv::Point circleCenter(roi.x + roi.width + offsetX, roi.y + roi.height / 2);
+            int circleRadius = 6;
+            cv::circle(vis1, circleCenter, circleRadius, color, 2);
+            rhsAC.push_back(circleCenter);
             putText(vis1, "P" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
-             cout << "Match " << k << " center (px): "
-             << m.x << ", " << m.y
-             << " circle coordinates: " << circleCenter.x << ", " << circleCenter.y
-            << endl;
+            if (verbose) {
+                cout << "Match " << k << " center (px): "
+                << m.x << ", " << m.y
+                << " circle coordinates: " << circleCenter.x << ", " << circleCenter.y
+                << endl;
+            }
         }
     }
-
+    
     if (0) {
         cv::imshow("templateLHS", templateLHS);
         cv::imshow("templateRHS", templateRHS);
     }
-    cv::imshow("vis1", vis1);
-    cv::waitKey(0);
+    
+    map<string, cv::Point> chipMarkers = combineChipMatches(lhsAC, rhsAC);
+    for (const auto& [chipName, chipPoint] : chipMarkers) {
+        cout << "Chip " << chipName << " center (px): "
+        << chipPoint.x << ", " << chipPoint.y
+        << endl;
+    }
+    
+    // -- write the matches to a JSON file
+    std::ofstream outFile(outMarksFile);
+    outFile << "{" << std::endl;
+    outFile << "  \"hdiMarkers\": [" << std::endl;
+    for (size_t k = 0; k < hdiMarkers.size(); ++k) {
+        const auto& m = hdiMarkers[k];
+        outFile << "    {" << std::endl;
+        outFile << "      \"x\": " << m[0] << ", " << std::endl;
+        outFile << "      \"y\": " << m[1] << endl;
+        outFile << "    }";
+        if (k + 1 < hdiMarkers.size()) {
+            outFile << ",";
+        }
+        outFile << std::endl;
+    }
+    outFile << "  ]," << std::endl;
+    outFile << "  \"chipMarkers\": [" << std::endl;
+    size_t chipIndex = 0;
+    for (const auto& [chipName, chipPoint] : chipMarkers) {
+        outFile << "    {" << std::endl;
+        outFile << "      \"name\": \"" << chipName << "\", " << std::endl;
+        outFile << "      \"x\": " << chipPoint.x << ", " << std::endl;
+        outFile << "      \"y\": " << chipPoint.y << endl;
+        outFile << "    }";
+        if (++chipIndex < chipMarkers.size()) {
+            outFile << ",";
+        }
+        outFile << std::endl;
+    }
+    outFile << "  ]" << std::endl; 
+    outFile << "}" << std::endl;
+    outFile.close();
+    
+    // Save visualization image (always, not just when visualizing)
+    string visFilename = filename.substr(filename.rfind('/') + 1);
+    visFilename = "png/" + visFilename.substr(0, visFilename.rfind('.')) + ".png";
+    cv::imwrite(visFilename, vis1);
+    cout << "Saved visualization to: " << visFilename << endl;
+    
+    if (visualize) {
+        cv::imshow("vis1", vis1);
+        cv::waitKey(0);
+    }
     return 0;
 }
