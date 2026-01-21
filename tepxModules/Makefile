@@ -1,4 +1,3 @@
-# Makefile for hdiMarkersFromJPG.cc
 # Assumes OpenCV is available via pkg-config as "opencv4".
 
 CXX      = g++
@@ -10,9 +9,9 @@ SRC_DIR  = .
 OBJ_DIR  = obj
 BIN_DIR  = bin
 
-TARGET   = $(BIN_DIR)/hdiMarkersFromJPG
-SRC      = $(SRC_DIR)/hdiMarkersFromJPG.cc
-OBJ      = $(OBJ_DIR)/hdiMarkersFromJPG.o
+TARGET   = $(BIN_DIR)/ocvMarkersFromJPG
+SRC      = $(SRC_DIR)/ocvMarkersFromJPG.cc
+OBJ      = $(OBJ_DIR)/ocvMarkersFromJPG.o
 
 all: dirs $(TARGET)
 
