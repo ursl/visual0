@@ -27,6 +27,121 @@ struct MarkerCandidate {
     float       rOuter;
 };
 
+// ----------------------------------------------------------------------
+// find chip-marker matches in the template match result, applying
+// thresholding, geometric vetoes using HDI markers, and non-maximum suppression
+std::vector<cv::Point> findChipMatches(const cv::Mat &result,
+    const std::vector<cv::Vec3f> &hdiMarkers,
+    double threshold,
+    double minDist2) {
+        // Get all candidate matches with their scores
+        struct Match {
+            cv::Point pt;
+            double score;
+        };
+        std::vector<Match> candidates;
+        for (int y = 0; y < result.rows; ++y) {
+            for (int x = 0; x < result.cols; ++x) {
+                float score = result.at<float>(y, x);
+                if (score > threshold) {
+                    candidates.push_back({cv::Point(x, y), score});
+                }
+            }
+        }
+        
+        // Sort by score (highest first)
+        std::sort(candidates.begin(), candidates.end(), [](const Match& a, const Match& b) { return a.score > b.score; });
+        
+        // Compute y/x bands between M0 and M1 to veto matches in that strip
+        double y0m = hdiMarkers.size() > 0 ? hdiMarkers[0][1] : 0.0;
+        double y1m = hdiMarkers.size() > 1 ? hdiMarkers[1][1] : 0.0;
+        double yMin = std::min(y0m, y1m);
+        double yMax = std::max(y0m, y1m);
+               
+        // Apply geometric vetoes and spatial non-maximum suppression
+        std::vector<cv::Point> matches;
+        for (const auto& cand : candidates) {
+            // Skip matches whose y lies strictly between the two marker y positions
+            if (hdiMarkers.size() > 1 && cand.pt.y > yMin && cand.pt.y < yMax) {
+                continue;
+            }
+                       
+            // Non-maximum suppression in space: enforce a minimum distance between matches
+            bool tooClose = false;
+            for (const auto& kept : matches) {
+                double dist = cv::norm(cand.pt - kept);
+                if (dist < minDist2) {
+                    tooClose = true;
+                    break;
+                }
+            }
+            if (!tooClose) {
+                matches.push_back(cand.pt);
+            }
+        }
+        
+        std::cout << "Found " << matches.size()
+        << " matches (after NMS from " << candidates.size()
+        << " candidates)" << std::endl;
+        
+        return matches;
+}
+    
+// ----------------------------------------------------------------------
+// helper to construct the composite chip-marker template
+// if mirrorRight is true, the template is horizontally flipped (RHS version)
+cv::Mat makeChipTemplate(bool mirrorRight = false) {
+    // Create a composite template: 3 rectangles (9x14 each), widely separated,
+    // then three rectangles nearly adjacent
+    int rectW = 9;
+    int rectH = 10;
+    int centerSpacing = rectH + rectW;
+    int gap = centerSpacing - rectW; // "big" gap between rectangles
+    
+    // Template size: enough to fit all three rectangles
+    // Total width: left padding + rect1 + gap + rect2 + gap + rect3 + right padding
+    int leftPadding = 10;
+    int templateW = leftPadding + rectW + gap + rectW + gap + rectW + 2 * gap + 3 * (rectW + 4);
+    int templateH = rectH; // add small padding top/bottom
+    
+    cv::Mat templateRect = cv::Mat(templateH, templateW, CV_8UC3, cv::Scalar(143, 168, 202));  // B, G, R
+    
+    // -- construct the pattern: three widely spaced then three nearly adjacent
+    int y0 = templateH / 2;         // center y for all rectangles
+    int x0 = leftPadding;           // first rectangle left x
+    cv::Rect r0(x0, y0 - rectH / 2, rectW, rectH);
+    cv::rectangle(templateRect, r0, cv::Scalar(206, 200, 195), -1); // filled rectangle
+    
+    int x1 = x0 + centerSpacing;
+    cv::Rect r1(x1, y0 - rectH / 2, rectW, rectH);
+    cv::rectangle(templateRect, r1, cv::Scalar(206, 200, 195), -1);
+    
+    int x2 = x1 + centerSpacing;
+    cv::Rect r2(x2, y0 - rectH / 2, rectW, rectH);
+    cv::rectangle(templateRect, r2, cv::Scalar(206, 200, 195), -1);
+    
+    int x3 = x2 + 2*centerSpacing;
+    cv::Rect r3(x3, y0 - rectH / 2, rectW, rectH);
+    cv::rectangle(templateRect, r3, cv::Scalar(206, 200, 195), -1);
+    
+    int x4 = x3 + rectW + 1;
+    cv::Rect r4(x4, y0 - rectH / 2, rectW, rectH);
+    cv::rectangle(templateRect, r4, cv::Scalar(206, 200, 195), -1);
+    
+    int x5 = x4 + rectW + 1;
+    cv::Rect r5(x5, y0 - rectH / 2, rectW, rectH);
+    cv::rectangle(templateRect, r5, cv::Scalar(206, 200, 195), -1);
+    
+    // Mirror horizontally for RHS pattern if requested
+    if (mirrorRight) {
+        cv::Mat flipped;
+        cv::flip(templateRect, flipped, 1); // flip around y-axis
+        return flipped;
+    }
+    
+    return templateRect;
+}
+    
 // ---------------------------------------------------------------------- 
 int main(int argc, char** argv) {
     std::string filename = "250109-M035_0255.JPG";
@@ -161,117 +276,77 @@ int main(int argc, char** argv) {
     
     
     // ------------------------------------------------------------------
-    // -- find chip markers
-       
-    // Create a composite template: 3 rectangles (9x14 each), centers 27 px apart
-    int rectW = 9;
-    int rectH = 12;
-    int centerSpacing = 27;
+    // -- find chip markers using a composite templates
+    cv::Mat templateLHS = makeChipTemplate(false);
+    cv::Mat resultLHS;
+    cv::matchTemplate(img, templateLHS, resultLHS, cv::TM_CCOEFF_NORMED);
     
-    // Template size: enough to fit all three rectangles
-    // Total width: left padding + rect1 + gap + rect2 + gap + rect3 + right padding
-    int templateW = rectW + centerSpacing + rectW + centerSpacing + 15; // = 9 + 27 + 9 + 27 + 9 = 81
-    int templateH = rectH + 2; // add small padding top/bottom
-    
-    //cv::Mat templateRect = cv::Mat::zeros(templateH, templateW, CV_8UC1);
-    cv::Mat templateRect = cv::Mat(templateH, templateW, CV_8UC1, cv::Scalar(90));
-    
-    // Draw three rectangles: Center positions within template (assuming we center the whole pattern)
-    int x0 = rectW / 2;  // first rectangle center x
-    int y0 = templateH / 2;  // center y for all rectangles
-    
-    // Rectangle 1
-    int grayValue = 128;
-    cv::Rect r1(x0 + 5, y0 - rectH/2, rectW, rectH);
-    cv::rectangle(templateRect, r1, cv::Scalar(grayValue), -1); // filled white rectangle
-    
-    // Rectangle 2 (center at x0 + 27)
-    int x1 = x0 + centerSpacing;
-    cv::Rect r2(x1, y0 - rectH/2, rectW, rectH);
-    cv::rectangle(templateRect, r2, cv::Scalar(grayValue), -1);
-    
-    // Rectangle 3 (center at x0 + 54)
-    int x2 = x0 + 2 * centerSpacing;
-    cv::Rect r3(x2, y0 - rectH/2, rectW, rectH);
-    cv::rectangle(templateRect, r3, cv::Scalar(grayValue), -1);
-    
-    // Optional: blur slightly to make matching more robust
-    //cv::GaussianBlur(templateRect, templateRect, cv::Size(3, 3), 0.5);
-    
-    cv::Mat result;
-    cv::matchTemplate(gray, templateRect, result, cv::TM_CCOEFF_NORMED);
+    cv::Mat templateRHS = makeChipTemplate(true);
+    cv::Mat resultRHS;
+    cv::matchTemplate(img, templateRHS, resultRHS, cv::TM_CCOEFF_NORMED);
     
     // Find peaks (local maxima) with non-maximum suppression
-    double threshold = 0.5; // tune: how strong a match you need
-    double minDist2 = 20.0;  // minimum distance between matches (px)
+    double threshold = 0.52; // tune: how strong a match you need
+    double minDist2 = 100.0;  // minimum distance between matches (px)
     
-    // Get all candidate matches with their scores
-    struct Match {
-        cv::Point pt;
-        double score;
-    };
-    std::vector<Match> candidates;
-    for (int y = 0; y < result.rows; ++y) {
-        for (int x = 0; x < result.cols; ++x) {
-            float score = result.at<float>(y, x);
-            if (score >= threshold) {
-                candidates.push_back({cv::Point(x, y), score});
-            }
-        }
-    }
+    double offsetX = 15;
+    double offsetY = 1;
     
-    // Sort by score (highest first)
-    std::sort(candidates.begin(), candidates.end(),
-              [](const Match& a, const Match& b) { return a.score > b.score; });
-    
-    // Non-maximum suppression: keep only matches far enough from already-kept ones
-    std::vector<cv::Point> matches;
-    for (const auto& cand : candidates) {
-        bool tooClose = false;
-        for (const auto& kept : matches) {
-            double dist = cv::norm(cand.pt - kept);
-            if (dist < minDist2) {
-                tooClose = true;
-                break;
-            }
-        }
-        if (!tooClose) {
-            matches.push_back(cand.pt);
-        }
-    }
-    
-    cout << "Found " << matches.size() << " matches (after NMS from " << candidates.size() << " candidates)\n";
-    for (size_t k = 0; k < matches.size(); ++k) {
-        const auto& m = matches[k];
+    std::vector<cv::Point> matchesLHS = findChipMatches(resultLHS, hdiMarkers, threshold, minDist2);
+    for (size_t k = 0; k < matchesLHS.size(); ++k) {
+        const auto& m = matchesLHS[k];
         Scalar color(0, 0, 255 - int(80 * k));  // different reds
         
         // Draw template at match location (m is top-left corner from matchTemplate)
-        cv::Rect roi(m.x, m.y, templateRect.cols, templateRect.rows);
+        cv::Rect roi(m.x, m.y, templateLHS.cols, templateLHS.rows);
         // Make sure ROI is within image bounds
-        if (roi.x >= 0 && roi.y >= 0 && 
-            roi.x + roi.width <= vis1.cols && 
-            roi.y + roi.height <= vis1.rows) {
-            // Convert template to BGR for visualization (if vis1 is color)
-            cv::Mat templateBGR;
-            cv::cvtColor(templateRect, templateBGR, cv::COLOR_GRAY2BGR);
-            // Draw template with colored border
+        if (roi.x >= 0 && roi.y >= 0 && roi.x + roi.width <= vis1.cols && roi.y + roi.height <= vis1.rows) {
             cv::Mat roiMat = vis1(roi);
-            cv::addWeighted(roiMat, 0.5, templateBGR, 0.5, 0, roiMat);
+            cv::addWeighted(roiMat, 0.5, templateLHS, 0.5, 0, roiMat);
             cv::rectangle(vis1, roi, color, 2);
+
+             // Draw a small circle just left of the LHS template
+             cv::Point circleCenter(roi.x - offsetX, roi.y + roi.height / 2);
+             int circleRadius = 6;
+             cv::circle(vis1, circleCenter, circleRadius, color, 2);
+
+            putText(vis1, "P" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
+             cout << "Match " << k << " center (px): "
+             << m.x << ", " << m.y
+             << " circle coordinates: " << circleCenter.x << ", " << circleCenter.y
+            << endl;
         }
-        
-        putText(vis1, "P" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
-        cout << "Match " << k << " center (px): "
-        << m.x << ", " << m.y
-        << endl;
+    }    
+
+
+     std::vector<cv::Point> matchesRHS = findChipMatches(resultRHS, hdiMarkers, threshold, minDist2);
+     for (size_t k = 0; k < matchesRHS.size(); ++k) {
+         const auto& m = matchesRHS[k];
+         Scalar color(0, 0, 255 - int(80 * k));  // different reds
+         cv::Rect roi(m.x, m.y, templateRHS.cols, templateRHS.rows);
+         if (roi.x >= 0 && roi.y >= 0 && roi.x + roi.width <= vis1.cols && roi.y + roi.height <= vis1.rows) {
+             cv::Mat roiMat = vis1(roi);
+             cv::addWeighted(roiMat, 0.5, templateRHS, 0.5, 0, roiMat);
+             cv::rectangle(vis1, roi, color, 2);
+
+              // Draw a small circle just right of the RHS template
+              cv::Point circleCenter(roi.x + roi.width + offsetX,
+                                     roi.y + roi.height / 2);
+              int circleRadius = 6;
+              cv::circle(vis1, circleCenter, circleRadius, color, 2);
+            putText(vis1, "P" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
+             cout << "Match " << k << " center (px): "
+             << m.x << ", " << m.y
+             << " circle coordinates: " << circleCenter.x << ", " << circleCenter.y
+            << endl;
+        }
     }
-    
-    cv::imshow("templateRect", templateRect);
 
-
-    cv::imshow("circles", vis1);
-
+    if (0) {
+        cv::imshow("templateLHS", templateLHS);
+        cv::imshow("templateRHS", templateRHS);
+    }
+    cv::imshow("vis1", vis1);
     cv::waitKey(0);
-    
     return 0;
 }
