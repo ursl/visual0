@@ -14,6 +14,7 @@ using namespace std;
 
 // ----------------------------------------------------------------------
 modulesAnalysis::modulesAnalysis(int mode) {
+  // -- legacy mode
   if (1 == mode) {
     // -- manually setup list of modules
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1000.svg2", 0));
@@ -190,10 +191,10 @@ void::modulesAnalysis::anaAll() {
       cout << "filling -999 for missing module " << mm->getFileName() << endl;
       // -- avoid "zero" as entry for missing modules
       fProfiles["prfAngleChips"]->Fill(mm->getHistIndex(), -0.01);
-      fProfiles["prfAngleChipsHDI"]->Fill(mm->getHistIndex(), -0.01);
+      // fProfiles["prfAngleChipsHDI"]->Fill(mm->getHistIndex(), -0.01);
       fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), 21.4);
-      fProfiles["prfChip00HDI"]->Fill(mm->getHistIndex(), 0.2);
-      fProfiles["prfChip31HDI"]->Fill(mm->getHistIndex(), 0.2);
+      // fProfiles["prfChip00HDI"]->Fill(mm->getHistIndex(), 0.2);
+      // fProfiles["prfChip31HDI"]->Fill(mm->getHistIndex(), 0.2);
       fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), -0.1);
       fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), 37.);
       continue;  
@@ -215,27 +216,27 @@ void::modulesAnalysis::anaAll() {
     fHists["diffXChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
     fHists["diffYChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
 
-    fHists["chip00HDI"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getHDIPrime(0).X()));
-    fHists["chip31HDI"]->Fill(sf * (mm->getCompound().getROCsPrime(7).X() - mm->getCompound().getHDIPrime(7).X()));
+    // fHists["chip00HDI"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getHDIPrime(0).X()));
+    // fHists["chip31HDI"]->Fill(sf * (mm->getCompound().getROCsPrime(7).X() - mm->getCompound().getHDIPrime(7).X()));
 
     TVector2 rocEdge = mm->getCompound().getROCsPrime(0) - mm->getCompound().getROCsPrime(7);
     double angle = TMath::PiOver2() - TMath::ATan2(rocEdge.Y(), rocEdge.X());
     fHists["angleChips"]->Fill(angle);
 
-    TVector2 hdiEdge = mm->getCompound().getHDIPrime(0) - mm->getCompound().getHDIPrime(7);
-    double angle2 = TMath::ACos(hdiEdge/hdiEdge.Mod() * rocEdge/rocEdge.Mod());
-    fHists["angleChipsHDI"]->Fill(angle2);
+    // TVector2 hdiEdge = mm->getCompound().getHDIPrime(0) - mm->getCompound().getHDIPrime(7);
+    // double angle2 = TMath::ACos(hdiEdge/hdiEdge.Mod() * rocEdge/rocEdge.Mod());
+    // fHists["angleChipsHDI"]->Fill(angle2);
 
     fProfiles["prfAngleChips"]->Fill(mm->getHistIndex(), angle);
-    fProfiles["prfAngleChipsHDI"]->Fill(mm->getHistIndex(), angle2);
+    // fProfiles["prfAngleChipsHDI"]->Fill(mm->getHistIndex(), angle2);
 
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(0));
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(1));
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(2));
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(3));
 
-    fProfiles["prfChip00HDI"]->Fill(mm->getHistIndex(), sf * ( mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getHDIPrime(0).X()));
-    fProfiles["prfChip31HDI"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(7).X() - mm->getCompound().getHDIPrime(7).X()));
+    // fProfiles["prfChip00HDI"]->Fill(mm->getHistIndex(), sf * ( mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getHDIPrime(0).X()));
+    // fProfiles["prfChip31HDI"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(7).X() - mm->getCompound().getHDIPrime(7).X()));
 
     fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
     fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
@@ -248,12 +249,12 @@ void modulesAnalysis::plotAll() {
   shrinkPad(0.15, 0.15, 0.1, 0.1);
   for (auto h : fHists) {
     h.second->Draw();
-    c1->SaveAs((h.first + ".pdf").c_str());
+    c1->SaveAs(("pdf/" + h.first + ".pdf").c_str());
   }
 
   for (auto prof : fProfiles) {
     prof.second->Draw();
-    c1->SaveAs((prof.first + ".pdf").c_str());
+    c1->SaveAs(("pdf/" + prof.first + ".pdf").c_str());
   }
 }
 
