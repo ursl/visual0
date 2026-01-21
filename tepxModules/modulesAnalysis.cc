@@ -44,6 +44,18 @@ modulesAnalysis::modulesAnalysis(int mode) {
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1024.svg2", 0));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1025.svg2", 1));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1026.svg2", 2));
+  } else if (2 == mode) {
+    // -- manually setup list of modules
+    fModules.push_back(new moduleMeasurement("json/P1008.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1020.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1036.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1045.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1061.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1071.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1104.json", 2));  
+    fModules.push_back(new moduleMeasurement("json/P1122.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1130.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1133.json", 2));
   }
   bookHistograms();
 }
