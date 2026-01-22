@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
 
   // -- run analysis on processed image files (either legacy CSV or JSON)
-  if (mode <= 2) {
+  if (mode <= 3) {
     modulesAnalysis ma(mode, directory);
     ma.doAll();
     if (1 == mode) ma.plotGlueTests();
