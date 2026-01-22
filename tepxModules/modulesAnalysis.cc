@@ -75,6 +75,25 @@ modulesAnalysis::~modulesAnalysis() {
   fFile->Close();
 }
 
+
+// ----------------------------------------------------------------------
+void modulesAnalysis::doAll() {
+  calcAll();
+  anaAll();
+  plotAll();
+  cout << "----------------------------------------" << endl;
+  cout << "Chip widths:" << endl;
+  for (auto mm : fModules) {
+    cout << mm->getFileName()
+         <<  " " << Form("%7.4f", mm->getChipWidth(0)) 
+         << " " << Form("%7.4f", mm->getChipWidth(1)) 
+         << " " << Form("%7.4f", mm->getChipWidth(2)) 
+         << " " << Form("%7.4f", mm->getChipWidth(3)) 
+         << endl;
+  }
+}
+
+
 // ---------------------------------------------------------------------- 
 void modulesAnalysis::bookHistograms() {
   fFile = new TFile("modulesAnalysis.root", "RECREATE");
@@ -113,20 +132,11 @@ void modulesAnalysis::bookHistograms() {
   h = new TH1D("chip31", "chip3 position bottom left (absolute)", nbins, 41.0, 41.5);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip31", h});
-  h = new TH1D("chip00HDI", "chip0 position top left (wrt HDI marker)", nbins, 0.2, 0.6);
-  setTitles(h, "x position [mm]", "entries");
-  fHists.insert({"chip00HDI", h});
-  h = new TH1D("chip31HDI", "chip3 position bottom left (wrt HDI marker)", nbins, 0.2, 0.6);
-  setTitles(h, "x position [mm]", "entries");
-  fHists.insert({"chip31HDI", h});
 
   // -- angle plots
   h = new TH1D("angleChips", " ", nbins, -0.01, 0.01);
   setTitles(h, "Pi/2 - angle(HDI, chips) [rad]", "entries");
   fHists.insert({"angleChips", h});
-  h = new TH1D("angleChipsHDI", " ", nbins, -0.01, 0.01);
-  setTitles(h, "angle(chips, HDI markers) [rad]", "entries");
-  fHists.insert({"angleChipsHDI", h});
 
   h = new TH1D("position", "position", 6, 0, 6);
   setTitles(h, "position", "entries");
@@ -136,16 +146,6 @@ void modulesAnalysis::bookHistograms() {
   //  setTitles(h2, "index", "chip width [mm]");
   h2->GetYaxis()->SetRangeUser(21.4, 21.6);
   fProfiles.insert({"prfChipWidth", h2});
-
-  h2 = new TProfile("prfChip00HDI", "chip position 00 vs Index", fModules.size(), 0, fModules.size(), 0.2, 0.6 );
-  //setTitles(h2, "index", "chip 0 position [mm]");
-  h2->GetYaxis()->SetRangeUser(0.2, 0.6);
-  fProfiles.insert({"prfChip00HDI", h2});
-
-  h2 = new TProfile("prfChip31HDI", "chip position 31 vs Index", fModules.size(), 0, fModules.size(), 0.2, 0.6 );
-  //setTitles(h2, "index", "chip 31 position [mm]");
-  h2->GetYaxis()->SetRangeUser(0.2, 0.6);
-  fProfiles.insert({"prfChip31HDI", h2});
 
   h2 = new TProfile("prfAngleChips", "angle(chips) vs Index", fModules.size(), 0, fModules.size(), -0.01, 0.01);
   //setTitles(h2, "index", "angle(chips) [rad]");
@@ -171,23 +171,6 @@ void modulesAnalysis::bookHistograms() {
 }
 
 // ----------------------------------------------------------------------
-void modulesAnalysis::doAll() {
-  calcAll();
-  anaAll();
-  plotAll();
-  cout << "----------------------------------------" << endl;
-  cout << "Chip widths:" << endl;
-  for (auto mm : fModules) {
-    cout << mm->getFileName()
-         <<  " " << Form("%7.4f", mm->getChipWidth(0)) 
-         << " " << Form("%7.4f", mm->getChipWidth(1)) 
-         << " " << Form("%7.4f", mm->getChipWidth(2)) 
-         << " " << Form("%7.4f", mm->getChipWidth(3)) 
-         << endl;
-  }
-}
-
-// ----------------------------------------------------------------------
 void modulesAnalysis::calcAll() {
   for (auto mm : fModules) {
     if (mm->getPosition() < 0) continue;
@@ -203,10 +186,7 @@ void::modulesAnalysis::anaAll() {
       cout << "filling -999 for missing module " << mm->getFileName() << endl;
       // -- avoid "zero" as entry for missing modules
       fProfiles["prfAngleChips"]->Fill(mm->getHistIndex(), -0.01);
-      // fProfiles["prfAngleChipsHDI"]->Fill(mm->getHistIndex(), -0.01);
       fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), 21.4);
-      // fProfiles["prfChip00HDI"]->Fill(mm->getHistIndex(), 0.2);
-      // fProfiles["prfChip31HDI"]->Fill(mm->getHistIndex(), 0.2);
       fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), -0.1);
       fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), 37.);
       continue;  
@@ -228,27 +208,18 @@ void::modulesAnalysis::anaAll() {
     fHists["diffXChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
     fHists["diffYChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
 
-    // fHists["chip00HDI"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getHDIPrime(0).X()));
-    // fHists["chip31HDI"]->Fill(sf * (mm->getCompound().getROCsPrime(7).X() - mm->getCompound().getHDIPrime(7).X()));
 
     TVector2 rocEdge = mm->getCompound().getROCsPrime(0) - mm->getCompound().getROCsPrime(7);
     double angle = TMath::PiOver2() - TMath::ATan2(rocEdge.Y(), rocEdge.X());
     fHists["angleChips"]->Fill(angle);
 
-    // TVector2 hdiEdge = mm->getCompound().getHDIPrime(0) - mm->getCompound().getHDIPrime(7);
-    // double angle2 = TMath::ACos(hdiEdge/hdiEdge.Mod() * rocEdge/rocEdge.Mod());
-    // fHists["angleChipsHDI"]->Fill(angle2);
 
     fProfiles["prfAngleChips"]->Fill(mm->getHistIndex(), angle);
-    // fProfiles["prfAngleChipsHDI"]->Fill(mm->getHistIndex(), angle2);
 
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(0));
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(1));
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(2));
     fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(3));
-
-    // fProfiles["prfChip00HDI"]->Fill(mm->getHistIndex(), sf * ( mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getHDIPrime(0).X()));
-    // fProfiles["prfChip31HDI"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(7).X() - mm->getCompound().getHDIPrime(7).X()));
 
     fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
     fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
