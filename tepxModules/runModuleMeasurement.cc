@@ -7,9 +7,12 @@
 
 
 using namespace std;
- 
+
 // ----------------------------------------------------------------------
+// run image analysis and produce json files
 // moor>./bin/runModuleMeasurement -m 10
+// 
+// run analysis on processed image files (either legacy CSV or JSON)
 // moor>./bin/runModuleMeasurement -m 2
 // ----------------------------------------------------------------------
 
@@ -23,7 +26,7 @@ int main(int argc, char* argv[]) {
     if (!strcmp(argv[i], "-f"))   {fileName = argv[++i];}
     if (!strcmp(argv[i], "-m"))   {mode = atoi(argv[++i]);}
   }
- 
+  
   // -- run analysis on processed image files (either legacy CSV or JSON)
   if (mode < 10) {
     modulesAnalysis ma(mode);
@@ -31,7 +34,7 @@ int main(int argc, char* argv[]) {
     if (1 == mode) ma.plotGlueTests();
     return 0;
   }
-
+  
   // -- process images
   if (mode >= 10) {
     // -- Find all files matching pattern "modules/p????.jpg"
@@ -45,7 +48,7 @@ int main(int argc, char* argv[]) {
       }
     }
     globfree(&globResult);
-        
+    
     // -- Loop over all found files
     for (const auto& imgFile : imageFiles) {
       cout << "Processing: " << imgFile << endl;
@@ -53,11 +56,11 @@ int main(int argc, char* argv[]) {
     }
     return 0;
   }
-
+  
   moduleMeasurement m(fileName, 0);
   if (fileName != "bla") {
     m.setFileName(fileName);
     m.calcAll();
   } 
   return 0;
- }
+}
