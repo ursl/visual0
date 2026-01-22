@@ -37,7 +37,7 @@ modulesAnalysis::modulesAnalysis(int mode, string directory): fDirectory(directo
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1015.svg2", 1));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1016.svg2", 2));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1017.svg2", 3));
-    fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1018.svg2", 0));
+    //?? fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1018.svg2", -1));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1019.svg2", 3));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1020.svg2", 4));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1021.svg2", 5));
