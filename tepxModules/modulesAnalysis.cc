@@ -2,21 +2,23 @@
 #include "moduleMeasurement.hh"
 #include "util.hh"
 
+#include <iostream>
+
+#include "TStyle.h"
 #include "TMath.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 
 #include <TH2.h>
 #include <TVersionCheck.h>
-#include <iostream>
 
 using namespace std;
 
 // ----------------------------------------------------------------------
-modulesAnalysis::modulesAnalysis(int mode) {
-  // -- legacy mode
+modulesAnalysis::modulesAnalysis(int mode, string directory): fDirectory(directory) {
+  cout << "fDirectory = " << fDirectory << endl;
   if (1 == mode) {
-    // -- manually setup list of modules
+    // -- legacy mode - manual measurements with inkscape
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1000.svg2", 0));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1001.svg2", 0));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1002.svg2", 1));
@@ -35,7 +37,7 @@ modulesAnalysis::modulesAnalysis(int mode) {
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1015.svg2", 1));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1016.svg2", 2));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1017.svg2", 3));
-    fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1018.svg2", -1));
+    fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1018.svg2", 0));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1019.svg2", 3));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1020.svg2", 4));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1021.svg2", 5));
@@ -45,17 +47,34 @@ modulesAnalysis::modulesAnalysis(int mode) {
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1025.svg2", 1));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1026.svg2", 2));
   } else if (2 == mode) {
-    // -- manually setup list of modules
+    // -- validation with same modules as legacy
+    fModules.push_back(new moduleMeasurement("json/P1000.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1001.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1002.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1003.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1004.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1005.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1006.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1007.json", 1));
     fModules.push_back(new moduleMeasurement("json/P1008.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1009.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1010.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1011.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1012.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1013.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1014.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1015.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1016.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1017.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1018.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1019.json", 3));
     fModules.push_back(new moduleMeasurement("json/P1020.json", 4));
-    fModules.push_back(new moduleMeasurement("json/P1036.json", 0));
-    fModules.push_back(new moduleMeasurement("json/P1045.json", 3));
-    fModules.push_back(new moduleMeasurement("json/P1061.json", 1));
-    fModules.push_back(new moduleMeasurement("json/P1071.json", 0));
-    fModules.push_back(new moduleMeasurement("json/P1104.json", 2));  
-    fModules.push_back(new moduleMeasurement("json/P1122.json", 0));
-    fModules.push_back(new moduleMeasurement("json/P1130.json", 5));
-    fModules.push_back(new moduleMeasurement("json/P1133.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1021.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1022.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1023.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1024.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1025.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1026.json", 2));
   }
   bookHistograms();
 }
@@ -96,9 +115,9 @@ void modulesAnalysis::doAll() {
 
 // ---------------------------------------------------------------------- 
 void modulesAnalysis::bookHistograms() {
-  fFile = new TFile("modulesAnalysis.root", "RECREATE");
+  fFile = new TFile((fDirectory + "/modulesAnalysis.root").c_str(), "RECREATE");
 
-  int nbins = 40;
+  int nbins = 50;
   // -- calibration plots
   TH1D *h = new TH1D("chipWidth", " ", nbins, 21.4, 21.6);
   setTitles(h, "chip width [mm]", "entries");
@@ -109,10 +128,15 @@ void modulesAnalysis::bookHistograms() {
   h = new TH1D("markerDistanceY", " ", nbins, 22.95, 23.05);
   setTitles(h, "HDI marker distance Y axis [mm]", "entries");
   fHists.insert({"markerDistanceY", h});
-  h = new TH1D("scaleFactor", "", nbins, 0.00678, 0.00682);
+
+  h = new TH1D("scaleFactor", "", nbins, 0.0090, 0.0092);
   setTitles(h, "scale factor [mm/pixel]", "entries");
   fHists.insert({"scaleFactor", h}); 
-  h = new TH1D("alpha", "", nbins, -3.2, -3.1);
+  h = new TH1D("scaleFactorInkScape", "", nbins, 0.00678, 0.00682);
+  setTitles(h, "scale factor (inkscape) [mm/pixel]", "entries");
+  fHists.insert({"scaleFactorInkScape", h}); 
+
+  h = new TH1D("alpha", "", nbins, -3.18, -3.12);
   setTitles(h, "alpha(svg, HDI) [rad]", "entries");
   fHists.insert({"alpha", h});
   h = new TH1D("orthogonality", "", nbins, 99.8, 100.2);
@@ -121,20 +145,31 @@ void modulesAnalysis::bookHistograms() {
   h = new TH1D("diffXChips", "", nbins, -0.1, 0.1);
   setTitles(h, "#Delta(x_{chip 0}, x_{chip 3}) [mm]", "entries");
   fHists.insert({"diffXChips", h});
-  h = new TH1D("diffYChips", "", nbins, 37.2, 37.4);
+  h = new TH1D("diffYChips", "", nbins, 37.1, 37.4);
   setTitles(h, "#Delta(y_{chip 0}, y_{chip 3}) [mm]", "entries");
   fHists.insert({"diffYChips", h});
 
   // -- distance plots
-  h = new TH1D("chip00", "chip0 position top left (absolute)", nbins, 41.0, 41.5);
+  h = new TH1D("chip00", "chip0 position top left (absolute)", nbins, 40.5, 42.5);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip00", h});
-  h = new TH1D("chip31", "chip3 position bottom left (absolute)", nbins, 41.0, 41.5);
+  h = new TH1D("chip01", "chip0 position top right (absolute)", nbins, 19.0, 21.0);
+  setTitles(h, "x position [mm]", "entries");
+  fHists.insert({"chip01", h});
+  h = new TH1D("chip10", "chip1 position top left (absolute)", nbins, 19.0, 21.0);
+  setTitles(h, "x position [mm]", "entries");
+  fHists.insert({"chip10", h});
+  h = new TH1D("chip11", "chip1 position top right (absolute)", nbins, -3.0, -1.0);
+  setTitles(h, "x position [mm]", "entries");
+  fHists.insert({"chip11", h});
+
+
+  h = new TH1D("chip31", "chip3 position bottom left (absolute)", nbins, 40.0, 43.0);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip31", h});
 
   // -- angle plots
-  h = new TH1D("angleChips", " ", nbins, -0.01, 0.01);
+  h = new TH1D("angleChips", " ", nbins, -0.005, 0.005);
   setTitles(h, "Pi/2 - angle(HDI, chips) [rad]", "entries");
   fHists.insert({"angleChips", h});
 
@@ -151,12 +186,6 @@ void modulesAnalysis::bookHistograms() {
   //setTitles(h2, "index", "angle(chips) [rad]");
   h2->GetYaxis()->SetRangeUser(-0.01, 0.01);
   fProfiles.insert({"prfAngleChips", h2});
-
-
-  h2 = new TProfile("prfAngleChipsHDI", "angle(chips, HDI markers) vs Index", fModules.size(), 0, fModules.size(), -0.01, 0.01);
-  //setTitles(h2, "index", "angle(chips, HDI markers) [rad]");
-  h2->GetYaxis()->SetRangeUser(-0.01, 0.01);
-  fProfiles.insert({"prfAngleChipsHDI", h2});
 
   h2 = new TProfile("prfdiffXChips", "#Delta(x_{chip 0}, x_{chip 3}) vs Index", fModules.size(), 0, fModules.size(), -0.1, 0.1);
   //setTitles(h2, "index", "#Delta(x_{chip 0}, x_{chip 3}) [mm]");
@@ -199,10 +228,14 @@ void::modulesAnalysis::anaAll() {
     fHists["markerDistanceX"]->Fill(mm->getMarkerDistance("x"));
     fHists["markerDistanceY"]->Fill(mm->getMarkerDistance("y"));
     fHists["scaleFactor"]->Fill(sf);
+    fHists["scaleFactorInkScape"]->Fill(sf);
     fHists["alpha"]->Fill(mm->getCompound().getAlpha());
     fHists["orthogonality"]->Fill(mm->getCompound().getOrthogonality());
 
     fHists["chip00"]->Fill(sf * mm->getCompound().getROCsPrime(0).X());
+    fHists["chip01"]->Fill(sf * mm->getCompound().getROCsPrime(1).X());
+    fHists["chip10"]->Fill(sf * mm->getCompound().getROCsPrime(2).X());
+    fHists["chip11"]->Fill(sf * mm->getCompound().getROCsPrime(3).X());
     fHists["chip31"]->Fill(sf * mm->getCompound().getROCsPrime(7).X());
 
     fHists["diffXChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
@@ -230,14 +263,15 @@ void::modulesAnalysis::anaAll() {
 void modulesAnalysis::plotAll() {
   TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
   shrinkPad(0.15, 0.15, 0.1, 0.1);
+  gStyle->SetOptStat(111111);
   for (auto h : fHists) {
     h.second->Draw();
-    c1->SaveAs(("pdf/" + h.first + ".pdf").c_str());
+    c1->SaveAs((fDirectory + "/" + h.first + ".pdf").c_str());
   }
 
   for (auto prof : fProfiles) {
     prof.second->Draw();
-    c1->SaveAs(("pdf/" + prof.first + ".pdf").c_str());
+    c1->SaveAs((fDirectory + "/" + prof.first + ".pdf").c_str());
   }
 }
 
@@ -275,6 +309,6 @@ void modulesAnalysis::plotGlueTests() {
   leg->Draw();
 
   c1->Draw();
-  c1->SaveAs("glueTests.pdf");
+  c1->SaveAs((fDirectory + "/glueTests.pdf").c_str());
 
 }
