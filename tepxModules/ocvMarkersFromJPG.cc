@@ -209,13 +209,19 @@ int main(int argc, char** argv) {
     string filename = "250109-M035_0255.JPG";
     string outMarksFile;  // e.g. "moduleTemplate.marks"
     bool visualize(false);    
+    int moduleNumber(-1);
     for (int i = 1; i < argc; ++i) {
         if (string(argv[i]) == "-d" && i + 1 < argc) { directory = argv[++i]; }
         if (string(argv[i]) == "-f" && i + 1 < argc) { filename = argv[++i]; }
         if (string(argv[i]) == "-o" && i + 1 < argc) { outMarksFile = argv[++i]; }
-        if (string(argv[i]) == "-v" && i + 1 < argc) { visualize = true; }
+        if (string(argv[i]) == "-v" && i + 1 < argc) { visualize = true; verbose = true; }
     }
     
+    if (string::npos != filename.find("p")) {
+        moduleNumber = stoi(filename.substr(filename.find("p") + 1, 4));
+    }
+    cout << "moduleNumber = " << moduleNumber << endl;
+
     if (outMarksFile.empty()) {
         outMarksFile = filename.substr(filename.rfind('/') + 1);
         outMarksFile = directory + "/" + outMarksFile.substr(0, outMarksFile.rfind('.')) + ".json";
@@ -241,12 +247,14 @@ int main(int argc, char** argv) {
     double minDist   = 500.0;  // min distance between centers (px)
     double param1    = 200.0;  // Canny high threshold
     double param2    = 50.0;   // accumulator threshold
-    int    minRadius = 25;     // px
-    int    maxRadius = 30;    // px
+    int    minRadius = 26;     // This is quite finely tuned - in principle should try to find the small circles 
+                               // after the big ones to confirm the scale
+    int    maxRadius = 28;     // px
     
-    cv::HoughCircles(gray, circles, cv::HOUGH_GRADIENT, dp, minDist, param1, param2, minRadius, maxRadius);
-        
+    if (1) cv::HoughCircles(gray, circles, cv::HOUGH_GRADIENT, dp, minDist, param1, param2, minRadius, maxRadius);
+          
     // -- draw result for visual debugging
+    cout << "circles.size() = " << circles.size() << endl;
     cv::Mat vis1 = img.clone();
     for (size_t k = 0; k < circles.size(); ++k) {
         const auto& c = circles[k];
@@ -296,7 +304,8 @@ int main(int argc, char** argv) {
     // -- reorder hdiMarkers to be in order of increasing y and then x
     int idxMinY = 0;
     int idxMinX = 0;
-    
+    cout << "hdiMarkers.size() = " << hdiMarkers.size() << endl;
+
     // -- find index of smallest y and smallest x
     for (int i = 1; i < 3; ++i) {
         if (hdiMarkers[i][1] < hdiMarkers[idxMinY][1]) {
@@ -354,7 +363,7 @@ int main(int argc, char** argv) {
     double threshold = 0.52; // tune: how strong a match you need
     double minDist2 = 100.0;  // minimum distance between matches (px)
     
-    double offsetX = 15;
+    double offsetX = 11;
     
     // -- alignment crosses
     vector<cv::Point> lhsAC, rhsAC;
@@ -429,6 +438,8 @@ int main(int argc, char** argv) {
     // -- write the matches to a JSON file
     std::ofstream outFile(outMarksFile);
     outFile << "{" << std::endl;
+    outFile << "  \"filename\": \"" << filename << "\"," << std::endl;
+    outFile << "  \"moduleNumber\": " << moduleNumber << "," << std::endl;
     outFile << "  \"hdiMarkers\": [" << std::endl;
     for (size_t k = 0; k < hdiMarkers.size(); ++k) {
         const auto& m = hdiMarkers[k];
@@ -462,7 +473,13 @@ int main(int argc, char** argv) {
     // Save visualization image (always, not just when visualizing)
     string visFilename = filename.substr(filename.rfind('/') + 1);
     visFilename = "png/" + visFilename.substr(0, visFilename.rfind('.')) + ".png";
-    cv::imwrite(visFilename, vis1);
+    
+    // Save with PNG compression (compression level 3: good balance of size vs speed)
+    std::vector<int> compression_params;
+    compression_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+    compression_params.push_back(3);  // 0-9: 0=no compression, 9=max compression
+    
+    cv::imwrite(visFilename, vis1, compression_params);
     cout << "Saved visualization to: " << visFilename << endl;
     
     if (visualize) {
