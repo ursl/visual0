@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
         if (string(argv[i]) == "-d" && i + 1 < argc) { directory = argv[++i]; }
         if (string(argv[i]) == "-f" && i + 1 < argc) { filename = argv[++i]; }
         if (string(argv[i]) == "-o" && i + 1 < argc) { outMarksFile = argv[++i]; }
-        if (string(argv[i]) == "-v" && i + 1 < argc) { visualize = true; verbose = true; }
+        if (string(argv[i]) == "-v") { visualize = true; verbose = true; }
     }
     
     if (string::npos != filename.find("p")) {
@@ -277,9 +277,9 @@ int main(int argc, char** argv) {
     
     
     // -- try to find concentric circles with fine-tuned radii
-    minRadius = 55;
+    minRadius = 56;
     maxRadius = 65;
-    param1    = 130;  
+    param1    = 90;  
     param2    = 50;
     vector<cv::Vec3f> circles2;
     
