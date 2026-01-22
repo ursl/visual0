@@ -75,6 +75,95 @@ modulesAnalysis::modulesAnalysis(int mode, string directory): fDirectory(directo
     fModules.push_back(new moduleMeasurement("json/P1024.json", 0));
     fModules.push_back(new moduleMeasurement("json/P1025.json", 1));
     fModules.push_back(new moduleMeasurement("json/P1026.json", 2));
+  } else if (3 == mode) {
+    // -- complete statistics
+    fModules.push_back(new moduleMeasurement("json/P1000.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1001.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1002.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1003.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1004.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1005.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1006.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1007.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1008.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1009.json", 3));
+
+    fModules.push_back(new moduleMeasurement("json/P1010.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1011.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1012.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1013.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1014.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1015.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1016.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1017.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1018.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1019.json", 3));
+
+    fModules.push_back(new moduleMeasurement("json/P1020.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1021.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1022.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1023.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1024.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1025.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1026.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1027.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1028.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1029.json", 3));
+
+    fModules.push_back(new moduleMeasurement("json/P1030.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1031.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1032.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1033.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1034.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1035.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1036.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1037.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1038.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1039.json", 3));
+
+    fModules.push_back(new moduleMeasurement("json/P1040.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1041.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1042.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1043.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1044.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1045.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1046.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1047.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1048.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1049.json", 1));
+
+    fModules.push_back(new moduleMeasurement("json/P1050.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1051.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1052.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1053.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1054.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1055.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1056.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1057.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1058.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1059.json", 3));
+  
+    fModules.push_back(new moduleMeasurement("json/P1060.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1061.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1062.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1063.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1064.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1065.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1066.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1067.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1068.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1069.json", 3));
+  
+    fModules.push_back(new moduleMeasurement("json/P1070.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1071.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1072.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1073.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1074.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1075.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1076.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1077.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1078.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1079.json", 0));
   }
   bookHistograms();
 }
@@ -117,7 +206,7 @@ void modulesAnalysis::doAll() {
 void modulesAnalysis::bookHistograms() {
   fFile = new TFile((fDirectory + "/modulesAnalysis.root").c_str(), "RECREATE");
 
-  int nbins = 50;
+  int nbins = 100;
   // -- calibration plots
   TH1D *h = new TH1D("chipWidth", " ", nbins, 21.4, 21.6);
   setTitles(h, "chip width [mm]", "entries");
@@ -177,26 +266,30 @@ void modulesAnalysis::bookHistograms() {
   setTitles(h, "position", "entries");
   fHists.insert({"position", h}); 
 
-  TProfile *h2 = new TProfile("prfChipWidth", "chip width vs Index", fModules.size(), 0, fModules.size(), 21.4, 21.6 );
+  TProfile *h2 = new TProfile("prfChipWidth", "chip width vs Index", fModules.size(), 0, fModules.size());
   //  setTitles(h2, "index", "chip width [mm]");
   h2->GetYaxis()->SetRangeUser(21.4, 21.6);
   fProfiles.insert({"prfChipWidth", h2});
 
-  h2 = new TProfile("prfAngleChips", "angle(chips) vs Index", fModules.size(), 0, fModules.size(), -0.01, 0.01);
+  h2 = new TProfile("prfAngleChips", "angle(chips) vs Index", fModules.size(), 0, fModules.size());
   //setTitles(h2, "index", "angle(chips) [rad]");
   h2->GetYaxis()->SetRangeUser(-0.01, 0.01);
   fProfiles.insert({"prfAngleChips", h2});
 
-  h2 = new TProfile("prfdiffXChips", "#Delta(x_{chip 0}, x_{chip 3}) vs Index", fModules.size(), 0, fModules.size(), -0.1, 0.1);
+  h2 = new TProfile("prfdiffXChips", "#Delta(x_{chip 0}, x_{chip 3}) vs Index", fModules.size(), 0, fModules.size());
   //setTitles(h2, "index", "#Delta(x_{chip 0}, x_{chip 3}) [mm]");
   h2->GetYaxis()->SetRangeUser(-0.1, 0.1);
   fProfiles.insert({"prfdiffXChips", h2});
 
-  h2 = new TProfile("prfdiffYChips", "#Delta(y_{chip 0}, y_{chip 3}) vs Index", fModules.size(), 0, fModules.size(), 37., 37.4);
+  h2 = new TProfile("prfdiffYChips", "#Delta(y_{chip 0}, y_{chip 3}) vs Index", fModules.size(), 0, fModules.size());
   //setTitles(h2, "index", "#Delta(y_{chip 0}, y_{chip 3}) [mm]");
   h2->GetYaxis()->SetRangeUser(37., 37.4);
   fProfiles.insert({"prfdiffYChips", h2});
 
+  h2 = new TProfile("prfscaleFactor", "scale factor vs Index", fModules.size(), 0, fModules.size());
+  //setTitles(h2, "index", "scale factor [mm/pixel]");
+  h2->GetYaxis()->SetRangeUser(0.0090, 0.0092);
+  fProfiles.insert({"prfscaleFactor", h2});
 }
 
 // ----------------------------------------------------------------------
@@ -218,10 +311,12 @@ void::modulesAnalysis::anaAll() {
       fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), 21.4);
       fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), -0.1);
       fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), 37.);
+      fProfiles["prfscaleFactor"]->Fill(mm->getHistIndex(), 0.00678);
       continue;  
     }
 
     for (int ichip = 0; ichip < 4; ichip++) {
+      if (!chipWellMeasured(mm->getCompound(), ichip)) continue;
       fHists["chipWidth"]->Fill(mm->getChipWidth(ichip));
     }
     double sf = mm->getCompound().getSF();
@@ -232,15 +327,22 @@ void::modulesAnalysis::anaAll() {
     fHists["alpha"]->Fill(mm->getCompound().getAlpha());
     fHists["orthogonality"]->Fill(mm->getCompound().getOrthogonality());
 
-    fHists["chip00"]->Fill(sf * mm->getCompound().getROCsPrime(0).X());
-    fHists["chip01"]->Fill(sf * mm->getCompound().getROCsPrime(1).X());
-    fHists["chip10"]->Fill(sf * mm->getCompound().getROCsPrime(2).X());
-    fHists["chip11"]->Fill(sf * mm->getCompound().getROCsPrime(3).X());
-    fHists["chip31"]->Fill(sf * mm->getCompound().getROCsPrime(7).X());
+    if (chipWellMeasured(mm->getCompound(), 0)) {
+       fHists["chip00"]->Fill(sf * mm->getCompound().getROCsPrime(0).X());
+       fHists["chip01"]->Fill(sf * mm->getCompound().getROCsPrime(1).X());
+    }
+    if (chipWellMeasured(mm->getCompound(), 1)) {
+      fHists["chip10"]->Fill(sf * mm->getCompound().getROCsPrime(2).X());
+      fHists["chip11"]->Fill(sf * mm->getCompound().getROCsPrime(3).X());
+    }
+    if (chipWellMeasured(mm->getCompound(), 3)) {
+      fHists["chip31"]->Fill(sf * mm->getCompound().getROCsPrime(7).X());
+    }
 
-    fHists["diffXChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
-    fHists["diffYChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
-
+    if (chipWellMeasured(mm->getCompound(), 0) && chipWellMeasured(mm->getCompound(), 3)) {
+      fHists["diffXChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
+      fHists["diffYChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
+    }
 
     TVector2 rocEdge = mm->getCompound().getROCsPrime(0) - mm->getCompound().getROCsPrime(7);
     double angle = TMath::PiOver2() - TMath::ATan2(rocEdge.Y(), rocEdge.X());
@@ -248,14 +350,17 @@ void::modulesAnalysis::anaAll() {
 
 
     fProfiles["prfAngleChips"]->Fill(mm->getHistIndex(), angle);
+    if (chipWellMeasured(mm->getCompound(), 0)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(0));
+    if (chipWellMeasured(mm->getCompound(), 1)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(1));
+    if (chipWellMeasured(mm->getCompound(), 2)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(2));
+    if (chipWellMeasured(mm->getCompound(), 3)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(3));
 
-    fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(0));
-    fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(1));
-    fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(2));
-    fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(3));
-
-    fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
-    fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
+    if (chipWellMeasured(mm->getCompound(), 0) && chipWellMeasured(mm->getCompound(), 3)) {
+      fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
+      fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
+    }
+    cout << "filling scale factor " << mm->getHistIndex() << " " << sf << endl;
+    fProfiles["prfscaleFactor"]->Fill(mm->getHistIndex(), sf);
   }
 }
 
@@ -311,4 +416,12 @@ void modulesAnalysis::plotGlueTests() {
   c1->Draw();
   c1->SaveAs((fDirectory + "/glueTests.pdf").c_str());
 
+}
+
+// ----------------------------------------------------------------------
+bool modulesAnalysis::chipWellMeasured(compound &c, int index) {
+  bool result(true); 
+  if (c.getROCs(index).X() < 0.001) result = false;
+  if (c.getROCs(index).Y() < 0.001) result = false;
+  return result;
 }

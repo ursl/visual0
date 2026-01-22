@@ -22,6 +22,8 @@ class modulesAnalysis {
   void plotAll();
   void plotGlueTests();
 
+  bool chipWellMeasured(compound &c, int index);
+
   private:
   std::vector<moduleMeasurement*> fModules;
   std::string fFilename, fDirectory;
