@@ -20,16 +20,32 @@ using namespace std;
 int main(int argc, char* argv[]) {
   // -- command line arguments
   int mode(0), verbose(0);
-  string fileName("bla");
+  string fileName("bla"), directory("pdf");
   for (int i = 0; i < argc; i++){
-    if (!strcmp(argv[i], "-v"))   {verbose = atoi(argv[++i]);}
+
+    if (!strcmp(argv[i], "-d"))   {directory = argv[++i];}
     if (!strcmp(argv[i], "-f"))   {fileName = argv[++i];}
     if (!strcmp(argv[i], "-m"))   {mode = atoi(argv[++i]);}
+    if (!strcmp(argv[i], "-v"))   {verbose = atoi(argv[++i]);}
   }
-  
+ 
+ 
+  if (0 == mode) {
+    if (fileName != "bla") {
+      moduleMeasurement m(fileName, 0);
+      m.setFileName(fileName);
+      m.calcAll();
+    } else {
+      cout << "Usage: runModuleMeasurement -m 0 -f <filename>" << endl;
+    }
+
+    return 0;
+  } 
+
+
   // -- run analysis on processed image files (either legacy CSV or JSON)
-  if (mode < 10) {
-    modulesAnalysis ma(mode);
+  if (mode <= 2) {
+    modulesAnalysis ma(mode, directory);
     ma.doAll();
     if (1 == mode) ma.plotGlueTests();
     return 0;
@@ -56,11 +72,6 @@ int main(int argc, char* argv[]) {
     }
     return 0;
   }
-  
-  moduleMeasurement m(fileName, 0);
-  if (fileName != "bla") {
-    m.setFileName(fileName);
-    m.calcAll();
-  } 
+ 
   return 0;
 }
