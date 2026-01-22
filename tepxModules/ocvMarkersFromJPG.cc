@@ -41,6 +41,9 @@ map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const
     int yDivider = 2500;
     // -- LHS
     for (size_t k = 0; k < matchesLHS.size(); ++k) {
+        // -- skip obviously bad matches
+        if (matchesLHS[k].x > 5000) continue;
+
         if (matchesLHS[k].x < xDivider) {
             if (matchesLHS[k].y < yDivider) {
                 chipName = "chip00";
@@ -60,6 +63,9 @@ map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const
     // -- RHS
     xDivider = 5000;
     for (size_t k = 0; k < matchesRHS.size(); ++k) {
+        // -- skip obviously bad matches
+        if (matchesRHS[k].x < 2500) continue;
+
         if (matchesRHS[k].x < xDivider) {
             if (matchesRHS[k].y < yDivider) {
                 chipName = "chip01";
