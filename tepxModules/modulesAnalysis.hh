@@ -12,7 +12,7 @@
 // ---------------------------------------------------------------------- 
 class modulesAnalysis {
   public:
-  modulesAnalysis(int mode = 1);
+  modulesAnalysis(int mode = 1, std::string directory = "pdf");
   ~modulesAnalysis();
 
   void bookHistograms();
@@ -24,7 +24,7 @@ class modulesAnalysis {
 
   private:
   std::vector<moduleMeasurement*> fModules;
-  std::string fFilename;
+  std::string fFilename, fDirectory;
   TFile *fFile;
   std::map<std::string, TH1 *> fHists;
   std::map<std::string, TProfile *> fProfiles;
