@@ -1,6 +1,7 @@
 #ifndef MODULESANALYSIS_HH
 #define MODULESANALYSIS_HH
 
+#include "compound.hh"
 #include "moduleMeasurement.hh"
 
 #include "TFile.h"
@@ -22,10 +23,9 @@ class modulesAnalysis {
   void plotAll();
   void plotGlueTests();
 
-  bool chipWellMeasured(compound &c, int index);
-
   private:
   std::vector<moduleMeasurement*> fModules;
+  std::vector<compound*> fCompounds;
   std::string fFilename, fDirectory;
   TFile *fFile;
   std::map<std::string, TH1 *> fHists;

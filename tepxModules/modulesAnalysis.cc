@@ -2,6 +2,8 @@
 #include "moduleMeasurement.hh"
 #include "util.hh"
 
+#include <glob.h>
+
 #include <iostream>
 
 #include "TStyle.h"
@@ -37,7 +39,7 @@ modulesAnalysis::modulesAnalysis(int mode, string directory): fDirectory(directo
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1015.svg2", 1));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1016.svg2", 2));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1017.svg2", 3));
-    //?? fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1018.svg2", -1));
+    //badly-aligned   fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1018.svg2", -1));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1019.svg2", 3));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1020.svg2", 4));
     fModules.push_back(new moduleMeasurement("/Users/ursl/inkscape/tepx-modules/P1021.svg2", 5));
@@ -164,6 +166,85 @@ modulesAnalysis::modulesAnalysis(int mode, string directory): fDirectory(directo
     fModules.push_back(new moduleMeasurement("json/P1077.json", 4));
     fModules.push_back(new moduleMeasurement("json/P1078.json", 5));
     fModules.push_back(new moduleMeasurement("json/P1079.json", 0));
+
+    fModules.push_back(new moduleMeasurement("json/P1080.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1081.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1082.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1083.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1084.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1085.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1086.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1087.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1088.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1089.json", 2));
+
+    fModules.push_back(new moduleMeasurement("json/P1090.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1091.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1092.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1093.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1094.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1095.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1096.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1097.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1098.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1099.json", 3));
+
+    fModules.push_back(new moduleMeasurement("json/P1100.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1101.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1102.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1103.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1104.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1105.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1106.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1107.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1108.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1109.json", 2));
+
+
+    fModules.push_back(new moduleMeasurement("json/P1110.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1111.json", 4));
+ //   fModules.push_back(new moduleMeasurement("json/P1112.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1113.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1114.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1115.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1116.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1117.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1118.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1119.json", 3));
+
+    fModules.push_back(new moduleMeasurement("json/P1120.json", 4));
+    fModules.push_back(new moduleMeasurement("json/P1121.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1122.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1123.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1124.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1125.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1126.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1127.json", 2));
+    fModules.push_back(new moduleMeasurement("json/P1128.json", 3));
+    fModules.push_back(new moduleMeasurement("json/P1129.json", 4));
+
+    fModules.push_back(new moduleMeasurement("json/P1130.json", 5));
+    fModules.push_back(new moduleMeasurement("json/P1131.json", 0));
+    fModules.push_back(new moduleMeasurement("json/P1132.json", 1));
+    fModules.push_back(new moduleMeasurement("json/P1133.json", 2));
+  } else if (4 == mode) {
+    // -- Find all files matching pattern "modules/p????.jpg"
+    vector<string> jsonFiles;
+    glob_t globResult;
+    int globRet = glob("json/p????.json", GLOB_TILDE, NULL, &globResult);
+    
+    if (globRet == 0) {
+      for (size_t i = 0; i < globResult.gl_pathc; ++i) {
+        string jsonFile = string(globResult.gl_pathv[i]);
+        if (jsonFile.find("p1112") == string::npos) continue;
+        jsonFiles.push_back(jsonFile);
+      }
+    }
+    globfree(&globResult);
+
+    for (const auto& jsonFile : jsonFiles) {
+      fCompounds.push_back(new compound(jsonFile));
+    }
   }
   bookHistograms();
 }
@@ -197,6 +278,9 @@ void modulesAnalysis::doAll() {
          << " " << Form("%7.4f", mm->getChipWidth(1)) 
          << " " << Form("%7.4f", mm->getChipWidth(2)) 
          << " " << Form("%7.4f", mm->getChipWidth(3)) 
+         << " chip separations:"
+         << " " << Form("%7.4f", mm->getChipMarkerSeparation(1, 2)) 
+         << " " << Form("%7.4f", mm->getChipMarkerSeparation(6, 5)) 
          << endl;
   }
 }
@@ -239,21 +323,21 @@ void modulesAnalysis::bookHistograms() {
   fHists.insert({"diffYChips", h});
 
   // -- distance plots
-  h = new TH1D("chip00", "chip0 position top left (absolute)", nbins, 40.5, 42.5);
+  h = new TH1D("chip00", "chip0 position top left (absolute)", nbins, 41.0, 42.5);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip00", h});
-  h = new TH1D("chip01", "chip0 position top right (absolute)", nbins, 19.0, 21.0);
+  h = new TH1D("chip01", "chip0 position top right (absolute)", nbins, 19.5, 21.0);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip01", h});
-  h = new TH1D("chip10", "chip1 position top left (absolute)", nbins, 19.0, 21.0);
+  h = new TH1D("chip10", "chip1 position top left (absolute)", nbins, 19.0, 20.5);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip10", h});
-  h = new TH1D("chip11", "chip1 position top right (absolute)", nbins, -3.0, -1.0);
+  h = new TH1D("chip11", "chip1 position top right (absolute)", nbins, -2.5, -1.0);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip11", h});
 
 
-  h = new TH1D("chip31", "chip3 position bottom left (absolute)", nbins, 40.0, 43.0);
+  h = new TH1D("chip31", "chip3 position bottom left (absolute)", nbins, 41.0, 42.5);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip31", h});
 
@@ -264,6 +348,7 @@ void modulesAnalysis::bookHistograms() {
 
   h = new TH1D("position", "position", 6, 0, 6);
   setTitles(h, "position", "entries");
+  h->SetMinimum(0.);
   fHists.insert({"position", h}); 
 
   TProfile *h2 = new TProfile("prfChipWidth", "chip width vs Index", fModules.size(), 0, fModules.size());
@@ -316,30 +401,56 @@ void::modulesAnalysis::anaAll() {
     }
 
     for (int ichip = 0; ichip < 4; ichip++) {
-      if (!chipWellMeasured(mm->getCompound(), ichip)) continue;
+      if (!mm->getCompound().chipWellMeasured(ichip)) {
+        cout << "**************************** skipping chip " << ichip << " of " << mm->getFileName() << endl;
+        continue;
+      }
       fHists["chipWidth"]->Fill(mm->getChipWidth(ichip));
     }
-    double sf = mm->getCompound().getSF();
-    fHists["markerDistanceX"]->Fill(mm->getMarkerDistance("x"));
-    fHists["markerDistanceY"]->Fill(mm->getMarkerDistance("y"));
-    fHists["scaleFactor"]->Fill(sf);
-    fHists["scaleFactorInkScape"]->Fill(sf);
-    fHists["alpha"]->Fill(mm->getCompound().getAlpha());
-    fHists["orthogonality"]->Fill(mm->getCompound().getOrthogonality());
 
-    if (chipWellMeasured(mm->getCompound(), 0)) {
+    double sf = mm->getCompound().getSF();
+    if (mm->getCompound().markersWellMeasured()) {
+      fHists["markerDistanceX"]->Fill(mm->getMarkerDistance("x"));
+      fHists["markerDistanceY"]->Fill(mm->getMarkerDistance("y"));
+      fHists["scaleFactor"]->Fill(sf);
+      fHists["scaleFactorInkScape"]->Fill(sf);
+      fHists["alpha"]->Fill(mm->getCompound().getAlpha());
+      fHists["orthogonality"]->Fill(mm->getCompound().getOrthogonality());
+    }
+
+    if (mm->getCompound().chipWellMeasured(0)) {
        fHists["chip00"]->Fill(sf * mm->getCompound().getROCsPrime(0).X());
        fHists["chip01"]->Fill(sf * mm->getCompound().getROCsPrime(1).X());
     }
-    if (chipWellMeasured(mm->getCompound(), 1)) {
+    if (mm->getCompound().chipWellMeasured(1)) {
       fHists["chip10"]->Fill(sf * mm->getCompound().getROCsPrime(2).X());
       fHists["chip11"]->Fill(sf * mm->getCompound().getROCsPrime(3).X());
+      if (sf * mm->getCompound().getROCsPrime(3).X() >-1. ) {
+        cout << "**************************** chip11 is badly placed **************************** " << mm->getFileName() << endl;
+        cout << "sf * mm->getCompound().getROCsPrime(3).X() = " << sf * mm->getCompound().getROCsPrime(3).X() << endl;
+        cout << "sf * mm->getCompound().getROCsPrime(3).Y() = " << sf * mm->getCompound().getROCsPrime(3).Y() << endl;
+        cout << "mm->getCompound().getROCsPrime(3).X() = " << mm->getCompound().getROCsPrime(3).X() << endl;
+        cout << "mm->getCompound().getROCsPrime(3).Y() = " << mm->getCompound().getROCsPrime(3).Y() << endl;
+        cout << "mm->getCompound().getROCs(3).X() = " << mm->getCompound().getROCs(3).X() << endl;
+        cout << "mm->getCompound().getROCs(3).Y() = " << mm->getCompound().getROCs(3).Y() << endl;
+      }
     }
-    if (chipWellMeasured(mm->getCompound(), 3)) {
+    if (mm->getCompound().chipWellMeasured(3)) {
       fHists["chip31"]->Fill(sf * mm->getCompound().getROCsPrime(7).X());
+      if (sf * mm->getCompound().getROCsPrime(7).X() < 40.) {
+        cout << "**************************** chip31 is too small " << mm->getFileName() << endl;
+        cout << "sf * mm->getCompound().getROCsPrime(7).X() = " << sf * mm->getCompound().getROCsPrime(7).X() << endl;
+        cout << "sf * mm->getCompound().getROCsPrime(7).Y() = " << sf * mm->getCompound().getROCsPrime(7).Y() << endl;
+        cout << "mm->getCompound().getROCsPrime(7).X() = " << mm->getCompound().getROCsPrime(7).X() << endl;
+        cout << "mm->getCompound().getROCsPrime(7).Y() = " << mm->getCompound().getROCsPrime(7).Y() << endl;
+        cout << "mm->getCompound().getROCs(7).X() = " << mm->getCompound().getROCs(7).X() << endl;
+        cout << "mm->getCompound().getROCs(7).Y() = " << mm->getCompound().getROCs(7).Y() << endl;
+        cout << "mm->getCompound().getROCsPrime(7).X() = " << mm->getCompound().getROCsPrime(7).X() << endl;
+        cout << "mm->getCompound().getROCsPrime(7).Y() = " << mm->getCompound().getROCsPrime(7).Y() << endl;
+      }
     }
 
-    if (chipWellMeasured(mm->getCompound(), 0) && chipWellMeasured(mm->getCompound(), 3)) {
+    if (mm->getCompound().chipWellMeasured(0) && mm->getCompound().chipWellMeasured(3)) {
       fHists["diffXChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
       fHists["diffYChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
     }
@@ -350,12 +461,12 @@ void::modulesAnalysis::anaAll() {
 
 
     fProfiles["prfAngleChips"]->Fill(mm->getHistIndex(), angle);
-    if (chipWellMeasured(mm->getCompound(), 0)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(0));
-    if (chipWellMeasured(mm->getCompound(), 1)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(1));
-    if (chipWellMeasured(mm->getCompound(), 2)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(2));
-    if (chipWellMeasured(mm->getCompound(), 3)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(3));
+    if (mm->getCompound().chipWellMeasured(0)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(0));
+    if (mm->getCompound().chipWellMeasured(1)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(1));
+    if (mm->getCompound().chipWellMeasured(2)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(2));
+    if (mm->getCompound().chipWellMeasured(3)) fProfiles["prfChipWidth"]->Fill(mm->getHistIndex(), mm->getChipWidth(3));
 
-    if (chipWellMeasured(mm->getCompound(), 0) && chipWellMeasured(mm->getCompound(), 3)) {
+    if (mm->getCompound().chipWellMeasured(0) && mm->getCompound().chipWellMeasured(3)) {
       fProfiles["prfdiffXChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).X() - mm->getCompound().getROCsPrime(7).X()));
       fProfiles["prfdiffYChips"]->Fill(mm->getHistIndex(), sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
     }
@@ -374,6 +485,7 @@ void modulesAnalysis::plotAll() {
     c1->SaveAs((fDirectory + "/" + h.first + ".pdf").c_str());
   }
 
+  gStyle->SetOptStat(0);
   for (auto prof : fProfiles) {
     prof.second->Draw();
     c1->SaveAs((fDirectory + "/" + prof.first + ".pdf").c_str());
@@ -416,12 +528,4 @@ void modulesAnalysis::plotGlueTests() {
   c1->Draw();
   c1->SaveAs((fDirectory + "/glueTests.pdf").c_str());
 
-}
-
-// ----------------------------------------------------------------------
-bool modulesAnalysis::chipWellMeasured(compound &c, int index) {
-  bool result(true); 
-  if (c.getROCs(index).X() < 0.001) result = false;
-  if (c.getROCs(index).Y() < 0.001) result = false;
-  return result;
 }

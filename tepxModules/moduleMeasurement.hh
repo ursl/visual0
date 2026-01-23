@@ -21,6 +21,8 @@ class moduleMeasurement {
   double getChipWidth(int ichip);
   // -- get marker distance
   double getMarkerDistance(std::string dir = "x");
+  // -- get chip separation 
+  double getChipMarkerSeparation(int ichip0, int ichip1);
   
   compound &getCompound() {return fCompound;}
   int getIndex() {return fIndex;}

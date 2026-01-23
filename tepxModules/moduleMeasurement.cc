@@ -35,6 +35,17 @@ void moduleMeasurement::calcAll(int verbose, int doParse) {
 // ----------------------------------------------------------------------
 double moduleMeasurement::getChipWidth(int ichip) {
   return fCompound.getSF() * TMath::Abs(fCompound.getROCsPrime(2*ichip).X() - fCompound.getROCsPrime(2*ichip+1).X());
+  // return fCompound.getSF() 
+  //        * TMath::Sqrt(TMath::Power(fCompound.getROCsPrime(2*ichip).X() - fCompound.getROCsPrime(2*ichip+1).X(), 2) 
+  //                    + TMath::Power(fCompound.getROCsPrime(2*ichip).Y() - fCompound.getROCsPrime(2*ichip+1).Y(), 2));
+}
+
+// ----------------------------------------------------------------------
+double moduleMeasurement::getChipMarkerSeparation(int ichip0, int ichip1) {
+  return fCompound.getSF() * TMath::Abs(fCompound.getROCsPrime(ichip0).X() - fCompound.getROCsPrime(ichip1).X());
+  // return fCompound.getSF() 
+  //       * TMath::Sqrt(TMath::Power(fCompound.getROCsPrime(2*ichip0).X() - fCompound.getROCsPrime(2*ichip1).X(), 2) 
+  //                   + TMath::Power(fCompound.getROCsPrime(2*ichip0).Y() - fCompound.getROCsPrime(2*ichip1).Y(), 2));
 }
 
 // ----------------------------------------------------------------------
