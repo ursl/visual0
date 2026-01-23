@@ -159,15 +159,16 @@ std::vector<cv::Point> findChipMatches(const cv::Mat &result, const vector<cv::V
 cv::Mat makeChipTemplate(bool mirrorRight = false) {
     // Create a composite template: 3 rectangles (9x14 each), widely separated,
     // then three rectangles nearly adjacent
-    int rectW = 9;
-    int rectH = 10;
-    int centerSpacing = rectH + rectW;
+    int rectW = 9; // 70um according to measurement by WE
+    int rectH = 12;
+    int centerSpacing = 25; // 200um according to RD53 drawing
     int gap = centerSpacing - rectW; // "big" gap between rectangles
+    int gap2 = 32;  
     
     // Template size: enough to fit all three rectangles
     // Total width: left padding + rect1 + gap + rect2 + gap + rect3 + right padding
-    int leftPadding = 10;
-    int templateW = leftPadding + rectW + gap + rectW + gap + rectW + 2 * gap + 3 * (rectW + 4);
+    int leftPadding = rectW;
+    int templateW = leftPadding + rectW + gap + rectW + gap + rectW + gap2 + 3 * (rectW) - 6; /*I don't know why I need to subtract this?!*/
     int templateH = rectH; // add small padding top/bottom
     
     cv::Mat templateRect = cv::Mat(templateH, templateW, CV_8UC3, cv::Scalar(143, 168, 202));  // B, G, R
@@ -175,27 +176,27 @@ cv::Mat makeChipTemplate(bool mirrorRight = false) {
     // -- construct the pattern: three widely spaced then three nearly adjacent
     int y0 = templateH / 2;         // center y for all rectangles
     int x0 = leftPadding;           // first rectangle left x
-    cv::Rect r0(x0, y0 - rectH / 2, rectW, rectH);
+    cv::Rect r0(x0, 0, rectW, rectH);
     cv::rectangle(templateRect, r0, cv::Scalar(206, 200, 195), -1); // filled rectangle
     
     int x1 = x0 + centerSpacing;
-    cv::Rect r1(x1, y0 - rectH / 2, rectW, rectH);
+    cv::Rect r1(x1, 0, rectW, rectH);
     cv::rectangle(templateRect, r1, cv::Scalar(206, 200, 195), -1);
     
     int x2 = x1 + centerSpacing;
-    cv::Rect r2(x2, y0 - rectH / 2, rectW, rectH);
+    cv::Rect r2(x2, 0, rectW, rectH);
     cv::rectangle(templateRect, r2, cv::Scalar(206, 200, 195), -1);
     
-    int x3 = x2 + 2*centerSpacing;
-    cv::Rect r3(x3, y0 - rectH / 2, rectW, rectH);
+    int x3 = x2  + gap2;
+    cv::Rect r3(x3, 0, rectW, rectH);
     cv::rectangle(templateRect, r3, cv::Scalar(206, 200, 195), -1);
     
     int x4 = x3 + rectW + 1;
-    cv::Rect r4(x4, y0 - rectH / 2, rectW, rectH);
+    cv::Rect r4(x4, 0, rectW, rectH);
     cv::rectangle(templateRect, r4, cv::Scalar(206, 200, 195), -1);
     
     int x5 = x4 + rectW + 1;
-    cv::Rect r5(x5, y0 - rectH / 2, rectW, rectH);
+    cv::Rect r5(x5, 0, rectW, rectH);
     cv::rectangle(templateRect, r5, cv::Scalar(206, 200, 195), -1);
     
     // Mirror horizontally for RHS pattern if requested
@@ -207,6 +208,34 @@ cv::Mat makeChipTemplate(bool mirrorRight = false) {
     
     return templateRect;
 }
+
+
+// ----------------------------------------------------------------------
+int modulePosition(int moduleNumber) {
+    static map<int, int> modulePositions = {
+      {1000, 0}, {1001, 0}, {1002, 1}, {1003, 2}, {1004, 0}, {1005, 1}, {1006, 0}, {1007, 1}, {1008, 2}, {1009, 3},
+      {1010, 4}, {1011, 0}, {1012, 0}, {1013, 1}, {1014, 2}, {1015, 1}, {1016, 2}, {1017, 3}, {1018, 0}, {1019, 3},
+      {1020, 4}, {1021, 5}, {1022, 4}, {1023, 4}, {1024, 0}, {1025, 1}, {1026, 2}, {1027, 1}, {1028, 2}, {1029, 3},
+      {1030, 4}, {1031, 0}, {1032, 1}, {1033, 3}, {1034, 4}, {1035, 0}, {1036, 0}, {1037, 1}, {1038, 2}, {1039, 3},
+      {1040, 4}, {1041, 5}, {1042, 0}, {1043, 1}, {1044, 2}, {1045, 3}, {1046, 4}, {1047, 5}, {1048, 0}, {1049, 1},
+      {1050, 2}, {1051, 0}, {1052, 1}, {1053, 2}, {1054, 3}, {1055, 2}, {1056, 3}, {1057, 0}, {1058, 1}, {1059, 3},
+      {1060, 4}, {1061, 5}, {1062, 4}, {1063, 4}, {1064, 0}, {1065, 1}, {1066, 2}, {1067, 3}, {1068, 4}, {1069, 5},
+      {1070, 0}, {1071, 1}, {1072, 2}, {1073, 3}, {1074, 4}, {1075, 5}, {1076, 0}, {1077, 1}, {1078, 2}, {1079, 3},
+      {1080, 5}, {1081, 0}, {1082, 1}, {1083, 2}, {1084, 3}, {1085, 4}, {1086, 5}, {1087, 0}, {1088, 1}, {1089, 2},
+      {1090, 3}, {1091, 4}, {1092, 5}, {1093, 0}, {1094, 1}, {1095, 2}, {1096, 0}, {1097, 1}, {1098, 2}, {1099, 3},
+      {1100, 4}, {1101, 5}, {1102, 0}, {1103, 1}, {1104, 2}, {1105, 3}, {1106, 4}, {1107, 0}, {1108, 1}, {1109, 2},
+      {1110, 1}, {1111, 2}, {1112, 3}, {1113, 4}, {1114, 5}, {1115, 0}, {1116, 1}, {1117, 2}, {1118, 3}, {1119, 4},
+      {1120, 5}, {1121, 0}, {1122, 1}, {1123, 2}, {1124, 3}, {1125, 0}, {1126, 1}, {1127, 2}, {1128, 3}, {1129, 4},
+      {1130, 5}, {1131, 0}, {1132, 1}, {1133, 2}
+     };
+    if (modulePositions.find(moduleNumber) == modulePositions.end()) {
+      cout << "Module number " << moduleNumber << " not found in modulePositions" << endl;
+      return -1;
+    }
+    return modulePositions[moduleNumber];
+  }
+  
+
 
 // ---------------------------------------------------------------------- 
 int main(int argc, char** argv) {
@@ -369,7 +398,7 @@ int main(int argc, char** argv) {
     double threshold = 0.52; // tune: how strong a match you need
     double minDist2 = 100.0;  // minimum distance between matches (px)
     
-    double offsetX = 11;
+    double offsetX = 7;
     
     // -- alignment crosses
     vector<cv::Point> lhsAC, rhsAC;
@@ -377,7 +406,7 @@ int main(int argc, char** argv) {
     vector<cv::Point> matchesLHS = findChipMatches(resultLHS, hdiMarkers, threshold, minDist2);
     for (size_t k = 0; k < matchesLHS.size(); ++k) {
         const auto& m = matchesLHS[k];
-        Scalar color(0, 0, 255 - int(80 * k));  // different reds
+        Scalar color(0, 0, 255);  // red
         
         // Draw template at match location (m is top-left corner from matchTemplate)
         cv::Rect roi(m.x, m.y, templateLHS.cols, templateLHS.rows);
@@ -385,15 +414,15 @@ int main(int argc, char** argv) {
         if (roi.x >= 0 && roi.y >= 0 && roi.x + roi.width <= vis1.cols && roi.y + roi.height <= vis1.rows) {
             cv::Mat roiMat = vis1(roi);
             cv::addWeighted(roiMat, 0.5, templateLHS, 0.5, 0, roiMat);
-            cv::rectangle(vis1, roi, color, 2);
+            cv::rectangle(vis1, roi, color, 1);
             
             // Draw a small circle just left of the LHS template
             cv::Point circleCenter(roi.x - offsetX, roi.y + roi.height / 2);
             int circleRadius = 6;
-            cv::circle(vis1, circleCenter, circleRadius, color, 2);
+            cv::circle(vis1, circleCenter, circleRadius, color, 1);
             lhsAC.push_back(circleCenter);
             
-            putText(vis1, "P" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
+            putText(vis1, "LHS" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
             if (verbose) {
                 cout << "Match " << k << " center (px): "
                 << m.x << ", " << m.y
@@ -407,19 +436,19 @@ int main(int argc, char** argv) {
     vector<Point> matchesRHS = findChipMatches(resultRHS, hdiMarkers, threshold, minDist2);
     for (size_t k = 0; k < matchesRHS.size(); ++k) {
         const auto& m = matchesRHS[k];
-        Scalar color(0, 0, 255 - int(80 * k));  // different reds
+        Scalar color(255, 0, 0);  // blue
         cv::Rect roi(m.x, m.y, templateRHS.cols, templateRHS.rows);
         if (roi.x >= 0 && roi.y >= 0 && roi.x + roi.width <= vis1.cols && roi.y + roi.height <= vis1.rows) {
             cv::Mat roiMat = vis1(roi);
             cv::addWeighted(roiMat, 0.5, templateRHS, 0.5, 0, roiMat);
-            cv::rectangle(vis1, roi, color, 2);
+            cv::rectangle(vis1, roi, color, 1);
             
             // Draw a small circle just right of the RHS template
             cv::Point circleCenter(roi.x + roi.width + offsetX, roi.y + roi.height / 2);
             int circleRadius = 6;
-            cv::circle(vis1, circleCenter, circleRadius, color, 2);
+            cv::circle(vis1, circleCenter, circleRadius, color, 1);
             rhsAC.push_back(circleCenter);
-            putText(vis1, "P" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
+            putText(vis1, "RHS" + std::to_string(k), Point2f(m.x-15, m.y+60), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
             if (verbose) {
                 cout << "Match " << k << " center (px): "
                 << m.x << ", " << m.y
@@ -429,7 +458,7 @@ int main(int argc, char** argv) {
         }
     }
     
-    if (0) {
+    if (visualize) {
         cv::imshow("templateLHS", templateLHS);
         cv::imshow("templateRHS", templateRHS);
     }
@@ -446,6 +475,7 @@ int main(int argc, char** argv) {
     outFile << "{" << std::endl;
     outFile << "  \"filename\": \"" << filename << "\"," << std::endl;
     outFile << "  \"moduleNumber\": " << moduleNumber << "," << std::endl;
+    outFile << "  \"modulePosition\": " << modulePosition(moduleNumber) << "," << std::endl;
     outFile << "  \"hdiMarkers\": [" << std::endl;
     for (size_t k = 0; k < hdiMarkers.size(); ++k) {
         const auto& m = hdiMarkers[k];
