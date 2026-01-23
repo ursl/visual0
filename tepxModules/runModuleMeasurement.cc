@@ -16,10 +16,12 @@ using namespace std;
 // moor>./bin/runModuleMeasurement -m 2
 // ----------------------------------------------------------------------
 
+
 // ----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
   // -- command line arguments
   int mode(0), verbose(0);
+  int pfirst(-1), plast(-1);
   string fileName("bla"), directory("pdf");
   for (int i = 0; i < argc; i++){
 
@@ -27,6 +29,8 @@ int main(int argc, char* argv[]) {
     if (!strcmp(argv[i], "-f"))   {fileName = argv[++i];}
     if (!strcmp(argv[i], "-m"))   {mode = atoi(argv[++i]);}
     if (!strcmp(argv[i], "-v"))   {verbose = atoi(argv[++i]);}
+    if (!strcmp(argv[i], "-p"))   {pfirst = atoi(argv[++i]);}
+    if (!strcmp(argv[i], "-q"))   {plast = atoi(argv[++i]);}
   }
  
  
@@ -67,6 +71,10 @@ int main(int argc, char* argv[]) {
     
     // -- Loop over all found files
     for (const auto& imgFile : imageFiles) {
+      int pNumber = stoi(imgFile.substr(imgFile.find("p") + 1, 4));
+      cout << "==> pNumber = " << pNumber << " pfirst = " << pfirst << " plast = " << plast << endl;
+      if (pfirst > -1 && pNumber < pfirst) continue;
+      if (plast > -1 && pNumber > plast) continue;
       cout << "Processing: " << imgFile << endl;
       system(("bin/ocvMarkersFromJPG -f " + imgFile).c_str());
     }
