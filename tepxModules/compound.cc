@@ -1,6 +1,7 @@
 #include "compound.hh"
 
 #include "util.hh"
+#include "json.h"
 
 #include "TMath.h"
 #include "TString.h"
@@ -64,57 +65,16 @@ void compound::parseJsonFile() {
     return;
   }
 
-  // Read entire file into a string
-  stringstream buffer;
-  buffer << INS.rdbuf();
-  string jsonContent = buffer.str();
+  // -- Parse JSON using nlohmann::json
+  nlohmann::json j;
+  INS >> j;
   INS.close();
 
-  // Simple JSON parser - extract hdiMarkers and chipMarkers
-  // Find hdiMarkers array
-  size_t hdiStart = jsonContent.find("\"hdiMarkers\":");
-  size_t chipStart = jsonContent.find("\"chipMarkers\":");
+  fModuleNumber = j["moduleNumber"].get<int>();
+  fModulePosition = j["modulePosition"].get<int>();
+  fIndex = j["index"].get<int>();
 
-  if (hdiStart == string::npos || chipStart == string::npos) {
-    cerr << "JSON file missing required fields" << endl;
-    return;
-  }
-
-  // Parse hdiMarkers (expect 3 markers)
-  size_t hdiArrayStart = jsonContent.find('[', hdiStart);
-  size_t hdiArrayEnd = jsonContent.find(']', hdiArrayStart);
-  string hdiArray = jsonContent.substr(hdiArrayStart + 1, hdiArrayEnd - hdiArrayStart - 1);
-
-  // Extract x,y pairs from hdiMarkers
-  size_t pos = 0;
-  int markerIdx = 0;
-  while (pos < hdiArray.length() && markerIdx < 3) {
-    size_t xPos = hdiArray.find("\"x\":", pos);
-    size_t yPos = hdiArray.find("\"y\":", pos);
-    if (xPos == string::npos || yPos == string::npos) break;
-
-    // Extract x value
-    size_t xValStart = hdiArray.find_first_of("0123456789-", xPos + 4);
-    size_t xValEnd = hdiArray.find_first_not_of("0123456789.-", xValStart);
-    double x = stod(hdiArray.substr(xValStart, xValEnd - xValStart));
-
-    // Extract y value
-    size_t yValStart = hdiArray.find_first_of("0123456789-", yPos + 4);
-    size_t yValEnd = hdiArray.find_first_not_of("0123456789.-", yValStart);
-    double y = stod(hdiArray.substr(yValStart, yValEnd - yValStart));
-
-    pMarkers[markerIdx] = TVector2(x, y);
-    markerIdx++;
-
-    pos = yValEnd;
-  }
-
-  // Parse chipMarkers (expect 8 chips: chip00, chip01, chip10, chip11, chip20, chip21, chip30, chip31)
-  size_t chipArrayStart = jsonContent.find('[', chipStart);
-  size_t chipArrayEnd = jsonContent.find(']', chipArrayStart);
-  string chipArray = jsonContent.substr(chipArrayStart + 1, chipArrayEnd - chipArrayStart - 1);
-
-  // Map chip names to indices: chip00->0, chip01->1, chip10->2, chip11->3, chip20->4, chip21->5, chip30->6, chip31->7
+  // -- Map chip names to indices: chip00->0, chip01->1, chip10->2, chip11->3, chip20->4, chip21->5, chip30->6, chip31->7
   map<string, int> chipNameToIdx;
   chipNameToIdx["chip00"] = 0;
   chipNameToIdx["chip01"] = 1;
@@ -125,44 +85,46 @@ void compound::parseJsonFile() {
   chipNameToIdx["chip30"] = 6;
   chipNameToIdx["chip31"] = 7;
 
-  // Extract each chip marker object
-  pos = 0;
-  while (pos < chipArray.length()) {
-    size_t namePos = chipArray.find("\"name\":", pos);
-    if (namePos == string::npos) break;
-
-    // Extract chip name
-    size_t nameStart = chipArray.find('"', namePos + 7) + 1;
-    size_t nameEnd = chipArray.find('"', nameStart);
-    string chipName = chipArray.substr(nameStart, nameEnd - nameStart);
-
-    // Find x and y for this chip
-    size_t xPos = chipArray.find("\"x\":", nameEnd);
-    size_t yPos = chipArray.find("\"y\":", nameEnd);
-    if (xPos == string::npos || yPos == string::npos) break;
-
-    // Extract x value
-    size_t xValStart = chipArray.find_first_of("0123456789-", xPos + 4);
-    size_t xValEnd = chipArray.find_first_not_of("0123456789.-", xValStart);
-    double x = stod(chipArray.substr(xValStart, xValEnd - xValStart));
-
-    // Extract y value
-    size_t yValStart = chipArray.find_first_of("0123456789-", yPos + 4);
-    size_t yValEnd = chipArray.find_first_not_of("0123456789.-", yValStart);
-    double y = stod(chipArray.substr(yValStart, yValEnd - yValStart));
-
-    // Store in pROCs if we know this chip name
-    if (chipNameToIdx.find(chipName) != chipNameToIdx.end()) {
-      int idx = chipNameToIdx[chipName];
-      pROCs[idx] = TVector2(x, y);
+  // -- Parse hdiMarkers (expect 3 markers)
+  if (j.contains("hdiMarkers") && j["hdiMarkers"].is_array()) {
+    int markerIdx = 0;
+    for (const auto& marker : j["hdiMarkers"]) {
+      if (markerIdx >= 3) break;
+      if (marker.contains("x") && marker.contains("y")) {
+        double x = marker["x"].get<double>();
+        double y = marker["y"].get<double>();
+        pMarkers[markerIdx] = TVector2(x, y);
+        markerIdx++;
+      }
     }
+    cout << "Parsed " << markerIdx << " HDI markers" << endl;
+  } else {
+    cerr << "JSON file missing or invalid 'hdiMarkers' array" << endl;
+  }
 
-    pos = yValEnd;
+  // -- Parse chipMarkers (expect 8 chips)
+  if (j.contains("chipMarkers") && j["chipMarkers"].is_array()) {
+    int chipCount = 0;
+    for (const auto& chip : j["chipMarkers"]) {
+      if (chip.contains("name") && chip.contains("x") && chip.contains("y")) {
+        string chipName = chip["name"].get<string>();
+        double x = chip["x"].get<double>();
+        double y = chip["y"].get<double>();
+        
+        // Store in pROCs if we know this chip name
+        if (chipNameToIdx.find(chipName) != chipNameToIdx.end()) {
+          int idx = chipNameToIdx[chipName];
+          pROCs[idx] = TVector2(x, y);
+          chipCount++;
+        }
+      }
+    }
+    cout << "Parsed " << chipCount << " chip markers" << endl;
+  } else {
+    cerr << "JSON file missing or invalid 'chipMarkers' array" << endl;
   }
 
   cout << "Parsed JSON file: " << fName << endl;
-  cout << "  Found " << markerIdx << " HDI markers" << endl;
-  cout << "  Found chip markers" << endl;
 }
 
 

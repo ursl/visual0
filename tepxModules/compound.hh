@@ -95,6 +95,7 @@ private:
   double fOrthogonality;
   TVector2 fOffset;
   std::string fName;
+  int fModuleNumber, fModulePosition, fIndex;
 };
 
 bool exists_test0(const std::string& name);
