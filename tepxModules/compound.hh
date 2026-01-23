@@ -60,6 +60,8 @@ class compound {
   double getChipMarkerSeparation(int ichip0, int ichip1);
   // -- get marker distance
   double getMarkerDistance(std::string dir = "x");
+  // -- check if chip is well measured
+  bool chipWellMeasured(int iChip);
 
   // -- get module number
   int getModuleNumber() {return fModuleNumber;}

@@ -283,13 +283,13 @@ void compound::determineSF() {
 
 // ----------------------------------------------------------------------
 double compound::getChipWidth(int ichip) {
-  return fSF * TMath::Abs(pROCsPrime[2*ichip].X() - pROCsPrime[2*ichip+1].X()) + 0.00853 + 0.00877;
+  return fSF * TMath::Abs(pROCsPrime[2*ichip].X() - pROCsPrime[2*ichip+1].X());
 }
 
 
 // ----------------------------------------------------------------------
 double compound::getChipMarkerSeparation(int ichip0, int ichip1) {
-  return fSF * TMath::Abs(pROCsPrime[ichip0].X() - pROCsPrime[ichip1].X()) + 0.00853 + 0.00877;
+  return fSF * TMath::Abs(pROCsPrime[ichip0].X() - pROCsPrime[ichip1].X());
 }
 
 
@@ -303,6 +303,20 @@ double compound::getMarkerDistance(std::string dir) {
   }
   return 0;
 }
+
+
+// ----------------------------------------------------------------------
+bool compound::chipWellMeasured(int iChip) {
+  bool result(true); 
+
+  if (pROCs[2*iChip].X() < 0.) result = false;
+  if (pROCs[2*iChip].Y() < 0.) result = false;
+
+  if (pROCs[2*iChip+1].X() < 0.) result = false;
+  if (pROCs[2*iChip+1].Y() < 0.) result = false;
+  return result;
+}
+
 
 
 // ----------------------------------------------------------------------
