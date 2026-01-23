@@ -29,12 +29,9 @@ compound::compound(string name)
   fOffset = a;
 }
 
+
 // ----------------------------------------------------------------------
 void compound::set(compound &other) {
-  // for (unsigned it = 0; it < other.pHDI.size(); ++it) {
-  //   pHDI[it] = other.pHDI[it];
-  //   pHDIPrime[it] = other.pHDIPrime[it];
-  // }
 
   for (unsigned it = 0; it < other.pROCs.size(); ++it) {
     pROCs[it] = other.pROCs[it];
@@ -55,7 +52,10 @@ void compound::set(compound &other) {
   fOffset = other.fOffset;
   fOrthogonality = other.fOrthogonality;
   fName = other.fName + string("_copy");
+  fModuleNumber = other.fModuleNumber;
+  fModulePosition = other.fModulePosition;
 }
+
 
 // ----------------------------------------------------------------------
 void compound::parseJsonFile() {
@@ -72,7 +72,6 @@ void compound::parseJsonFile() {
 
   fModuleNumber = j["moduleNumber"].get<int>();
   fModulePosition = j["modulePosition"].get<int>();
-  fIndex = j["index"].get<int>();
 
   // -- Map chip names to indices: chip00->0, chip01->1, chip10->2, chip11->3, chip20->4, chip21->5, chip30->6, chip31->7
   map<string, int> chipNameToIdx;
@@ -213,6 +212,7 @@ void compound::parseSvgFile(int doParse) {
 
 }
 
+
 // ----------------------------------------------------------------------
 TVector2 compound::transform(TVector2 r, double theta, TVector2 t) {
   TVector2 rp = r - t;
@@ -220,6 +220,7 @@ TVector2 compound::transform(TVector2 r, double theta, TVector2 t) {
   double   ynew = TMath::Sin(theta) * rp.X() + TMath::Cos(theta) * rp.Y();
   return TVector2(xnew, ynew);
 }
+
 
 // ----------------------------------------------------------------------
 void compound::transform(std::vector<TVector2> &orig,
@@ -229,10 +230,12 @@ void compound::transform(std::vector<TVector2> &orig,
   }
 }
 
+
 // ----------------------------------------------------------------------
 string compound::dump(TVector2 a) {
   return string(Form("%9.6f/%9.6f", a.X(), a.Y()));
 }
+
 
 // ----------------------------------------------------------------------
 void compound::determineTransformation() {
@@ -259,6 +262,7 @@ void compound::determineTransformation() {
   fAlpha = -TMath::Pi() + (rsgn < 0 ? alpha : -1. * alpha);
 }
 
+
 // ----------------------------------------------------------------------
 void compound::determineSF() {
   double dm0m1 = 23.0; // mm
@@ -275,6 +279,31 @@ void compound::determineSF() {
   fSF = 0.5 * (dm0m1 / pxDiff1 + dm1m2 / pxDiff2);
   // cout << "fSF = " << fSF << endl;
 }
+
+
+// ----------------------------------------------------------------------
+double compound::getChipWidth(int ichip) {
+  return fSF * TMath::Abs(pROCsPrime[2*ichip].X() - pROCsPrime[2*ichip+1].X()) + 0.00853 + 0.00877;
+}
+
+
+// ----------------------------------------------------------------------
+double compound::getChipMarkerSeparation(int ichip0, int ichip1) {
+  return fSF * TMath::Abs(pROCsPrime[ichip0].X() - pROCsPrime[ichip1].X()) + 0.00853 + 0.00877;
+}
+
+
+// ----------------------------------------------------------------------
+double compound::getMarkerDistance(std::string dir) {
+  if (dir == "x") {
+    return fSF * (pMarkersPrime[2] - pMarkersPrime[1]).Mod();
+  }
+  if (dir == "y") {
+    return fSF * (pMarkersPrime[0] - pMarkersPrime[1]).Mod();
+  }
+  return 0;
+}
+
 
 // ----------------------------------------------------------------------
 void compound::determineAlignmentCrosses() {
@@ -304,6 +333,7 @@ void compound::determineAlignmentCrosses() {
       TVector2(pROCsPrime[7].X() + 6.75 - 30, pROCsPrime[7].Y() + 8.3);
 }
 
+
 // ----------------------------------------------------------------------
 void compound::calcAll(int verbose, int doParse) {
   cout << "compound ->" << fName << "<- " << "inside calcAll() for object " << this << endl;
@@ -320,6 +350,7 @@ void compound::calcAll(int verbose, int doParse) {
   determineAlignmentCrosses();
   dump();
 }
+
 
 // ----------------------------------------------------------------------
 void compound::dump() {
@@ -405,6 +436,7 @@ void compound::dump() {
   // cout << "RMS = " << h1->GetRMS() << "mm" << endl;
   // delete h1;
 }
+
 
 // ----------------------------------------------------------------------
 bool exists_test0(const std::string& name) {

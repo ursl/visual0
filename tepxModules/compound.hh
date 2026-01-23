@@ -37,11 +37,13 @@ class compound {
   // -- set (circumvent [past?] issues with copy c'tor)
   void set(compound &c);
 
-  // -- calculate all
+  // -- calculate all - call this before doing anything else!
   void calcAll(int verbose = 0, int doParse = 1);
+
   // -- read information
   void parseSvgFile(int doParse = 1);
   void parseJsonFile();
+
   // -- calculate scale factor (pixel to mm)
   void determineSF();
   // -- calculate fOffset and fAlpha
@@ -51,6 +53,18 @@ class compound {
   // -- calculate coordinates in HDI frame (starting from coordinates in SVG frame)
   TVector2 transform(TVector2 r, double theta, TVector2 t);
   void     transform(std::vector<TVector2> &orig, std::vector<TVector2> &trsf);
+
+  // -- get chip width
+  double getChipWidth(int ichip);
+  // -- get chip marker separation
+  double getChipMarkerSeparation(int ichip0, int ichip1);
+  // -- get marker distance
+  double getMarkerDistance(std::string dir = "x");
+
+  // -- get module number
+  int getModuleNumber() {return fModuleNumber;}
+  // -- get module position
+  int getModulePosition() {return fModulePosition;}
 
   // -- setters
   void setSF(double sf) {fSF = sf;}
@@ -95,7 +109,7 @@ private:
   double fOrthogonality;
   TVector2 fOffset;
   std::string fName;
-  int fModuleNumber, fModulePosition, fIndex;
+  int fModuleNumber, fModulePosition;
 };
 
 bool exists_test0(const std::string& name);
