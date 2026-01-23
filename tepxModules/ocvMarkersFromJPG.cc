@@ -22,7 +22,15 @@ using namespace std;
 
 
 // ----------------------------------------------------------------------
-map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const vector<Point> &matchesRHS) {
+bool isInRange(double x, const vector<double> &xVec) {
+  for (size_t k = 0; k < xVec.size(); ++k) {
+    if (TMath::Abs(x - xVec[k]) < 250) return true;
+  }
+  return false;
+}
+
+// ----------------------------------------------------------------------
+map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const vector<Point> &matchesRHS, const vector<double> &xVec) {
     map<string, cv::Point> chipMarkers;
     // RHS x-divider: 5000, LHS x-divider: 3000
     // -- LHS
@@ -35,7 +43,9 @@ map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const
     // Match 1 center (px): 3715, 215 circle coordinates: 3846, 220
     // Match 2 center (px): 6111, 208 circle coordinates: 6242, 213
     // Match 3 center (px): 6130, 4295 circle coordinates: 6261, 4300
-    
+
+    cout << "xVec = " << xVec[0] << ", " << xVec[1] << ", " << xVec[2] << endl;
+
     string chipName = "chip";
     int xDivider = 2500;
     int yDivider = 2500;
@@ -43,6 +53,10 @@ map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const
     for (size_t k = 0; k < matchesLHS.size(); ++k) {
         // -- skip obviously bad matches
         if (matchesLHS[k].x > 5000) continue;
+        if (!isInRange(matchesLHS[k].x, xVec)) {
+            cout << "skipping LHS match " << k << " because it is not in range" << endl;
+            continue;
+        }
 
         if (matchesLHS[k].x < xDivider) {
             if (matchesLHS[k].y < yDivider) {
@@ -65,6 +79,10 @@ map<string, cv::Point> combineChipMatches(const vector<Point> &matchesLHS, const
     for (size_t k = 0; k < matchesRHS.size(); ++k) {
         // -- skip obviously bad matches
         if (matchesRHS[k].x < 2500) continue;
+        if (!isInRange(matchesRHS[k].x, xVec)) {
+            cout << "skipping RHS match " << k << " because it is not in range" << endl;
+            continue;
+        }
 
         if (matchesRHS[k].x < xDivider) {
             if (matchesRHS[k].y < yDivider) {
@@ -463,7 +481,10 @@ int main(int argc, char** argv) {
         cv::imshow("templateRHS", templateRHS);
     }
     
-    map<string, cv::Point> chipMarkers = combineChipMatches(lhsAC, rhsAC);
+    vector<double> xVec = {hdiMarkers[2][0], (0.5*(hdiMarkers[0][0] + hdiMarkers[2][0])), hdiMarkers[0][0]};
+   
+
+    map<string, cv::Point> chipMarkers = combineChipMatches(lhsAC, rhsAC, xVec);
     for (const auto& [chipName, chipPoint] : chipMarkers) {
         cout << "Chip " << chipName << " center (px): "
         << chipPoint.x << ", " << chipPoint.y
