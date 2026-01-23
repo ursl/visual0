@@ -309,14 +309,30 @@ double compound::getMarkerDistance(std::string dir) {
 bool compound::chipWellMeasured(int iChip) {
   bool result(true); 
 
-  if (pROCs[2*iChip].X() < 0.) result = false;
-  if (pROCs[2*iChip].Y() < 0.) result = false;
+  if (pROCs[2*iChip].X() < 1.) result = false;
+  if (pROCs[2*iChip].Y() < 1.) result = false;
 
-  if (pROCs[2*iChip+1].X() < 0.) result = false;
-  if (pROCs[2*iChip+1].Y() < 0.) result = false;
+  if (pROCs[2*iChip+1].X() < 1.) result = false;
+  if (pROCs[2*iChip+1].Y() < 1.) result = false;
+
+  if (!markersWellMeasured()) result = false;
+
   return result;
 }
 
+
+// ----------------------------------------------------------------------
+bool compound::markersWellMeasured() {
+  bool result(true); 
+  if (pMarkers[0].X() < 1.) result = false;
+  if (pMarkers[0].Y() < 1.) result = false;
+  if (pMarkers[1].X() < 1.) result = false;
+  if (pMarkers[1].Y() < 1.) result = false;
+  if (pMarkers[2].X() < 1.) result = false;
+  if (pMarkers[2].Y() < 1.) result = false;
+
+  return result;
+}
 
 
 // ----------------------------------------------------------------------

@@ -62,6 +62,8 @@ class compound {
   double getMarkerDistance(std::string dir = "x");
   // -- check if chip is well measured
   bool chipWellMeasured(int iChip);
+  // -- check if markers are well measured
+  bool markersWellMeasured();
 
   // -- get module number
   int getModuleNumber() {return fModuleNumber;}
