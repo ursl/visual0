@@ -54,6 +54,10 @@ class compound {
   TVector2 transform(TVector2 r, double theta, TVector2 t);
   void     transform(std::vector<TVector2> &orig, std::vector<TVector2> &trsf);
 
+  // -----------
+  // -- analysis
+  // -----------
+
   // -- get chip width
   double getChipWidth(int ichip);
   // -- get chip marker separation
@@ -64,6 +68,9 @@ class compound {
   bool chipWellMeasured(int iChip);
   // -- check if markers are well measured
   bool markersWellMeasured();
+  // -- get angle between Chip Marker and HDI y-axis
+  double getAngleChipMarkerHDIyAxis(int ichip0, int ichip1);
+
 
   // -- get module number
   int getModuleNumber() {return fModuleNumber;}
@@ -77,12 +84,23 @@ class compound {
   void setOffset(TVector2 offset) {fOffset = offset;}
   void setName(std::string name) {fName = name;}
 
-  // -- getters
+  // --------------
+  // -- basic stuff
+  // --------------
+  // -- scale factor mm/pixel
   double getSF() {return fSF;}
+  // -- rotation angle between SVG and HDI coordinate systems
   double getAlpha() {return fAlpha;}
+  // -- Orthogonality between HDI x-axis and y-axis
   double getOrthogonality() {return fOrthogonality;}
+  // -- offset of HDI coordinate system relative to SVG coordinate system
   TVector2 getOffset() {return fOffset;}
+  // -- name of the compound
   std::string getName() {return fName;}
+
+
+
+
 
   // TVector2 getHDI(int i) {return pHDI[i];}
   // TVector2 getHDIPrime(int i) {return pHDIPrime[i];}
