@@ -336,7 +336,15 @@ void modulesAnalysis::bookHistograms() {
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip11", h});
 
-
+  h = new TH1D("chip20", "chip2 position bottom right (absolute)", nbins, -2.5, -1.0);
+  setTitles(h, "x position [mm]", "entries");
+  fHists.insert({"chip20", h});
+  h = new TH1D("chip21", "chip2 position bottom left (absolute)", nbins, 19.0, 20.5);
+  setTitles(h, "x position [mm]", "entries");
+  fHists.insert({"chip21", h});
+  h = new TH1D("chip30", "chip3 position bottom right (absolute)", nbins, 19.5, 21.0);
+  setTitles(h, "x position [mm]", "entries");
+  fHists.insert({"chip30", h});
   h = new TH1D("chip31", "chip3 position bottom left (absolute)", nbins, 41.0, 42.5);
   setTitles(h, "x position [mm]", "entries");
   fHists.insert({"chip31", h});
@@ -435,7 +443,12 @@ void::modulesAnalysis::anaAll() {
         cout << "mm->getCompound().getROCs(3).Y() = " << mm->getCompound().getROCs(3).Y() << endl;
       }
     }
+    if (mm->getCompound().chipWellMeasured(2)) {
+      fHists["chip20"]->Fill(sf * mm->getCompound().getROCsPrime(4).X());
+      fHists["chip21"]->Fill(sf * mm->getCompound().getROCsPrime(5).X());
+    }
     if (mm->getCompound().chipWellMeasured(3)) {
+      fHists["chip30"]->Fill(sf * mm->getCompound().getROCsPrime(6).X());
       fHists["chip31"]->Fill(sf * mm->getCompound().getROCsPrime(7).X());
       if (sf * mm->getCompound().getROCsPrime(7).X() < 40.) {
         cout << "**************************** chip31 is too small " << mm->getFileName() << endl;
@@ -455,7 +468,7 @@ void::modulesAnalysis::anaAll() {
       fHists["diffYChips"]->Fill(sf * (mm->getCompound().getROCsPrime(0).Y() - mm->getCompound().getROCsPrime(7).Y()));
     }
 
-    TVector2 rocEdge = mm->getCompound().getROCsPrime(0) - mm->getCompound().getROCsPrime(7);
+    TVector2 rocEdge = mm->getCompound().getROCsPrime(1) - mm->getCompound().getROCsPrime(6);
     double angle = TMath::PiOver2() - TMath::ATan2(rocEdge.Y(), rocEdge.X());
     fHists["angleChips"]->Fill(angle);
 
