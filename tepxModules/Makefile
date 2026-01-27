@@ -23,7 +23,7 @@ OSUFFIX := .o
 
 # -- Source code
 FILES = compound.o modulesAnalysis.o 
-BINARIES = runModuleMeasurement ocvMarkersFromJPG
+BINARIES = runModulesAnalysis ocvMarkersFromJPG
 
 LIBRARIES = lib/libAnaUtil.so 
 
@@ -45,9 +45,9 @@ lib: prep $(addprefix obj/,$(FILES))
 	echo "hallo lib"
 	$(CXX) $(SOFLAGS) $(addprefix obj/,$(FILES)) -o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS)
  
-bin: lib obj/runModuleMeasurement.o obj/ocvMarkersFromJPG.o
+bin: lib obj/runModulesAnalysis.o obj/ocvMarkersFromJPG.o
 	echo "hallo bin"
-	$(LD) $(LDFLAGS) -o bin/runModuleMeasurement obj/runModuleMeasurement.o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS) 
+	$(LD) $(LDFLAGS) -o bin/runModulesAnalysis obj/runModulesAnalysis.o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS) 
 	$(LD) $(LDFLAGS) -o bin/ocvMarkersFromJPG obj/ocvMarkersFromJPG.o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS) $(OPENCV_LIBS) 
 
 
