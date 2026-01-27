@@ -2,7 +2,6 @@
 #define MODULESANALYSIS_HH
 
 #include "compound.hh"
-#include "moduleMeasurement.hh"
 
 #include "TFile.h"
 #include "TH1.h"
@@ -24,8 +23,7 @@ class modulesAnalysis {
   void plotGlueTests();
 
   private:
-  std::vector<moduleMeasurement*> fModules;
-  std::vector<compound*> fCompounds;
+  std::vector<compound*> fModules;
   std::string fFilename, fDirectory;
   TFile *fFile;
   std::map<std::string, TH1 *> fHists;

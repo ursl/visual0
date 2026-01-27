@@ -15,8 +15,8 @@
 using namespace std;
 
 // ----------------------------------------------------------------------
-compound::compound(string name)
-    : fSF(0.1), fAlpha(0.0), fOrthogonality(9999.), fName(name) {
+compound::compound(string name, int position)
+    : fSF(0.1), fAlpha(0.0), fOrthogonality(9999.), fName(name), fModuleNumber(0), fModulePosition(position) {
   cout << "ctor compound ->" << fName << "<- " << "inside constructor for object " << this << endl;
   TVector2 a(0., 0.);
   // pHDI = {a, a, a, a, a, a, a, a};
@@ -27,6 +27,21 @@ compound::compound(string name)
   pMarkers = {a, a, a};
   pMarkersPrime = {a, a, a};
   fOffset = a;
+
+  // -- extract module number from filename (e.g., "json/P1000.json" -> 1000)
+  size_t pos = fName.find_last_of("/");
+  if (pos != string::npos) {
+    pos += 2; // skip the leading letter (P or p)
+  } else {
+    pos = 1; // no path, just skip the leading letter
+  }
+  string numStr = fName.substr(pos, 4);
+  try {
+    fModuleNumber = stoi(numStr);
+  } catch (...) {
+    fModuleNumber = 0;
+  }
+  cout << "fModuleNumber = " << fModuleNumber << endl;
 }
 
 

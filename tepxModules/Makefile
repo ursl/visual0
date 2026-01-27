@@ -22,7 +22,7 @@ GLIBS         = $(filter-out -lz, $(ROOTGLIBS))
 OSUFFIX := .o
 
 # -- Source code
-FILES = compound.o moduleMeasurement.o modulesAnalysis.o 
+FILES = compound.o modulesAnalysis.o 
 BINARIES = runModuleMeasurement ocvMarkersFromJPG
 
 LIBRARIES = lib/libAnaUtil.so 

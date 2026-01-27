@@ -32,7 +32,7 @@
 // ----------------------------------------------------------------------
 class compound {
   public:
-  compound(std::string name = "unset");
+  compound(std::string name = "unset", int position = 0);
 
   // -- set (circumvent [past?] issues with copy c'tor)
   void set(compound &c);
@@ -76,6 +76,8 @@ class compound {
   int getModuleNumber() {return fModuleNumber;}
   // -- get module position
   int getModulePosition() {return fModulePosition;}
+  // -- get histogram index (module number - 1000)
+  int getHistIndex() {return fModuleNumber - 1000;}
 
   // -- setters
   void setSF(double sf) {fSF = sf;}
