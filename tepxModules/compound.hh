@@ -70,6 +70,8 @@ class compound {
   bool markersWellMeasured();
   // -- get angle between Chip Marker and HDI y-axis
   double getAngleChipMarkerHDIyAxis(int ichip0, int ichip1);
+  // -- get angle between Chip Marker and HDI y-axis
+  double getAngleChipMarkerHDIxAxis(int ichip0, int ichip1);
 
 
   // -- get module number

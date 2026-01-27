@@ -137,8 +137,6 @@ void compound::parseJsonFile() {
   } else {
     cerr << "JSON file missing or invalid 'chipMarkers' array" << endl;
   }
-
-  cout << "Parsed JSON file: " << fName << endl;
 }
 
 
@@ -347,6 +345,20 @@ bool compound::markersWellMeasured() {
   if (pMarkers[2].Y() < 1.) result = false;
 
   return result;
+}
+
+
+// ----------------------------------------------------------------------
+double compound::getAngleChipMarkerHDIyAxis(int ichip0, int ichip1) {
+  TVector2 chipVector = pROCsPrime[ichip0] - pROCsPrime[ichip1];
+  return TMath::PiOver2() - TMath::ATan2(chipVector.Y(), chipVector.X());
+}
+
+
+// ----------------------------------------------------------------------
+double compound::getAngleChipMarkerHDIxAxis(int ichip0, int ichip1) {
+  TVector2 chipVector = pROCsPrime[ichip1] - pROCsPrime[ichip0];
+  return TMath::ATan2(chipVector.Y(), chipVector.X());
 }
 
 
