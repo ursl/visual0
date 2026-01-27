@@ -1,4 +1,3 @@
-#include "moduleMeasurement.hh"
 #include "modulesAnalysis.hh"
 #include <iostream>
 #include <string>
@@ -9,11 +8,17 @@
 using namespace std;
 
 // ----------------------------------------------------------------------
-// run image analysis and produce json files
-// moor>./bin/runModuleMeasurement -m 10
+// run opencv2 image analysis and produce json files
+// moor>./bin/runModulesAnalysis -m 10
 // 
+// run analysis on single processed image file (-m 0 can be omitted)
+// moor> ./bin/runModulesAnalysis -f json/p1003.json -d single
+//
 // run analysis on processed image files (either legacy CSV or JSON)
-// moor>./bin/runModuleMeasurement -m 2
+// moor>./bin/runModulesAnalysis -m [1|2]
+//
+// run analysis and produce plots on manually curated list of all modules (without badly aligned M1112)
+// moor>./bin/runModulesAnalysis -m 3 -d pdf
 // ----------------------------------------------------------------------
 
 
@@ -36,16 +41,14 @@ int main(int argc, char* argv[]) {
  
   if (0 == mode) {
     if (fileName != "bla") {
-      moduleMeasurement m(fileName, 0);
-      m.setFileName(fileName);
-      m.calcAll();
+      modulesAnalysis ma(0, directory, fileName);
+      ma.doAll();
     } else {
-      cout << "Usage: runModuleMeasurement -m 0 -f <filename>" << endl;
+      cout << "Usage: runModulesAnalysis -m 0 -d <directory> -f <filename>" << endl;
+      return 1;
     }
-
     return 0;
-  } 
-
+  }
 
   // -- run analysis on processed image files (either legacy CSV or JSON)
   if (mode <= 3) {
