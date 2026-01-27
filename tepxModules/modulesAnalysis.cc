@@ -16,216 +16,216 @@
 using namespace std;
 
 // ----------------------------------------------------------------------
-modulesAnalysis::modulesAnalysis(int mode, string directory): fDirectory(directory) {
+modulesAnalysis::modulesAnalysis(int mode, string directory, string filename): fDirectory(directory), fFilename(filename) {
   cout << "fDirectory = " << fDirectory << endl;
-  if (1 == mode) {
+  if (0 == mode) {
+    // -- single module
+    fCompunds.push_back(new compound(fFilename, 0));
+  }
+  else if (1 == mode) {
     // -- legacy mode - manual measurements with inkscape
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1000.svg2", 0));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1001.svg2", 0));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1002.svg2", 1));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1003.svg2", 2));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1004.svg2", 0));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1005.svg2", 1));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1006.svg2", 0));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1007.svg2", 1));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1008.svg2", 2));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1009.svg2", 3));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1010.svg2", 4));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1011.svg2", 0));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1012.svg2", 0));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1013.svg2", 1));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1014.svg2", 2));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1015.svg2", 1));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1016.svg2", 2));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1017.svg2", 3));
-    //badly-aligned   fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1018.svg2", -1));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1019.svg2", 3));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1020.svg2", 4));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1021.svg2", 5));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1022.svg2", 4));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1023.svg2", 4));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1024.svg2", 0));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1025.svg2", 1));
-    fModules.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1026.svg2", 2));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1000.svg2", 0));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1001.svg2", 0));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1002.svg2", 1));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1003.svg2", 2));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1004.svg2", 0));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1005.svg2", 1));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1006.svg2", 0));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1007.svg2", 1));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1008.svg2", 2));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1009.svg2", 3));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1010.svg2", 4));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1011.svg2", 0));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1012.svg2", 0));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1013.svg2", 1));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1014.svg2", 2));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1015.svg2", 1));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1016.svg2", 2));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1017.svg2", 3));
+    //badly-aligned   fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1018.svg2", -1));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1019.svg2", 3));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1020.svg2", 4));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1021.svg2", 5));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1022.svg2", 4));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1023.svg2", 4));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1024.svg2", 0));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1025.svg2", 1));
+    fCompunds.push_back(new compound("/Users/ursl/inkscape/tepx-modules/P1026.svg2", 2));
   } else if (2 == mode) {
     // -- validation with same modules as legacy
-    fModules.push_back(new compound("json/P1000.json", 0));
-    fModules.push_back(new compound("json/P1001.json", 0));
-    fModules.push_back(new compound("json/P1002.json", 1));
-    fModules.push_back(new compound("json/P1003.json", 2));
-    fModules.push_back(new compound("json/P1004.json", 0));
-    fModules.push_back(new compound("json/P1005.json", 1));
-    fModules.push_back(new compound("json/P1006.json", 0));
-    fModules.push_back(new compound("json/P1007.json", 1));
-    fModules.push_back(new compound("json/P1008.json", 2));
-    fModules.push_back(new compound("json/P1009.json", 3));
-    fModules.push_back(new compound("json/P1010.json", 4));
-    fModules.push_back(new compound("json/P1011.json", 0));
-    fModules.push_back(new compound("json/P1012.json", 0));
-    fModules.push_back(new compound("json/P1013.json", 1));
-    fModules.push_back(new compound("json/P1014.json", 2));
-    fModules.push_back(new compound("json/P1015.json", 1));
-    fModules.push_back(new compound("json/P1016.json", 2));
-    fModules.push_back(new compound("json/P1017.json", 3));
-    fModules.push_back(new compound("json/P1018.json", 0));
-    fModules.push_back(new compound("json/P1019.json", 3));
-    fModules.push_back(new compound("json/P1020.json", 4));
-    fModules.push_back(new compound("json/P1021.json", 5));
-    fModules.push_back(new compound("json/P1022.json", 4));
-    fModules.push_back(new compound("json/P1023.json", 4));
-    fModules.push_back(new compound("json/P1024.json", 0));
-    fModules.push_back(new compound("json/P1025.json", 1));
-    fModules.push_back(new compound("json/P1026.json", 2));
+    fCompunds.push_back(new compound("json/P1000.json", 0));
+    fCompunds.push_back(new compound("json/P1001.json", 0));
+    fCompunds.push_back(new compound("json/P1002.json", 1));
+    fCompunds.push_back(new compound("json/P1003.json", 2));
+    fCompunds.push_back(new compound("json/P1004.json", 0));
+    fCompunds.push_back(new compound("json/P1005.json", 1));
+    fCompunds.push_back(new compound("json/P1006.json", 0));
+    fCompunds.push_back(new compound("json/P1007.json", 1));
+    fCompunds.push_back(new compound("json/P1008.json", 2));
+    fCompunds.push_back(new compound("json/P1009.json", 3));
+    fCompunds.push_back(new compound("json/P1010.json", 4));
+    fCompunds.push_back(new compound("json/P1011.json", 0));
+    fCompunds.push_back(new compound("json/P1012.json", 0));
+    fCompunds.push_back(new compound("json/P1013.json", 1));
+    fCompunds.push_back(new compound("json/P1014.json", 2));
+    fCompunds.push_back(new compound("json/P1015.json", 1));
+    fCompunds.push_back(new compound("json/P1016.json", 2));
+    fCompunds.push_back(new compound("json/P1017.json", 3));
+    fCompunds.push_back(new compound("json/P1018.json", 0));
+    fCompunds.push_back(new compound("json/P1019.json", 3));
+    fCompunds.push_back(new compound("json/P1020.json", 4));
+    fCompunds.push_back(new compound("json/P1021.json", 5));
+    fCompunds.push_back(new compound("json/P1022.json", 4));
+    fCompunds.push_back(new compound("json/P1023.json", 4));
+    fCompunds.push_back(new compound("json/P1024.json", 0));
+    fCompunds.push_back(new compound("json/P1025.json", 1));
+    fCompunds.push_back(new compound("json/P1026.json", 2));
   } else if (3 == mode) {
     // -- complete statistics
-    fModules.push_back(new compound("json/P1000.json", 0));
-    fModules.push_back(new compound("json/P1001.json", 0));
-    fModules.push_back(new compound("json/P1002.json", 1));
-    fModules.push_back(new compound("json/P1003.json", 2));
-    fModules.push_back(new compound("json/P1004.json", 0));
-    fModules.push_back(new compound("json/P1005.json", 1));
-    fModules.push_back(new compound("json/P1006.json", 0));
-    fModules.push_back(new compound("json/P1007.json", 1));
-    fModules.push_back(new compound("json/P1008.json", 2));
-    fModules.push_back(new compound("json/P1009.json", 3));
+    fCompunds.push_back(new compound("json/P1000.json", 0));
+    fCompunds.push_back(new compound("json/P1001.json", 0));
+    fCompunds.push_back(new compound("json/P1002.json", 1));
+    fCompunds.push_back(new compound("json/P1003.json", 2));
+    fCompunds.push_back(new compound("json/P1004.json", 0));
+    fCompunds.push_back(new compound("json/P1005.json", 1));
+    fCompunds.push_back(new compound("json/P1006.json", 0));
+    fCompunds.push_back(new compound("json/P1007.json", 1));
+    fCompunds.push_back(new compound("json/P1008.json", 2));
+    fCompunds.push_back(new compound("json/P1009.json", 3));
+    fCompunds.push_back(new compound("json/P1010.json", 4));
+    fCompunds.push_back(new compound("json/P1011.json", 0));
+    fCompunds.push_back(new compound("json/P1012.json", 0));
+    fCompunds.push_back(new compound("json/P1013.json", 1));
+    fCompunds.push_back(new compound("json/P1014.json", 2));
+    fCompunds.push_back(new compound("json/P1015.json", 1));
+    fCompunds.push_back(new compound("json/P1016.json", 2));
+    fCompunds.push_back(new compound("json/P1017.json", 3));
+    fCompunds.push_back(new compound("json/P1018.json", 0));
+    fCompunds.push_back(new compound("json/P1019.json", 3));
+    fCompunds.push_back(new compound("json/P1020.json", 4));
+    fCompunds.push_back(new compound("json/P1021.json", 5));
+    fCompunds.push_back(new compound("json/P1022.json", 4));
+    fCompunds.push_back(new compound("json/P1023.json", 4));
+    fCompunds.push_back(new compound("json/P1024.json", 0));
+    fCompunds.push_back(new compound("json/P1025.json", 1));
+    fCompunds.push_back(new compound("json/P1026.json", 2));
+    fCompunds.push_back(new compound("json/P1027.json", 1));
+    fCompunds.push_back(new compound("json/P1028.json", 2));
+    fCompunds.push_back(new compound("json/P1029.json", 3));
+    fCompunds.push_back(new compound("json/P1030.json", 4));
+    fCompunds.push_back(new compound("json/P1031.json", 0));
+    fCompunds.push_back(new compound("json/P1032.json", 1));
+    fCompunds.push_back(new compound("json/P1033.json", 3));
+    fCompunds.push_back(new compound("json/P1034.json", 4));
+    fCompunds.push_back(new compound("json/P1035.json", 0));
+    fCompunds.push_back(new compound("json/P1036.json", 0));
+    fCompunds.push_back(new compound("json/P1037.json", 1));
+    fCompunds.push_back(new compound("json/P1038.json", 2));
+    fCompunds.push_back(new compound("json/P1039.json", 3));
+    fCompunds.push_back(new compound("json/P1040.json", 4));
+    fCompunds.push_back(new compound("json/P1041.json", 5));
+    fCompunds.push_back(new compound("json/P1042.json", 0));
+    fCompunds.push_back(new compound("json/P1043.json", 1));
+    fCompunds.push_back(new compound("json/P1044.json", 2));
+    fCompunds.push_back(new compound("json/P1045.json", 3));
+    fCompunds.push_back(new compound("json/P1046.json", 4));
+    fCompunds.push_back(new compound("json/P1047.json", 5));
+    fCompunds.push_back(new compound("json/P1048.json", 0));
+    fCompunds.push_back(new compound("json/P1049.json", 1));
 
-    fModules.push_back(new compound("json/P1010.json", 4));
-    fModules.push_back(new compound("json/P1011.json", 0));
-    fModules.push_back(new compound("json/P1012.json", 0));
-    fModules.push_back(new compound("json/P1013.json", 1));
-    fModules.push_back(new compound("json/P1014.json", 2));
-    fModules.push_back(new compound("json/P1015.json", 1));
-    fModules.push_back(new compound("json/P1016.json", 2));
-    fModules.push_back(new compound("json/P1017.json", 3));
-    fModules.push_back(new compound("json/P1018.json", 0));
-    fModules.push_back(new compound("json/P1019.json", 3));
-
-    fModules.push_back(new compound("json/P1020.json", 4));
-    fModules.push_back(new compound("json/P1021.json", 5));
-    fModules.push_back(new compound("json/P1022.json", 4));
-    fModules.push_back(new compound("json/P1023.json", 4));
-    fModules.push_back(new compound("json/P1024.json", 0));
-    fModules.push_back(new compound("json/P1025.json", 1));
-    fModules.push_back(new compound("json/P1026.json", 2));
-    fModules.push_back(new compound("json/P1027.json", 1));
-    fModules.push_back(new compound("json/P1028.json", 2));
-    fModules.push_back(new compound("json/P1029.json", 3));
-
-    fModules.push_back(new compound("json/P1030.json", 4));
-    fModules.push_back(new compound("json/P1031.json", 0));
-    fModules.push_back(new compound("json/P1032.json", 1));
-    fModules.push_back(new compound("json/P1033.json", 3));
-    fModules.push_back(new compound("json/P1034.json", 4));
-    fModules.push_back(new compound("json/P1035.json", 0));
-    fModules.push_back(new compound("json/P1036.json", 0));
-    fModules.push_back(new compound("json/P1037.json", 1));
-    fModules.push_back(new compound("json/P1038.json", 2));
-    fModules.push_back(new compound("json/P1039.json", 3));
-
-    fModules.push_back(new compound("json/P1040.json", 4));
-    fModules.push_back(new compound("json/P1041.json", 5));
-    fModules.push_back(new compound("json/P1042.json", 0));
-    fModules.push_back(new compound("json/P1043.json", 1));
-    fModules.push_back(new compound("json/P1044.json", 2));
-    fModules.push_back(new compound("json/P1045.json", 3));
-    fModules.push_back(new compound("json/P1046.json", 4));
-    fModules.push_back(new compound("json/P1047.json", 5));
-    fModules.push_back(new compound("json/P1048.json", 0));
-    fModules.push_back(new compound("json/P1049.json", 1));
-
-    fModules.push_back(new compound("json/P1050.json", 2));
-    fModules.push_back(new compound("json/P1051.json", 0));
-    fModules.push_back(new compound("json/P1052.json", 1));
-    fModules.push_back(new compound("json/P1053.json", 2));
-    fModules.push_back(new compound("json/P1054.json", 3));
-    fModules.push_back(new compound("json/P1055.json", 2));
-    fModules.push_back(new compound("json/P1056.json", 3));
-    fModules.push_back(new compound("json/P1057.json", 0));
-    fModules.push_back(new compound("json/P1058.json", 1));
-    fModules.push_back(new compound("json/P1059.json", 3));
+    fCompunds.push_back(new compound("json/P1050.json", 2));
+    fCompunds.push_back(new compound("json/P1051.json", 0));
+    fCompunds.push_back(new compound("json/P1052.json", 1));
+    fCompunds.push_back(new compound("json/P1053.json", 2));
+    fCompunds.push_back(new compound("json/P1054.json", 3));
+    fCompunds.push_back(new compound("json/P1055.json", 2));
+    fCompunds.push_back(new compound("json/P1056.json", 3));
+    fCompunds.push_back(new compound("json/P1057.json", 0));
+    fCompunds.push_back(new compound("json/P1058.json", 1));
+    fCompunds.push_back(new compound("json/P1059.json", 3));
   
-    fModules.push_back(new compound("json/P1060.json", 0));
-    fModules.push_back(new compound("json/P1061.json", 1));
-    fModules.push_back(new compound("json/P1062.json", 2));
-    fModules.push_back(new compound("json/P1063.json", 3));
-    fModules.push_back(new compound("json/P1064.json", 4));
-    fModules.push_back(new compound("json/P1065.json", 5));
-    fModules.push_back(new compound("json/P1066.json", 0));
-    fModules.push_back(new compound("json/P1067.json", 1));
-    fModules.push_back(new compound("json/P1068.json", 2));
-    fModules.push_back(new compound("json/P1069.json", 3));
+    fCompunds.push_back(new compound("json/P1060.json", 0));
+    fCompunds.push_back(new compound("json/P1061.json", 1));
+    fCompunds.push_back(new compound("json/P1062.json", 2));
+    fCompunds.push_back(new compound("json/P1063.json", 3));
+    fCompunds.push_back(new compound("json/P1064.json", 4));
+    fCompunds.push_back(new compound("json/P1065.json", 5));
+    fCompunds.push_back(new compound("json/P1066.json", 0));
+    fCompunds.push_back(new compound("json/P1067.json", 1));
+    fCompunds.push_back(new compound("json/P1068.json", 2));
+    fCompunds.push_back(new compound("json/P1069.json", 3));
   
-    fModules.push_back(new compound("json/P1070.json", 4));
-    fModules.push_back(new compound("json/P1071.json", 0));
-    fModules.push_back(new compound("json/P1072.json", 5));
-    fModules.push_back(new compound("json/P1073.json", 0));
-    fModules.push_back(new compound("json/P1074.json", 1));
-    fModules.push_back(new compound("json/P1075.json", 2));
-    fModules.push_back(new compound("json/P1076.json", 3));
-    fModules.push_back(new compound("json/P1077.json", 4));
-    fModules.push_back(new compound("json/P1078.json", 5));
-    fModules.push_back(new compound("json/P1079.json", 0));
+    fCompunds.push_back(new compound("json/P1070.json", 4));
+    fCompunds.push_back(new compound("json/P1071.json", 0));
+    fCompunds.push_back(new compound("json/P1072.json", 5));
+    fCompunds.push_back(new compound("json/P1073.json", 0));
+    fCompunds.push_back(new compound("json/P1074.json", 1));
+    fCompunds.push_back(new compound("json/P1075.json", 2));
+    fCompunds.push_back(new compound("json/P1076.json", 3));
+    fCompunds.push_back(new compound("json/P1077.json", 4));
+    fCompunds.push_back(new compound("json/P1078.json", 5));
+    fCompunds.push_back(new compound("json/P1079.json", 0));
 
-    fModules.push_back(new compound("json/P1080.json", 1));
-    fModules.push_back(new compound("json/P1081.json", 2));
-    fModules.push_back(new compound("json/P1082.json", 3));
-    fModules.push_back(new compound("json/P1083.json", 4));
-    fModules.push_back(new compound("json/P1084.json", 5));
-    fModules.push_back(new compound("json/P1085.json", 0));
-    fModules.push_back(new compound("json/P1086.json", 1));
-    fModules.push_back(new compound("json/P1087.json", 0));
-    fModules.push_back(new compound("json/P1088.json", 1));
-    fModules.push_back(new compound("json/P1089.json", 2));
+    fCompunds.push_back(new compound("json/P1080.json", 1));
+    fCompunds.push_back(new compound("json/P1081.json", 2));
+    fCompunds.push_back(new compound("json/P1082.json", 3));
+    fCompunds.push_back(new compound("json/P1083.json", 4));
+    fCompunds.push_back(new compound("json/P1084.json", 5));
+    fCompunds.push_back(new compound("json/P1085.json", 0));
+    fCompunds.push_back(new compound("json/P1086.json", 1));
+    fCompunds.push_back(new compound("json/P1087.json", 0));
+    fCompunds.push_back(new compound("json/P1088.json", 1));
+    fCompunds.push_back(new compound("json/P1089.json", 2));
 
-    fModules.push_back(new compound("json/P1090.json", 3));
-    fModules.push_back(new compound("json/P1091.json", 4));
-    fModules.push_back(new compound("json/P1092.json", 5));
-    fModules.push_back(new compound("json/P1093.json", 0));
-    fModules.push_back(new compound("json/P1094.json", 1));
-    fModules.push_back(new compound("json/P1095.json", 2));
-    fModules.push_back(new compound("json/P1096.json", 0));
-    fModules.push_back(new compound("json/P1097.json", 1));
-    fModules.push_back(new compound("json/P1098.json", 2));
-    fModules.push_back(new compound("json/P1099.json", 3));
+    fCompunds.push_back(new compound("json/P1090.json", 3));
+    fCompunds.push_back(new compound("json/P1091.json", 4));
+    fCompunds.push_back(new compound("json/P1092.json", 5));
+    fCompunds.push_back(new compound("json/P1093.json", 0));
+    fCompunds.push_back(new compound("json/P1094.json", 1));
+    fCompunds.push_back(new compound("json/P1095.json", 2));
+    fCompunds.push_back(new compound("json/P1096.json", 0));
+    fCompunds.push_back(new compound("json/P1097.json", 1));
+    fCompunds.push_back(new compound("json/P1098.json", 2));
+    fCompunds.push_back(new compound("json/P1099.json", 3));
 
-    fModules.push_back(new compound("json/P1100.json", 4));
-    fModules.push_back(new compound("json/P1101.json", 5));
-    fModules.push_back(new compound("json/P1102.json", 0));
-    fModules.push_back(new compound("json/P1103.json", 1));
-    fModules.push_back(new compound("json/P1104.json", 2));
-    fModules.push_back(new compound("json/P1105.json", 3));
-    fModules.push_back(new compound("json/P1106.json", 4));
-    fModules.push_back(new compound("json/P1107.json", 0));
-    fModules.push_back(new compound("json/P1108.json", 1));
-    fModules.push_back(new compound("json/P1109.json", 2));
+    fCompunds.push_back(new compound("json/P1100.json", 4));
+    fCompunds.push_back(new compound("json/P1101.json", 5));
+    fCompunds.push_back(new compound("json/P1102.json", 0));
+    fCompunds.push_back(new compound("json/P1103.json", 1));
+    fCompunds.push_back(new compound("json/P1104.json", 2));
+    fCompunds.push_back(new compound("json/P1105.json", 3));
+    fCompunds.push_back(new compound("json/P1106.json", 4));
+    fCompunds.push_back(new compound("json/P1107.json", 0));
+    fCompunds.push_back(new compound("json/P1108.json", 1));
+    fCompunds.push_back(new compound("json/P1109.json", 2));
 
 
-    fModules.push_back(new compound("json/P1110.json", 3));
-    fModules.push_back(new compound("json/P1111.json", 4));
+    fCompunds.push_back(new compound("json/P1110.json", 3));
+    fCompunds.push_back(new compound("json/P1111.json", 4));
  //   fModules.push_back(new compound("json/P1112.json", 5));
-    fModules.push_back(new compound("json/P1113.json", 0));
-    fModules.push_back(new compound("json/P1114.json", 1));
-    fModules.push_back(new compound("json/P1115.json", 2));
-    fModules.push_back(new compound("json/P1116.json", 0));
-    fModules.push_back(new compound("json/P1117.json", 1));
-    fModules.push_back(new compound("json/P1118.json", 2));
-    fModules.push_back(new compound("json/P1119.json", 3));
+    fCompunds.push_back(new compound("json/P1113.json", 0));
+    fCompunds.push_back(new compound("json/P1114.json", 1));
+    fCompunds.push_back(new compound("json/P1115.json", 2));
+    fCompunds.push_back(new compound("json/P1116.json", 0));
+    fCompunds.push_back(new compound("json/P1117.json", 1));
+    fCompunds.push_back(new compound("json/P1118.json", 2));
+    fCompunds.push_back(new compound("json/P1119.json", 3));
 
-    fModules.push_back(new compound("json/P1120.json", 4));
-    fModules.push_back(new compound("json/P1121.json", 5));
-    fModules.push_back(new compound("json/P1122.json", 0));
-    fModules.push_back(new compound("json/P1123.json", 1));
-    fModules.push_back(new compound("json/P1124.json", 2));
-    fModules.push_back(new compound("json/P1125.json", 0));
-    fModules.push_back(new compound("json/P1126.json", 1));
-    fModules.push_back(new compound("json/P1127.json", 2));
-    fModules.push_back(new compound("json/P1128.json", 3));
-    fModules.push_back(new compound("json/P1129.json", 4));
+    fCompunds.push_back(new compound("json/P1120.json", 4));
+    fCompunds.push_back(new compound("json/P1121.json", 5));
+    fCompunds.push_back(new compound("json/P1122.json", 0));
+    fCompunds.push_back(new compound("json/P1123.json", 1));
+    fCompunds.push_back(new compound("json/P1124.json", 2));
+    fCompunds.push_back(new compound("json/P1125.json", 0));
+    fCompunds.push_back(new compound("json/P1126.json", 1));
+    fCompunds.push_back(new compound("json/P1127.json", 2));
+    fCompunds.push_back(new compound("json/P1128.json", 3));
+    fCompunds.push_back(new compound("json/P1129.json", 4));
 
-    fModules.push_back(new compound("json/P1130.json", 5));
-    fModules.push_back(new compound("json/P1131.json", 0));
-    fModules.push_back(new compound("json/P1132.json", 1));
-    fModules.push_back(new compound("json/P1133.json", 2));
+    fCompunds.push_back(new compound("json/P1130.json", 5));
+    fCompunds.push_back(new compound("json/P1131.json", 0));
+    fCompunds.push_back(new compound("json/P1132.json", 1));
+    fCompunds.push_back(new compound("json/P1133.json", 2));
   } else if (4 == mode) {
     // -- Find all files matching pattern "modules/p????.jpg"
     vector<string> jsonFiles;
@@ -242,7 +242,7 @@ modulesAnalysis::modulesAnalysis(int mode, string directory): fDirectory(directo
     globfree(&globResult);
 
     for (const auto& jsonFile : jsonFiles) {
-      fModules.push_back(new compound(jsonFile));
+      fCompunds.push_back(new compound(jsonFile));
     }
   }
   bookHistograms();
@@ -271,7 +271,7 @@ void modulesAnalysis::doAll() {
   plotAll();
   cout << "----------------------------------------" << endl;
   cout << "Chip widths:" << endl;
-  for (auto mm : fModules) {
+  for (auto mm : fCompunds) {
     cout << mm->getName()
          <<  " " << Form("%7.4f", mm->getChipWidth(0)) 
          << " " << Form("%7.4f", mm->getChipWidth(1)) 
@@ -353,32 +353,36 @@ void modulesAnalysis::bookHistograms() {
   setTitles(h, "Pi/2 - angle(HDI, chips) [rad]", "entries");
   fHists.insert({"angleChips", h});
 
+  h = new TH1D("aveAngleChips", " ", nbins, -0.005, 0.005);
+  setTitles(h, "Pi/2 - aveAngle(HDI, chips) [rad]", "entries");
+  fHists.insert({"aveAngleChips", h});
+
   h = new TH1D("position", "position", 6, 0, 6);
   setTitles(h, "position", "entries");
   h->SetMinimum(0.);
   fHists.insert({"position", h}); 
 
-  TProfile *h2 = new TProfile("prfChipWidth", "chip width vs Index", fModules.size(), 0, fModules.size());
+  TProfile *h2 = new TProfile("prfChipWidth", "chip width vs Index", fCompunds.size(), 0, fCompunds.size());
   //  setTitles(h2, "index", "chip width [mm]");
   h2->GetYaxis()->SetRangeUser(21.4, 21.6);
   fProfiles.insert({"prfChipWidth", h2});
 
-  h2 = new TProfile("prfAngleChips", "angle(chips) vs Index", fModules.size(), 0, fModules.size());
+  h2 = new TProfile("prfAngleChips", "angle(chips) vs Index", fCompunds.size(), 0, fCompunds.size());
   //setTitles(h2, "index", "angle(chips) [rad]");
   h2->GetYaxis()->SetRangeUser(-0.01, 0.01);
   fProfiles.insert({"prfAngleChips", h2});
 
-  h2 = new TProfile("prfdiffXChips", "#Delta(x_{chip 0}, x_{chip 3}) vs Index", fModules.size(), 0, fModules.size());
+  h2 = new TProfile("prfdiffXChips", "#Delta(x_{chip 0}, x_{chip 3}) vs Index", fCompunds.size(), 0, fCompunds.size());
   //setTitles(h2, "index", "#Delta(x_{chip 0}, x_{chip 3}) [mm]");
   h2->GetYaxis()->SetRangeUser(-0.1, 0.1);
   fProfiles.insert({"prfdiffXChips", h2});
 
-  h2 = new TProfile("prfdiffYChips", "#Delta(y_{chip 0}, y_{chip 3}) vs Index", fModules.size(), 0, fModules.size());
+  h2 = new TProfile("prfdiffYChips", "#Delta(y_{chip 0}, y_{chip 3}) vs Index", fCompunds.size(), 0, fCompunds.size());
   //setTitles(h2, "index", "#Delta(y_{chip 0}, y_{chip 3}) [mm]");
   h2->GetYaxis()->SetRangeUser(37., 37.4);
   fProfiles.insert({"prfdiffYChips", h2});
 
-  h2 = new TProfile("prfscaleFactor", "scale factor vs Index", fModules.size(), 0, fModules.size());
+  h2 = new TProfile("prfscaleFactor", "scale factor vs Index", fCompunds.size(), 0, fCompunds.size());
   //setTitles(h2, "index", "scale factor [mm/pixel]");
   h2->GetYaxis()->SetRangeUser(0.0090, 0.0092);
   fProfiles.insert({"prfscaleFactor", h2});
@@ -386,7 +390,7 @@ void modulesAnalysis::bookHistograms() {
 
 // ----------------------------------------------------------------------
 void modulesAnalysis::calcAll() {
-  for (auto mm : fModules) {
+  for (auto mm : fCompunds) {
     if (mm->getModulePosition() < 0) continue;
     fHists["position"]->Fill(mm->getModulePosition());
     mm->calcAll(0, 0);
@@ -395,7 +399,7 @@ void modulesAnalysis::calcAll() {
 
 // ----------------------------------------------------------------------
 void::modulesAnalysis::anaAll() {
-  for (auto mm : fModules) {
+  for (auto mm : fCompunds) {
     if (mm->getModulePosition() < 0) {
       cout << "filling -999 for missing module " << mm->getName() << endl;
       // -- avoid "zero" as entry for missing modules
@@ -467,8 +471,25 @@ void::modulesAnalysis::anaAll() {
       fHists["diffYChips"]->Fill(sf * (mm->getROCsPrime(0).Y() - mm->getROCsPrime(7).Y()));
     }
 
-    TVector2 rocEdge = mm->getROCsPrime(1) - mm->getROCsPrime(6);
-    double angle = TMath::PiOver2() - TMath::ATan2(rocEdge.Y(), rocEdge.X());
+    vector<double> angles; 
+    if (mm->chipWellMeasured(0) && mm->chipWellMeasured(3)) {
+      //angles.push_back(mm->getAngleChipMarkerHDIyAxis(0, 7));
+      angles.push_back(mm->getAngleChipMarkerHDIyAxis(1, 6));
+    }
+    if (mm->chipWellMeasured(1) && mm->chipWellMeasured(2)) {
+      angles.push_back(mm->getAngleChipMarkerHDIyAxis(2, 5));
+      angles.push_back(mm->getAngleChipMarkerHDIyAxis(3, 4));
+    }
+
+    if (angles.size() > 0) {
+      double aveAngle = 0.;
+      for (auto angle : angles) {
+        aveAngle += angle;
+      }
+      aveAngle /= angles.size();
+      fHists["aveAngleChips"]->Fill(aveAngle);
+    }
+    double angle = mm->getAngleChipMarkerHDIyAxis(1, 6);
     fHists["angleChips"]->Fill(angle);
 
 

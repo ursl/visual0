@@ -12,7 +12,7 @@
 // ---------------------------------------------------------------------- 
 class modulesAnalysis {
   public:
-  modulesAnalysis(int mode = 1, std::string directory = "pdf");
+  modulesAnalysis(int mode = 1, std::string directory = "pdf", std::string filename = "bla");
   ~modulesAnalysis();
 
   void bookHistograms();
@@ -23,7 +23,7 @@ class modulesAnalysis {
   void plotGlueTests();
 
   private:
-  std::vector<compound*> fModules;
+  std::vector<compound*> fCompunds;
   std::string fFilename, fDirectory;
   TFile *fFile;
   std::map<std::string, TH1 *> fHists;
