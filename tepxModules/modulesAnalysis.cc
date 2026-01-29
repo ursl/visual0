@@ -429,40 +429,10 @@ void::modulesAnalysis::anaAll() {
       fHists["orthogonality"]->Fill(mm->getOrthogonality());
     }
 
-    if (mm->chipWellMeasured(0)) {
-       fHists["chip00"]->Fill(sf * mm->getROCsPrime(0).X());
-       fHists["chip01"]->Fill(sf * mm->getROCsPrime(1).X());
-    }
-    if (mm->chipWellMeasured(1)) {
-      fHists["chip10"]->Fill(sf * mm->getROCsPrime(2).X());
-      fHists["chip11"]->Fill(sf * mm->getROCsPrime(3).X());
-      if (sf * mm->getROCsPrime(3).X() >-1. ) {
-        cout << "**************************** chip11 is badly placed **************************** " << mm->getName() << endl;
-        cout << "sf * mm->getROCsPrime(3).X() = " << sf * mm->getROCsPrime(3).X() << endl;
-        cout << "sf * mm->getROCsPrime(3).Y() = " << sf * mm->getROCsPrime(3).Y() << endl;
-        cout << "mm->getROCsPrime(3).X() = " << mm->getROCsPrime(3).X() << endl;
-        cout << "mm->getROCsPrime(3).Y() = " << mm->getROCsPrime(3).Y() << endl;
-        cout << "mm->getROCs(3).X() = " << mm->getROCs(3).X() << endl;
-        cout << "mm->getROCs(3).Y() = " << mm->getROCs(3).Y() << endl;
-      }
-    }
-    if (mm->chipWellMeasured(2)) {
-      fHists["chip20"]->Fill(sf * mm->getROCsPrime(4).X());
-      fHists["chip21"]->Fill(sf * mm->getROCsPrime(5).X());
-    }
-    if (mm->chipWellMeasured(3)) {
-      fHists["chip30"]->Fill(sf * mm->getROCsPrime(6).X());
-      fHists["chip31"]->Fill(sf * mm->getROCsPrime(7).X());
-      if (sf * mm->getROCsPrime(7).X() < 40.) {
-        cout << "**************************** chip31 is too small " << mm->getName() << endl;
-        cout << "sf * mm->getROCsPrime(7).X() = " << sf * mm->getROCsPrime(7).X() << endl;
-        cout << "sf * mm->getROCsPrime(7).Y() = " << sf * mm->getROCsPrime(7).Y() << endl;
-        cout << "mm->getROCsPrime(7).X() = " << mm->getROCsPrime(7).X() << endl;
-        cout << "mm->getROCsPrime(7).Y() = " << mm->getROCsPrime(7).Y() << endl;
-        cout << "mm->getROCs(7).X() = " << mm->getROCs(7).X() << endl;
-        cout << "mm->getROCs(7).Y() = " << mm->getROCs(7).Y() << endl;
-        cout << "mm->getROCsPrime(7).X() = " << mm->getROCsPrime(7).X() << endl;
-        cout << "mm->getROCsPrime(7).Y() = " << mm->getROCsPrime(7).Y() << endl;
+    for (int ichip = 0; ichip < 4; ichip++) {
+      if (mm->chipWellMeasured(ichip)) {
+        fHists["chip" + to_string(ichip) + "0"]->Fill(sf * mm->getROCsPrime(2*ichip).X());
+        fHists["chip" + to_string(ichip) + "1"]->Fill(sf * mm->getROCsPrime(2*ichip + 1).X());
       }
     }
 
