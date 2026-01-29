@@ -54,7 +54,6 @@ int main(int argc, char* argv[]) {
   if (mode <= 3) {
     modulesAnalysis ma(mode, directory);
     ma.doAll();
-    if (1 == mode) ma.plotGlueTests();
     return 0;
   }
   

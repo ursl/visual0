@@ -20,7 +20,6 @@ class modulesAnalysis {
   void calcAll();
   void anaAll();
   void plotAll();
-  void plotGlueTests();
 
   private:
   std::vector<compound*> fCompunds;

@@ -443,7 +443,6 @@ void::modulesAnalysis::anaAll() {
 
     vector<double> angles; 
     if (mm->chipWellMeasured(0) && mm->chipWellMeasured(3)) {
-      //angles.push_back(mm->getAngleChipMarkerHDIyAxis(0, 7));
       angles.push_back(mm->getAngleChipMarkerHDIyAxis(1, 6));
     }
     if (mm->chipWellMeasured(1) && mm->chipWellMeasured(2)) {
@@ -493,42 +492,4 @@ void modulesAnalysis::plotAll() {
     prof.second->Draw();
     c1->SaveAs((fDirectory + "/" + prof.first + ".pdf").c_str());
   }
-}
-
-
-// ----------------------------------------------------------------------
-void modulesAnalysis::plotGlueTests() {
-  vector<double> x1 = {0, 1, 2, 3, 4, 5};
-  vector<double> x2 = {0, 1, 2, 3, 4, 5};
-  vector<double> y1 = {0.0146, 0.0174, 0.0222, 0.0259, 0.0309, 0.0336};
-  vector<double> y2 = {0.0143, 0.0154, 0.0204, 0.0222, 0.0243, 0.0235};
-
-  TGraph *g1 = new TGraph(x1.size(), x1.data(), y1.data());
-  TGraph *g2 = new TGraph(x2.size(), x2.data(), y2.data());
-
-  g1->SetMarkerStyle(20);
-  g1->SetMarkerColor(kRed);
-  g2->SetMarkerStyle(20);
-  g2->SetMarkerColor(kBlue);
-
-  TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
-  shrinkPad(0.1, 0.15, 0.1, 0.1);
-  g1->Draw("AP");
-  g2->Draw("P");
-  g1->SetMarkerSize(1.5); 
-  g2->SetMarkerSize(1.5); 
-  g1->SetTitle(" ");
-  g1->GetXaxis()->SetTitle("position");
-  g1->GetYaxis()->SetTitle("glue [gram]");
-  g1->GetYaxis()->SetRangeUser(0.0, 0.035);
-
-  TLegend *leg = newLegend(0.16, 0.72, 0.3, 0.85); 
-  leg->AddEntry(g1, "3 Araldite presses", "p");
-  leg->AddEntry(g2, "2 Araldite presses", "p");
-  leg->SetHeader("Glue tests");
-  leg->Draw();
-
-  c1->Draw();
-  c1->SaveAs((fDirectory + "/glueTests.pdf").c_str());
-
 }
