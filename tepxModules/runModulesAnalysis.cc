@@ -10,6 +10,7 @@ using namespace std;
 // ----------------------------------------------------------------------
 // run opencv2 image analysis and produce json files
 // moor>./bin/runModulesAnalysis -m 10
+// moor>./bin/runModulesAnalysis -m 10 -p 1134 -q 1139
 // 
 // run analysis on single processed image file (-m 0 can be omitted)
 // moor> ./bin/runModulesAnalysis -f json/p1003.json -d single
