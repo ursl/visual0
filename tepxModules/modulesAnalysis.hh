@@ -22,8 +22,8 @@ class modulesAnalysis {
   void plotAll();
 
   private:
-  std::vector<compound*> fCompunds;
-  std::string fFilename, fDirectory;
+  std::vector<compound*> fCompounds;
+  std::string fDirectory,fFilename;
   TFile *fFile;
   std::map<std::string, TH1 *> fHists;
   std::map<std::string, TProfile *> fProfiles;
