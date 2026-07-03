@@ -23,7 +23,7 @@ OSUFFIX := .o
 
 # -- Source code
 FILES = compound.o modulesAnalysis.o 
-BINARIES = runModulesAnalysis ocvMarkersFromJPG
+BINARIES = runModulesAnalysis ocvMarkersFromJPGV0 ocvMarkersFromJPGV1
 
 LIBRARIES = lib/libAnaUtil.so 
 
