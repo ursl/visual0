@@ -439,9 +439,9 @@ int main(int argc, char** argv) {
     }
     
     // -- determine and display ROIs
-    const int boxSizeX = 300;
-    const int boxSizeY = 60;
-    const double yTopRocMm = 11.5 + 18.9;
+    const int boxSizeX = 120;
+    const int boxSizeY = 40;
+    const double yTopRocMm = 11.5 + 18.8;
     const double yBottomRocMm = yTopRocMm - 37.25;
     struct HdiRocSpec {
         std::string name;
@@ -449,14 +449,14 @@ int main(int argc, char** argv) {
         double yMm;
     };
     const std::vector<HdiRocSpec> hdiRocSpecs = {
-        {"ROC00", 40.0 + 1.7, yTopRocMm},
-        {"ROC01", 20.0 + 2.7, yTopRocMm},
+        {"ROC00", 39.3 + 2.7, yTopRocMm},
+        {"ROC01", 18.5 + 2.7, yTopRocMm},
         {"ROC10", 20.0 - 0.1, yTopRocMm},
-        {"ROC11",  0.0 + 0.8, yTopRocMm},
-        {"ROC20",  0.0 + 0.8, yBottomRocMm},
+        {"ROC11", -0.6 + 0.0, yTopRocMm},
+        {"ROC20", -0.6 + 0.0, yBottomRocMm},
         {"ROC21", 20.0 - 0.1, yBottomRocMm},
-        {"ROC30", 20.0 + 2.7, yBottomRocMm},
-        {"ROC31", 40.0 + 1.7, yBottomRocMm}
+        {"ROC30", 18.5 + 2.7, yBottomRocMm},
+        {"ROC31", 39.3 + 2.7, yBottomRocMm}
     };
     std::vector<RocRoi> rocRois;
     rocRois.reserve(hdiRocSpecs.size());
@@ -479,37 +479,43 @@ int main(int argc, char** argv) {
              << "  sf: " << lc.sf << endl;
     }
 
-    // -- now search for magic pattern (RHS and LHS) in ROIs
+    // -- now search for the simple pattern in ROIs
     const cv::Mat templateLHS = makeChipTemplate(false);
-    const cv::Mat templateRHS = makeChipTemplate(true);
-    const double matchThreshold = 0.15;
-    std::map<std::string, cv::Point> chipMarkers;
+//    const cv::Mat templateRHS = makeChipTemplate(true);
+    const double matchThreshold = 0.40;
+    struct SvgRocSpec {
+        std::string name;
+        cv::Point matchPt;
+        double score;
+    };
+
+    std::map<std::string, SvgRocSpec> chipMarkers;
     for (const auto& spec : hdiRocSpecs) {
-        chipMarkers["chip" + spec.name.substr(3)] = cv::Point(-1, -1);
+        const std::string chipName = "chip" + spec.name.substr(3);
+        chipMarkers[chipName] = SvgRocSpec{chipName, cv::Point(-1, -1), 0.0};
     }
     int nMatched = 0;
     for (const auto& roi : rocRois) {
-        cv::Point matchPt;
-        double score = 0.0;
-        const bool found = searchMagicPatternInRoi(img, roi, templateLHS, templateRHS,
-                                                   matchThreshold, matchPt, score);
+        SvgRocSpec hit;
+        hit.name = roi.chipName;
+        const bool found = searchMagicPatternInRoi(img, roi, templateLHS, templateLHS,
+                                                   matchThreshold, hit.matchPt, hit.score);
         const Scalar color = found ? Scalar(0, 200, 0) : Scalar(0, 0, 255);
         if (found) {
-            const cv::Mat& tmpl = roi.isRhs ? templateRHS : templateLHS;
-            cv::rectangle(vis1, cv::Rect(matchPt, cv::Size(tmpl.cols, tmpl.rows)), color, 2);
-            chipMarkers[roi.chipName] = matchPt;
+            chipMarkers[roi.chipName] = hit;
+            cv::rectangle(vis1,
+                          cv::Rect(hit.matchPt, cv::Size(templateLHS.cols, templateLHS.rows)),
+                          color, 2);
             nMatched++;
         }
-        const std::string side = roi.isRhs ? "RHS" : "LHS";
-        cout << roi.name << " (" << side << "): "
-             << (found ? "match" : "no match")
-             << " score=" << score;
+        cout << roi.name << ": " << (found ? "match" : "no match")
+             << " score=" << hit.score;
         if (found) {
-            cout << " at " << matchPt.x << ", " << matchPt.y;
+            cout << " at " << hit.matchPt.x << ", " << hit.matchPt.y;
         }
         cout << endl;
     }
-    cout << "Magic pattern: matched " << nMatched << "/" << rocRois.size() << " ROIs" << endl;
+    cout << "Simple pattern: matched " << nMatched << "/" << rocRois.size() << " ROIs" << endl;
 
     // -- write the matches to a JSON file
     std::ofstream outFile(outMarksFile);
@@ -537,9 +543,10 @@ int main(int argc, char** argv) {
         }
         firstChip = false;
         outFile << "    {" << std::endl;
-        outFile << "      \"name\": \"" << entry.first << "\"," << std::endl;
-        outFile << "      \"x\": " << entry.second.x << "," << std::endl;
-        outFile << "      \"y\": " << entry.second.y << std::endl;
+        outFile << "      \"name\": \"" << entry.second.name << "\"," << std::endl;
+        outFile << "      \"x\": " << entry.second.matchPt.x << "," << std::endl;
+        outFile << "      \"y\": " << entry.second.matchPt.y << "," << std::endl;
+        outFile << "      \"score\": " << entry.second.score << std::endl;
         outFile << "    }";
     }
     outFile << std::endl << "  ]" << std::endl;
