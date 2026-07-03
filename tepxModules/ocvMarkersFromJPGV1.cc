@@ -176,6 +176,26 @@ cv::Mat makeChipTemplate(bool mirrorRight = false) {
     return templateRect;
 }
 
+namespace ChipPattern {
+constexpr int kRectW = 8;
+constexpr int kRectH = 12;
+constexpr int kCenterSpacing = 23;
+constexpr int kPadGap = kCenterSpacing - kRectW; // edge-to-edge gap between wide pads
+constexpr int kMarkerVisRadius = 10;
+} // namespace ChipPattern
+
+// LHS:  +__[]__[]__[]     marker one pad-gap left of the first wide pad
+// RHS:  []__[]__[]__+     marker one pad-gap right of the third wide pad
+cv::Point chipMarkerFromMatch(const cv::Point& matchPt, bool isRhs) {
+    using namespace ChipPattern;
+    const int bondY = matchPt.y + kRectH / 2;
+    if (isRhs) {
+        const int thirdPadRight = matchPt.x + 2 * kCenterSpacing + kRectW;
+        return cv::Point(thirdPadRight + kPadGap, bondY);
+    }
+    return cv::Point(matchPt.x - kPadGap, bondY);
+}
+
 
 
 
@@ -236,10 +256,11 @@ std::vector<cv::Point> findChipMatches(const cv::Mat &result, const vector<cv::V
     return matches;
 }
 
+// Marker on RHS (+ right of wide pads) vs LHS (+ left). Matches HdiLayout::chipCornerNominals.
 bool isRhsRoc(const std::string& rocName) {
     const int chipRow = rocName[3] - '0';
     const int chipCol = rocName[4] - '0';
-    return (chipRow % 2 == 0) ? (chipCol == 1) : (chipCol == 0);
+    return (chipRow >= 2) ? (chipCol == 0) : (chipCol == 1);
 }
 
 struct RocRoi {
@@ -485,7 +506,7 @@ int main(int argc, char** argv) {
     const double matchThreshold = 0.40;
     struct SvgRocSpec {
         std::string name;
-        cv::Point matchPt;
+        cv::Point markerPt;
         double score;
     };
 
@@ -498,20 +519,23 @@ int main(int argc, char** argv) {
     for (const auto& roi : rocRois) {
         SvgRocSpec hit;
         hit.name = roi.chipName;
+        cv::Point matchPt;
         const bool found = searchMagicPatternInRoi(img, roi, templateLHS, templateLHS,
-                                                   matchThreshold, hit.matchPt, hit.score);
+                                                   matchThreshold, matchPt, hit.score);
         const Scalar color = found ? Scalar(0, 200, 0) : Scalar(0, 0, 255);
         if (found) {
+            hit.markerPt = chipMarkerFromMatch(matchPt, roi.isRhs);
             chipMarkers[roi.chipName] = hit;
             cv::rectangle(vis1,
-                          cv::Rect(hit.matchPt, cv::Size(templateLHS.cols, templateLHS.rows)),
+                          cv::Rect(matchPt, cv::Size(templateLHS.cols, templateLHS.rows)),
                           color, 2);
+            cv::circle(vis1, hit.markerPt, ChipPattern::kMarkerVisRadius, Scalar(255, 255, 0), 2);
             nMatched++;
         }
         cout << roi.name << ": " << (found ? "match" : "no match")
              << " score=" << hit.score;
         if (found) {
-            cout << " at " << hit.matchPt.x << ", " << hit.matchPt.y;
+            cout << " marker at " << hit.markerPt.x << ", " << hit.markerPt.y;
         }
         cout << endl;
     }
@@ -544,8 +568,8 @@ int main(int argc, char** argv) {
         firstChip = false;
         outFile << "    {" << std::endl;
         outFile << "      \"name\": \"" << entry.second.name << "\"," << std::endl;
-        outFile << "      \"x\": " << entry.second.matchPt.x << "," << std::endl;
-        outFile << "      \"y\": " << entry.second.matchPt.y << "," << std::endl;
+        outFile << "      \"x\": " << entry.second.markerPt.x << "," << std::endl;
+        outFile << "      \"y\": " << entry.second.markerPt.y << "," << std::endl;
         outFile << "      \"score\": " << entry.second.score << std::endl;
         outFile << "    }";
     }
