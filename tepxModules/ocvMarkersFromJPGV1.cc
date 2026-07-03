@@ -5,6 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <string>
+#include <map>
 
 #include "TVector2.h"
 #include "TMath.h"
@@ -28,32 +29,15 @@ using namespace std;
 struct lCompound {
     std::vector<TVector2> pMarkers;
     TVector2 offset;
-
+    
     double alpha; 
     double sf;
     
-
+    
     lCompound(std::vector<TVector2> pMarkers) {
         this->pMarkers = pMarkers;
         determineTransformation();
     }
-    
-    TVector2 transform(TVector2 r, double theta, TVector2 t) {
-        TVector2 rp = r - t;
-        double   xnew = TMath::Cos(theta) * rp.X() - TMath::Sin(theta) * rp.Y();
-        double   ynew = TMath::Sin(theta) * rp.X() + TMath::Cos(theta) * rp.Y();
-        return TVector2(xnew, ynew);
-    }
-    
-    
-    std::vector<TVector2> transformToHDIFrame(std::vector<TVector2> &orig) {
-        std::vector<TVector2> trsf(orig.size());
-        for (unsigned it = 0; it < orig.size(); ++it) {
-            trsf[it] = transform(orig[it], alpha, offset);
-        }
-        return trsf;
-    }
-    
     
     void determineTransformation() {
         TVector2 ySvg = pMarkers[0] - pMarkers[1];
@@ -63,18 +47,229 @@ struct lCompound {
         xSvg /= xSvg.Mod();
         offset = pMarkers[1];
         
-        // -- average rotation angle from  both x- and y-axes (always < pi/2)
+        // -- rotation angles determined from  x- and y-axes
         double theta0 = TMath::ACos(xSvg * TVector2(1., 0.));
         double theta1 = TMath::ACos(ySvg * TVector2(0., 1.));
-        double alpha = 0.5 * (theta0 + theta1);
+        // -- average rotation angle - this implies that neither M0 nor M2 
+        //    will be *perfectly* aligned in HDI CS
+        alpha = 0.5 * (theta0 + theta1);
         
         // -- make sure rotation is towards y-axis
         TVector2 xOld = TVector2(1, 0);
         double   rsgn = xOld.X() * xSvg.Y() - xOld.Y() * xSvg.X();
         alpha -= TMath::Pi();
         alpha = -TMath::Pi() + (rsgn < 0 ? alpha : -1. * alpha);
+
+        // -- determine scale factor
+        double dm0m1 = 23.0; // mm
+        double dm1m2 = 40.0; // mm
+      
+        double pxDiff1 = (pMarkers[0] - pMarkers[1]).Mod();
+        double pxDiff2 = (pMarkers[1] - pMarkers[2]).Mod();
+      
+        sf = 0.5 * (dm0m1 / pxDiff1 + dm1m2 / pxDiff2);
     }
+    
+    // Forward: image pixel p -> HDI primed p' = R(alpha) * (p - offset),  offset = M1.
+    TVector2 transform(TVector2 r, double theta, TVector2 t) {
+        TVector2 rp = r - t;
+        double   xnew = TMath::Cos(theta) * rp.X() - TMath::Sin(theta) * rp.Y();
+        double   ynew = TMath::Sin(theta) * rp.X() + TMath::Cos(theta) * rp.Y();
+        return TVector2(xnew, ynew);
+    }
+
+    // Inverse: p = R(-alpha) * p' + offset.  NOT R(-alpha)*(p' - offset) 
+    TVector2 fromHDIFrame(TVector2 primed) {
+        const double c = TMath::Cos(-alpha);
+        const double s = TMath::Sin(-alpha);
+        return TVector2(c * primed.X() - s * primed.Y() + offset.X(),
+                        s * primed.X() + c * primed.Y() + offset.Y());
+    }
+    
+    std::vector<TVector2> transformToHDIFrame(std::vector<TVector2> &orig) {
+        std::vector<TVector2> trsf(orig.size());
+        for (unsigned it = 0; it < orig.size(); ++it) {
+            trsf[it] = transform(orig[it], alpha, offset);
+        }
+        return trsf;
+    }
+
+    TVector2 transformToHDIFrame(TVector2 orig) {
+        std::vector<TVector2> one = {orig};
+        return transformToHDIFrame(one)[0];
+    }
+
+    // HDI primed (pixel units) or mm/sf -> image pixel coordinates.
+    std::vector<TVector2> transformToSVGFrame(std::vector<TVector2> &orig) {
+        std::vector<TVector2> trsf(orig.size());
+        for (unsigned it = 0; it < orig.size(); ++it) {
+            trsf[it] = fromHDIFrame(orig[it]);
+        }
+        return trsf;
+    }
+
+    TVector2 transformToSVGFrame(TVector2 orig) {
+        return fromHDIFrame(orig);
+    }
+
+    // HDI primed position in mm -> image pixel coordinates.
+    TVector2 hdiMmToPixel(TVector2 hdiMm) {
+        return fromHDIFrame(TVector2(hdiMm.X() / sf, hdiMm.Y() / sf));
+    }
+
 };
+
+
+// ----------------------------------------------------------------------
+// helper to construct the composite chip-marker template
+// if mirrorRight is true, the template is horizontally flipped (RHS version)
+cv::Mat makeChipTemplate(bool mirrorRight = false) {
+    // Create a composite template: 3 rectangles (9x14 each), widely separated,
+    // then three rectangles nearly adjacent
+    int rectW = 8; // 70um according to measurement by WE
+    int rectH = 12;
+    int centerSpacing = 23; // 200um according to RD53 drawing
+    int gap = centerSpacing - rectW; // "big" gap between rectangles
+    int gap2 = 32;  
+    
+    // Template size: enough to fit all three rectangles
+    // Total width: left padding + rect1 + gap + rect2 + gap + rect3 + right padding
+    int leftPadding = 0; //rectW;
+    int templateW = leftPadding + rectW + gap + rectW + gap + rectW;
+    int templateH = rectH; // add small padding top/bottom
+    
+    cv::Mat templateRect = cv::Mat(templateH, templateW, CV_8UC3, cv::Scalar(143, 168, 202));  // B, G, R
+    
+    // -- construct the pattern: three widely spaced then three nearly adjacent
+    int y0 = templateH / 2;         // center y for all rectangles
+    int x0 = leftPadding;           // first rectangle left x
+    cv::Rect r0(x0, 0, rectW, rectH);
+    cv::rectangle(templateRect, r0, cv::Scalar(206, 200, 195), -1); // filled rectangle
+    
+    int x1 = x0 + centerSpacing;
+    cv::Rect r1(x1, 0, rectW, rectH);
+    cv::rectangle(templateRect, r1, cv::Scalar(206, 200, 195), -1);
+    
+    int x2 = x1 + centerSpacing;
+    cv::Rect r2(x2, 0, rectW, rectH);
+    cv::rectangle(templateRect, r2, cv::Scalar(206, 200, 195), -1);
+    
+    // int x3 = x2  + gap2;
+    // cv::Rect r3(x3, 0, rectW, rectH);
+    // cv::rectangle(templateRect, r3, cv::Scalar(206, 200, 195), -1);
+    
+    // int x4 = x3 + rectW + 1;
+    // cv::Rect r4(x4, 0, rectW, rectH);
+    // cv::rectangle(templateRect, r4, cv::Scalar(206, 200, 195), -1);
+    
+    // int x5 = x4 + rectW + 1;
+    // cv::Rect r5(x5, 0, rectW, rectH);
+    // cv::rectangle(templateRect, r5, cv::Scalar(206, 200, 195), -1);
+    
+    // Mirror horizontally for RHS pattern if requested
+    if (mirrorRight) {
+        cv::Mat flipped;
+        cv::flip(templateRect, flipped, 1); // flip around y-axis
+        return flipped;
+    }
+    
+    return templateRect;
+}
+
+
+
+
+// ----------------------------------------------------------------------
+// find chip-marker matches in the template match result, applying
+// thresholding, geometric vetoes using HDI markers, and non-maximum suppression
+std::vector<cv::Point> findChipMatches(const cv::Mat &result, const vector<cv::Vec3f> &hdiMarkers, double threshold, double minDist2) {
+    // Get all candidate matches with their scores
+    struct Match {
+        cv::Point pt;
+        double score;
+    };
+    std::vector<Match> candidates;
+    for (int y = 0; y < result.rows; ++y) {
+        for (int x = 0; x < result.cols; ++x) {
+            float score = result.at<float>(y, x);
+            if (score > threshold) {
+                candidates.push_back({cv::Point(x, y), score});
+            }
+        }
+    }
+    
+    // Sort by score (highest first)
+    std::sort(candidates.begin(), candidates.end(), [](const Match& a, const Match& b) { return a.score > b.score; });
+    
+    // Compute y/x bands between M0 and M1 to veto matches in that strip
+    double y0m = hdiMarkers.size() > 0 ? hdiMarkers[0][1] : 0.0;
+    double y1m = hdiMarkers.size() > 1 ? hdiMarkers[1][1] : 0.0;
+    double yMin = std::min(y0m, y1m);
+    double yMax = std::max(y0m, y1m);
+    
+    // Apply geometric vetoes and spatial non-maximum suppression
+    std::vector<cv::Point> matches;
+    for (const auto& cand : candidates) {
+        // Skip matches whose y lies strictly between the two marker y positions
+        if (hdiMarkers.size() > 1 && cand.pt.y > yMin && cand.pt.y < yMax) {
+            continue;
+        }
+        
+        // Non-maximum suppression in space: enforce a minimum distance between matches
+        bool tooClose = false;
+        for (const auto& kept : matches) {
+            double dist = cv::norm(cand.pt - kept);
+            if (dist < minDist2) {
+                tooClose = true;
+                break;
+            }
+        }
+        if (!tooClose) {
+            matches.push_back(cand.pt);
+        }
+    }
+    
+    std::cout << "Found " << matches.size()
+    << " matches (after NMS from " << candidates.size()
+    << " candidates)" << std::endl;
+    
+    return matches;
+}
+
+bool isRhsRoc(const std::string& rocName) {
+    const int chipRow = rocName[3] - '0';
+    const int chipCol = rocName[4] - '0';
+    return (chipRow % 2 == 0) ? (chipCol == 1) : (chipCol == 0);
+}
+
+struct RocRoi {
+    std::string name;
+    std::string chipName;
+    bool isRhs;
+    cv::Rect rect;
+};
+
+bool searchMagicPatternInRoi(const cv::Mat& img, const RocRoi& roi,
+                             const cv::Mat& templateLHS, const cv::Mat& templateRHS,
+                             double threshold, cv::Point& matchPt, double& score) {
+    const cv::Rect bounds(0, 0, img.cols, img.rows);
+    const cv::Rect clipped = roi.rect & bounds;
+    const cv::Mat& tmpl = roi.isRhs ? templateRHS : templateLHS;
+    if (clipped.width < tmpl.cols || clipped.height < tmpl.rows) {
+        return false;
+    }
+    const cv::Mat patch = img(clipped);
+    cv::Mat result;
+    cv::matchTemplate(patch, tmpl, result, cv::TM_CCOEFF_NORMED);
+    cv::Point maxLoc;
+    cv::minMaxLoc(result, nullptr, &score, nullptr, &maxLoc);
+    if (score < threshold) {
+        return false;
+    }
+    matchPt = clipped.tl() + maxLoc;
+    return true;
+}
+
 
 
 
@@ -214,31 +409,108 @@ int main(int argc, char** argv) {
     ordered[2] = hdiMarkers[idxMinX]; // smallest x
     
     hdiMarkers.swap(ordered);
-
+    
     std::vector<TVector2> tvhdiMarkers(3);
     for (size_t k = 0; k < hdiMarkers.size(); ++k) {
         tvhdiMarkers[k] = TVector2(hdiMarkers[k][0], hdiMarkers[k][1]);
     }
-
+    
+    // -- test new lCompound
     lCompound lc(tvhdiMarkers);
     lc.determineTransformation();
     std::vector<TVector2> hdiMarkersPrime = lc.transformToHDIFrame(tvhdiMarkers);
-
-    cout << "Found " << hdiMarkers.size() << " concentric pairs of HDI markers\n";
-    for (size_t k = 0; k < hdiMarkers.size(); ++k) {
-        const auto& c = hdiMarkers[k];
-        Scalar color(0, 0, 255 - int(80 * k));  // different reds
-        putText(vis1, "M" + std::to_string(k), Point2f(c[0]-15, c[1]+10), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
-        cout << "HDI marker " << k << " center (px): "
-        << c[0] << ", " << c[1]
-        << " tv marker: " << tvhdiMarkers[k].X() << ", " << tvhdiMarkers[k].Y()
-        << "  transformed to HDI frame: " << hdiMarkersPrime[k].X() << ", " << hdiMarkersPrime[k].Y()
-        << endl;
+    std::vector<TVector2> svgMarkersPrime = lc.transformToSVGFrame(hdiMarkersPrime);
+    
+    if (verbose) {
+        cout << "Found " << hdiMarkers.size() << " concentric pairs of HDI markers" << endl;
+        cout << "Scale factor: " << lc.sf << endl;
+        cout << "Rotation: " << lc.alpha << endl;
+        for (size_t k = 0; k < hdiMarkers.size(); ++k) {
+            const auto& c = hdiMarkers[k];
+            Scalar color(0, 0, 255 - int(80 * k));  // different reds
+            putText(vis1, "M" + std::to_string(k), Point2f(c[0]-15, c[1]+10), FONT_HERSHEY_SIMPLEX, 0.8, color, 2);
+            cout << "HDI marker " << k << " center (px): "
+            << c[0] << ", " << c[1]
+            << " tv marker: " << tvhdiMarkers[k].X() << ", " << tvhdiMarkers[k].Y()
+            << "  transformed to HDI frame: " << hdiMarkersPrime[k].X() << ", " << hdiMarkersPrime[k].Y()
+            << "  back to SVG frame: " << svgMarkersPrime[k].X() << ", " << svgMarkersPrime[k].Y()
+            << endl;
+        }
     }
     
+    // -- determine and display ROIs
+    const int boxSizeX = 300;
+    const int boxSizeY = 60;
+    const double yTopRocMm = 11.5 + 18.9;
+    const double yBottomRocMm = yTopRocMm - 37.25;
+    struct HdiRocSpec {
+        std::string name;
+        double xMm;
+        double yMm;
+    };
+    const std::vector<HdiRocSpec> hdiRocSpecs = {
+        {"ROC00", 40.0 + 1.7, yTopRocMm},
+        {"ROC01", 20.0 + 2.7, yTopRocMm},
+        {"ROC10", 20.0 - 0.1, yTopRocMm},
+        {"ROC11",  0.0 + 0.8, yTopRocMm},
+        {"ROC20",  0.0 + 0.8, yBottomRocMm},
+        {"ROC21", 20.0 - 0.1, yBottomRocMm},
+        {"ROC30", 20.0 + 2.7, yBottomRocMm},
+        {"ROC31", 40.0 + 1.7, yBottomRocMm}
+    };
+    std::vector<RocRoi> rocRois;
+    rocRois.reserve(hdiRocSpecs.size());
+    for (const auto& spec : hdiRocSpecs) {
+        TVector2 hdiROC{spec.xMm, spec.yMm};
+        TVector2 svgROC = lc.hdiMmToPixel(hdiROC);
+        const cv::Rect roiRect(static_cast<int>(svgROC.X()), static_cast<int>(svgROC.Y()),
+                               boxSizeX, boxSizeY);
+        RocRoi roi;
+        roi.name = spec.name;
+        roi.chipName = "chip" + spec.name.substr(3);
+        roi.isRhs = isRhsRoc(spec.name);
+        roi.rect = roiRect;
+        rocRois.push_back(roi);
+        cv::rectangle(vis1, roiRect, Scalar(0, 255, 255), 2);
+        putText(vis1, spec.name, Point2f(svgROC.X(), svgROC.Y()) + cv::Point2f(-30, -30),
+                FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0, 255, 255), 2);
+        cout << spec.name << " (mm): " << spec.xMm << ", " << spec.yMm
+             << " -> pixel: " << svgROC.X() << ", " << svgROC.Y()
+             << "  sf: " << lc.sf << endl;
+    }
 
+    // -- now search for magic pattern (RHS and LHS) in ROIs
+    const cv::Mat templateLHS = makeChipTemplate(false);
+    const cv::Mat templateRHS = makeChipTemplate(true);
+    const double matchThreshold = 0.15;
+    std::map<std::string, cv::Point> chipMarkers;
+    for (const auto& spec : hdiRocSpecs) {
+        chipMarkers["chip" + spec.name.substr(3)] = cv::Point(-1, -1);
+    }
+    int nMatched = 0;
+    for (const auto& roi : rocRois) {
+        cv::Point matchPt;
+        double score = 0.0;
+        const bool found = searchMagicPatternInRoi(img, roi, templateLHS, templateRHS,
+                                                   matchThreshold, matchPt, score);
+        const Scalar color = found ? Scalar(0, 200, 0) : Scalar(0, 0, 255);
+        if (found) {
+            const cv::Mat& tmpl = roi.isRhs ? templateRHS : templateLHS;
+            cv::rectangle(vis1, cv::Rect(matchPt, cv::Size(tmpl.cols, tmpl.rows)), color, 2);
+            chipMarkers[roi.chipName] = matchPt;
+            nMatched++;
+        }
+        const std::string side = roi.isRhs ? "RHS" : "LHS";
+        cout << roi.name << " (" << side << "): "
+             << (found ? "match" : "no match")
+             << " score=" << score;
+        if (found) {
+            cout << " at " << matchPt.x << ", " << matchPt.y;
+        }
+        cout << endl;
+    }
+    cout << "Magic pattern: matched " << nMatched << "/" << rocRois.size() << " ROIs" << endl;
 
-    
     // -- write the matches to a JSON file
     std::ofstream outFile(outMarksFile);
     outFile << "{" << std::endl;
@@ -256,7 +528,21 @@ int main(int argc, char** argv) {
         }
         outFile << std::endl;
     }
-    outFile << "  ]" << std::endl; 
+    outFile << "  ]," << std::endl;
+    outFile << "  \"chipMarkers\": [" << std::endl;
+    bool firstChip = true;
+    for (const auto& entry : chipMarkers) {
+        if (!firstChip) {
+            outFile << "," << std::endl;
+        }
+        firstChip = false;
+        outFile << "    {" << std::endl;
+        outFile << "      \"name\": \"" << entry.first << "\"," << std::endl;
+        outFile << "      \"x\": " << entry.second.x << "," << std::endl;
+        outFile << "      \"y\": " << entry.second.y << std::endl;
+        outFile << "    }";
+    }
+    outFile << std::endl << "  ]" << std::endl;
     outFile << "}" << std::endl;
     outFile.close();
     
