@@ -22,33 +22,29 @@ GLIBS         = $(filter-out -lz, $(ROOTGLIBS))
 OSUFFIX := .o
 
 # -- Source code
-FILES = compound.o modulesAnalysis.o 
+FILES = compound.o modulesAnalysis.o
 BINARIES = runModulesAnalysis ocvMarkersFromJPGV0 ocvMarkersFromJPGV1
+BIN_OBJS = $(addprefix obj/,$(addsuffix .o,$(BINARIES)))
 
-LIBRARIES = lib/libAnaUtil.so 
-
+LIBRARIES = lib/libAnaUtil.so
 
 # -- Default rules
 $(addprefix obj/,%.o) : %.cc %.hh
-	$(CXX) $(CXXFLAGS)  $(EXTHEADERS) $(OPENCV_CFLAGS) -c $< -o $@
- 
+	$(CXX) $(CXXFLAGS) $(EXTHEADERS) $(OPENCV_CFLAGS) -c $< -o $@
+
 $(addprefix obj/,%.o) : %.cc
-	$(CXX) $(CXXFLAGS)   $(EXTHEADERS) $(OPENCV_CFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(EXTHEADERS) $(OPENCV_CFLAGS) -c $< -o $@
 
 # -- Targets
 all: prep lib bin
 
-# -- targets
-all: prep lib bin
- 
 lib: prep $(addprefix obj/,$(FILES))
-	echo "hallo lib"
-	$(CXX) $(SOFLAGS) $(addprefix obj/,$(FILES)) -o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS)
- 
-bin: lib obj/runModulesAnalysis.o obj/ocvMarkersFromJPG.o
-	echo "hallo bin"
-	$(LD) $(LDFLAGS) -o bin/runModulesAnalysis obj/runModulesAnalysis.o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS) 
-	$(LD) $(LDFLAGS) -o bin/ocvMarkersFromJPG obj/ocvMarkersFromJPG.o lib/libModuleMeasurements.so  $(LIBRARIES) $(GLIBS) $(OPENCV_LIBS) 
+	$(CXX) $(SOFLAGS) $(addprefix obj/,$(FILES)) -o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS)
+
+bin: lib $(BIN_OBJS)
+	$(LD) $(LDFLAGS) -o bin/runModulesAnalysis obj/runModulesAnalysis.o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS)
+	$(LD) $(LDFLAGS) -o bin/ocvMarkersFromJPGV0 obj/ocvMarkersFromJPGV0.o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS) $(OPENCV_LIBS)
+	$(LD) $(LDFLAGS) -o bin/ocvMarkersFromJPGV1 obj/ocvMarkersFromJPGV1.o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS) $(OPENCV_LIBS)
 
 
 # -- create directories if not yet existing
@@ -57,7 +53,7 @@ prep:
 	cd lib && rm -f libAnaUtil.so && ln -s /Users/ursl/macros/ana/util/lib/libAnaUtil.so  && cd -
 
 clean:
-	rm -f $(addprefix obj/,$(FILES) $(DICT))
+	rm -f $(addprefix obj/,$(FILES)) $(BIN_OBJS)
 	rm -rf bin/* obj/*
 	rm -f lib/libModuleMeasurements.so
 	rm -f lib/*.pcm
