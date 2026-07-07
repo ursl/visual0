@@ -232,6 +232,7 @@ modulesAnalysis::modulesAnalysis(int mode, string directory, string filename): f
     fCompounds.push_back(new compound("json/P1136.json", 5));
     fCompounds.push_back(new compound("json/P1137.json", 0));
     fCompounds.push_back(new compound("json/P1138.json", 1));
+    fCompounds.push_back(new compound("json/P1138.json", 0));
   } else if (4 == mode) {
     // -- Find all files matching pattern "modules/p????.jpg"
     vector<string> jsonFiles;
