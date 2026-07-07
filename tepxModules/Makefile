@@ -23,9 +23,9 @@ OSUFFIX := .o
 
 # -- Source code
 FILES = compound.o modulesAnalysis.o
-MODULE_BINARIES = runModulesAnalysis
+MODULE_BINARIES = runModulesAnalysis parseRobotLog
 OPENCV_BINARIES = ocvMarkersFromJPGV0 ocvMarkersFromJPGV1 ocvMarkersFromJPG
-BINARIES = $(MODULE_BINARIES) $(OPENCV_BINARIES)
+BINARIES = $(MODULE_BINARIES) $(OPENCV_BINARIES) $(ROBOT_BINARIES)
 BIN_OBJS = $(addprefix obj/,$(addsuffix .o,$(BINARIES)))
 
 LIBRARIES = lib/libAnaUtil.so
