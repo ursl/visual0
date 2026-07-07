@@ -23,7 +23,9 @@ OSUFFIX := .o
 
 # -- Source code
 FILES = compound.o modulesAnalysis.o
-BINARIES = runModulesAnalysis ocvMarkersFromJPGV0 ocvMarkersFromJPGV1
+MODULE_BINARIES = runModulesAnalysis
+OPENCV_BINARIES = ocvMarkersFromJPGV0 ocvMarkersFromJPGV1 ocvMarkersFromJPG
+BINARIES = $(MODULE_BINARIES) $(OPENCV_BINARIES)
 BIN_OBJS = $(addprefix obj/,$(addsuffix .o,$(BINARIES)))
 
 LIBRARIES = lib/libAnaUtil.so
@@ -41,10 +43,11 @@ all: prep lib bin
 lib: prep $(addprefix obj/,$(FILES))
 	$(CXX) $(SOFLAGS) $(addprefix obj/,$(FILES)) -o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS)
 
-bin: lib $(BIN_OBJS)
-	$(LD) $(LDFLAGS) -o bin/runModulesAnalysis obj/runModulesAnalysis.o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS)
-	$(LD) $(LDFLAGS) -o bin/ocvMarkersFromJPGV0 obj/ocvMarkersFromJPGV0.o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS) $(OPENCV_LIBS)
-	$(LD) $(LDFLAGS) -o bin/ocvMarkersFromJPGV1 obj/ocvMarkersFromJPGV1.o lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS) $(OPENCV_LIBS)
+bin: lib $(addprefix bin/,$(BINARIES))
+
+bin/%: obj/%.o lib/libModuleMeasurements.so
+	$(LD) $(LDFLAGS) -o $@ $< lib/libModuleMeasurements.so $(LIBRARIES) $(GLIBS) \
+		$(if $(filter $(notdir $@),$(OPENCV_BINARIES)),$(OPENCV_LIBS))
 
 
 # -- create directories if not yet existing
