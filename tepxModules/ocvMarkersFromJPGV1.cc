@@ -190,10 +190,12 @@ cv::Point chipMarkerFromMatch(const cv::Point& matchPt, bool isRhs) {
     using namespace ChipPattern;
     const int bondY = matchPt.y + kRectH / 2;
     if (isRhs) {
+        const double scale = 1.1;
         const int thirdPadRight = matchPt.x + 2 * kCenterSpacing + kRectW;
-        return cv::Point(thirdPadRight + kPadGap, bondY);
+        return cv::Point(thirdPadRight + scale*kPadGap, bondY);
     }
-    return cv::Point(matchPt.x - kPadGap, bondY);
+    const double scale = 1.2;
+    return cv::Point(matchPt.x - scale*kPadGap, bondY);
 }
 
 
@@ -502,7 +504,7 @@ int main(int argc, char** argv) {
 
     // -- now search for the simple pattern in ROIs
     const cv::Mat templateLHS = makeChipTemplate(false);
-//    const cv::Mat templateRHS = makeChipTemplate(true);
+    //    const cv::Mat templateRHS = makeChipTemplate(true);
     const double matchThreshold = 0.40;
     struct SvgRocSpec {
         std::string name;
