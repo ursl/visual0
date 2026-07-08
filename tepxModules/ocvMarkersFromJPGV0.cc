@@ -258,13 +258,15 @@ int modulePosition(int moduleNumber) {
 // ---------------------------------------------------------------------- 
 int main(int argc, char** argv) {
     bool verbose(false);
-    string directory = "json";
+    string moduleDirectory = "";
+    string jsonDirectory = "json";
     string filename = "250109-M035_0255.JPG";
     string outMarksFile;  // e.g. "moduleTemplate.marks"
     bool visualize(false);    
     int moduleNumber(-1);
     for (int i = 1; i < argc; ++i) {
-        if (string(argv[i]) == "-d" && i + 1 < argc) { directory = argv[++i]; }
+        if (string(argv[i]) == "-d" && i + 1 < argc) { moduleDirectory = argv[++i]; }
+        if (string(argv[i]) == "-j" && i + 1 < argc) { jsonDirectory = argv[++i]; }
         if (string(argv[i]) == "-f" && i + 1 < argc) { filename = argv[++i]; }
         if (string(argv[i]) == "-o" && i + 1 < argc) { outMarksFile = argv[++i]; }
         if (string(argv[i]) == "-v") { visualize = true; verbose = true; }
@@ -277,9 +279,34 @@ int main(int argc, char** argv) {
 
     if (outMarksFile.empty()) {
         outMarksFile = filename.substr(filename.rfind('/') + 1);
-        outMarksFile = directory + "/" + outMarksFile.substr(0, outMarksFile.rfind('.')) + ".json";
+        outMarksFile = jsonDirectory + "/" + outMarksFile.substr(0, outMarksFile.rfind('.')) + ".json";
     }
-    
+
+    // -- if moduleDirectory is set, process all files in that directory
+    if (!moduleDirectory.empty()) {
+        std::vector<std::string> moduleFiles;
+        namespace fs = std::filesystem;
+        for (const auto& entry : fs::directory_iterator(moduleDirectory)) {
+            if (entry.is_regular_file()) {
+                moduleFiles.push_back(entry.path().string());
+            }
+        }
+        std::sort(moduleFiles.begin(), moduleFiles.end());
+        if (verbose) {
+            cout << "Found " << moduleFiles.size() << " files in " << moduleDirectory << endl;
+            for (const auto& f : moduleFiles) {
+                cout << "  " << f << endl;
+            }
+        }
+        // -- now invoke with the proper argumants
+        for (const auto& f : moduleFiles) {
+            string command = "./bin/ocvMarkersFromJPGV1 -f " + f + " -j " + jsonDirectory;
+            cout << "************************ " << command << endl;
+            system(command.c_str());
+        }
+    }
+
+
     // -- read image
     cv::Mat img = cv::imread(filename, cv::IMREAD_COLOR);
     if (img.empty()) {

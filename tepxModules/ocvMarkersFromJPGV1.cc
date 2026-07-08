@@ -123,6 +123,7 @@ struct lCompound {
 };
 
 
+// ----------------------------------------------------------------------
 // Capture stdout of a shell command (like Perl backticks).
 std::string captureCommandOutput(const std::string& cmd) {
     std::string result;
@@ -348,8 +349,8 @@ int main(int argc, char** argv) {
     }
     
     // -- if moduleDirectory is set, process all files in that directory
-    std::vector<std::string> moduleFiles;
     if (!moduleDirectory.empty()) {
+        std::vector<std::string> moduleFiles;
         namespace fs = std::filesystem;
         for (const auto& entry : fs::directory_iterator(moduleDirectory)) {
             if (entry.is_regular_file()) {
@@ -595,8 +596,8 @@ int main(int argc, char** argv) {
     }
     cout << "Simple pattern: matched " << nMatched << "/" << rocRois.size() << " ROIs" << endl;
 
-    const string modulePosition = captureCommandOutput(
-        "./bin/parseRobotLog -p position -m P-" + to_string(moduleNumber));
+    const string modulePosition = captureCommandOutput("./bin/parseRobotLog -p position -m P-" 
+                                                       + to_string(moduleNumber));
 
     // -- write the matches to a JSON file
     std::ofstream outFile(outMarksFile);
