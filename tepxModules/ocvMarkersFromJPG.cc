@@ -769,6 +769,7 @@ HolisticResult findChipCornersHolistic(const cv::Mat& bright, const vector<cv::V
 
 // ----------------------------------------------------------------------
 int modulePosition(int moduleNumber) {
+    // -- these numbers are not always correct?!
     static map<int, int> modulePositions = {
       {1000, 0}, {1001, 0}, {1002, 1}, {1003, 2}, {1004, 0}, {1005, 1}, {1006, 0}, {1007, 1}, {1008, 2}, {1009, 3},
       {1010, 4}, {1011, 0}, {1012, 0}, {1013, 1}, {1014, 2}, {1015, 1}, {1016, 2}, {1017, 3}, {1018, 0}, {1019, 3},
