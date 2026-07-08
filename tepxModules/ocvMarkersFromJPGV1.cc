@@ -2,10 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include <ostream>
+#include <cstdio>
 #include <vector>
 #include <cmath>
 #include <string>
 #include <map>
+#include <array>
+#include <algorithm>
+#include <filesystem>
 
 #include "TVector2.h"
 #include "TMath.h"
@@ -16,8 +20,7 @@ using namespace std;
 // ocvMarkersFromJPG.cc
 //
 // Usage:
-//   ./bin/ocvMarkersFromJPG -f 250109-M035_0255.JPG -
-//   ./bin/ocvMarkersFromJPG -f image.JPG -n 7   // narrow pads in corner signature (holistic finder)
+//   ./bin/ocvMarkersFromJPGV1 -f modules/p1139.jpg
 //
 // It:
 //   - reads the JPG
@@ -118,6 +121,26 @@ struct lCompound {
     }
 
 };
+
+
+// Capture stdout of a shell command (like Perl backticks).
+std::string captureCommandOutput(const std::string& cmd) {
+    std::string result;
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe) {
+        return result;
+    }
+    std::array<char, 256> buf{};
+    while (fgets(buf.data(), static_cast<int>(buf.size()), pipe) != nullptr) {
+        result += buf.data();
+    }
+    pclose(pipe);
+    // Strip trailing newlines (parseRobotLog prints with endl).
+    while (!result.empty() && (result.back() == '\n' || result.back() == '\r')) {
+        result.pop_back();
+    }
+    return result;
+}
 
 
 // ----------------------------------------------------------------------
@@ -299,13 +322,15 @@ bool searchMagicPatternInRoi(const cv::Mat& img, const RocRoi& roi,
 // ---------------------------------------------------------------------- 
 int main(int argc, char** argv) {
     bool verbose(true);
-    string directory = "json";
+    string moduleDirectory = "";
+    string jsonDirectory = "json";
     string filename = "modules/p1137.jpg";
-    string outMarksFile = "json/p1137.json";  // e.g. "moduleTemplate.marks"
+    string outMarksFile = "";  // e.g. "moduleTemplate.marks"
     int moduleNumber(-1);
     int nAdjacentRects(7);
     for (int i = 1; i < argc; ++i) {
-        if (string(argv[i]) == "-d" && i + 1 < argc) { directory = argv[++i]; }
+        if (string(argv[i]) == "-d" && i + 1 < argc) { moduleDirectory = argv[++i]; }
+        if (string(argv[i]) == "-j" && i + 1 < argc) { jsonDirectory = argv[++i]; }
         if (string(argv[i]) == "-f" && i + 1 < argc) { filename = argv[++i]; }
         if (string(argv[i]) == "-o" && i + 1 < argc) { outMarksFile = argv[++i]; }
         if (string(argv[i]) == "-n" && i + 1 < argc) { nAdjacentRects = stoi(argv[++i]); }
@@ -319,9 +344,33 @@ int main(int argc, char** argv) {
     
     if (outMarksFile.empty()) {
         outMarksFile = filename.substr(filename.rfind('/') + 1);
-        outMarksFile = directory + "/" + outMarksFile.substr(0, outMarksFile.rfind('.')) + ".json";
+        outMarksFile = jsonDirectory + "/" + outMarksFile.substr(0, outMarksFile.rfind('.')) + ".json";
     }
     
+    // -- if moduleDirectory is set, process all files in that directory
+    std::vector<std::string> moduleFiles;
+    if (!moduleDirectory.empty()) {
+        namespace fs = std::filesystem;
+        for (const auto& entry : fs::directory_iterator(moduleDirectory)) {
+            if (entry.is_regular_file()) {
+                moduleFiles.push_back(entry.path().string());
+            }
+        }
+        std::sort(moduleFiles.begin(), moduleFiles.end());
+        if (verbose) {
+            cout << "Found " << moduleFiles.size() << " files in " << moduleDirectory << endl;
+            for (const auto& f : moduleFiles) {
+                cout << "  " << f << endl;
+            }
+        }
+        // -- now invoke with the proper argumants
+        for (const auto& f : moduleFiles) {
+            string command = "./bin/ocvMarkersFromJPGV1 -f " + f + " -j " + jsonDirectory;
+            cout << "************************ " << command << endl;
+            system(command.c_str());
+        }
+    }
+
     // -- read image
     cv::Mat img = cv::imread(filename, cv::IMREAD_COLOR);
     if (img.empty()) {
@@ -329,6 +378,9 @@ int main(int argc, char** argv) {
         return 1;
     }
     
+    cout << "filename = " << filename << endl;
+    cout << "moduleDirectory = " << moduleDirectory << endl;
+    cout << "jsonDirectory = " << jsonDirectory << endl;
     cout << "img.size() = " << img.size() << endl;
     
     cv::Mat gray;
@@ -543,11 +595,15 @@ int main(int argc, char** argv) {
     }
     cout << "Simple pattern: matched " << nMatched << "/" << rocRois.size() << " ROIs" << endl;
 
+    const string modulePosition = captureCommandOutput(
+        "./bin/parseRobotLog -p position -m P-" + to_string(moduleNumber));
+
     // -- write the matches to a JSON file
     std::ofstream outFile(outMarksFile);
     outFile << "{" << std::endl;
     outFile << "  \"filename\": \"" << filename << "\"," << std::endl;
     outFile << "  \"moduleNumber\": " << moduleNumber << "," << std::endl;
+    outFile << "  \"modulePosition\": " << modulePosition << "," << std::endl;
     outFile << "  \"hdiMarkers\": [" << std::endl;
     for (size_t k = 0; k < hdiMarkers.size(); ++k) {
         const auto& m = hdiMarkers[k];
