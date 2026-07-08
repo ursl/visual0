@@ -38,14 +38,16 @@ int main(int argc, char** argv) {
         cout << "Module number " << i << " not found in modulePositions" << endl;
         return 0;
       }
-      string parsedPosition = parsePosition(to_string(i), fileName);
+      string module2Parse = "P-" + to_string(i);
+      string parsedPosition = parsePosition(module2Parse, fileName);
       string bla("");
       if (parsedPosition != to_string(position)) {
        bla += "  ***";
       }
       cout << "Module number " << i << " modulePosition: " << position 
-           << " parsedPosition: " << parsePosition(to_string(i), fileName) 
-           << bla
+           << " parsedPosition: " << parsedPosition 
+           << " " << bla
+           << " (" << module2Parse << ")"
            << endl;
     }
     return 0;
