@@ -790,7 +790,7 @@ int modulePosition(int moduleNumber) {
       return -1;
     }
     return modulePositions[moduleNumber];
-  }
+}
   
 
 
